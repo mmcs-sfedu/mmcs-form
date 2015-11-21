@@ -1,0 +1,6 @@
+node_modules 
+.idea 
+pids 
+logs 
+results
+build
