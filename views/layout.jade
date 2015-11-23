@@ -1,10 +1,19 @@
 doctype html
 html
   head
+    // declaring block for further extension (it will put described in render function content for title tag)
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+
+    // jquery (some materialize things uses it)
+    script(type='text/javascript' src='https://code.jquery.com/jquery-2.1.1.min.js')
+
+    // materialize
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js')
     link(href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet')
+
+    // local styles
+    link(rel='stylesheet', href='/stylesheets/style.css')
   body
+    // block for extension
     block content
