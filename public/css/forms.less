@@ -1,0 +1,59 @@
+@import "colors";
+
+/* Common */
+
+/* label color */
+.input-field label {
+  color: @main-white
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+  color: @main-white;
+}
+.input-field {
+  color: @main-white;
+}
+
+/* Text fields */
+
+/* label focus color */
+.input-field input[type=text]:focus + label {
+  color: @main-white;
+}
+/* label underline color */
+.input-field input[type=text] {
+  border-bottom: 1px solid @main-white;
+  box-shadow: 0 1px 0 0 @main-white;
+}
+/* label underline focus color */
+.input-field input[type=text]:focus {
+  border-bottom: 1px solid @main-white;
+  box-shadow: 0 1px 0 0 @main-white;
+}
+/* invalid color */
+.input-field input[type=text].invalid {
+  border-bottom: 1px solid @invalid-red;
+  box-shadow: 0 1px 0 0 @invalid-red;
+}
+
+/* Password fields */
+
+/* label focus color */
+.input-field input[type=password]:focus + label {
+  color: @main-white;
+}
+/* label underline color */
+.input-field input[type=password] {
+  border-bottom: 1px solid @main-white;
+  box-shadow: 0 1px 0 0 @main-white;
+}
+/* label underline focus color */
+.input-field input[type=password]:focus {
+  border-bottom: 1px solid @main-white;
+  box-shadow: 0 1px 0 0 @main-white;
+}
+/* invalid color */
+.input-field input[type=password].invalid {
+  border-bottom: 1px solid @invalid-red;
+  box-shadow: 0 1px 0 0 @invalid-red;
+}

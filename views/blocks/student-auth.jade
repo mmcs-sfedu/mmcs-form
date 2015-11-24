@@ -1,0 +1,18 @@
+// TODO если не авторизован
+div(class='row blue lighten-2 z-depth-1')
+    div(class='col s2') &nbsp
+    div(class='input-field col s2')
+        input(id='last_name' type='text' class='validate')
+        label(for='last_name') Логин или E-Mail
+    div(class='input-field col s2')
+        input(id='password' type='password' class='validate')
+        label(for='password') Пароль
+    div(class='col s1')
+        br
+        // TODO запилить авторизацию, линк на авторизацию
+        a(href="")
+            i(class='small white-text material-icons') input
+    div(class='col s4')
+        br
+        div.valign-wrapper
+            p.white-text Для авторизации используются данные <a class="blue-text text-darken-2" href="http://rating.mmcs.sfedu.ru" target="_blank">сервиса БРС</a>
