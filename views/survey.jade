@@ -2,6 +2,19 @@ extends layout
 
 block includes
     link(rel='stylesheet' href='css/forms.css')
+    link(rel='stylesheet' href='css/survey.css')
+    script(src='js/survey.js')
 
 block content
     include blocks/student-auth
+
+    div.container
+        br
+        div(class='col s12') Выберите дисциплину:
+        br
+        select
+            option(disabled selected) . . .
+            option(value='1') Микропрограммирование (Преподаватель К.К.)
+            option(value='2') Многопоточное программирование (Преподаватель К.К.)
+            option(value='3') Машинное обучение (Преподаватель К.К.)
+        label Выбор дисциплины
