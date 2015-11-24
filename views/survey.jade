@@ -18,3 +18,35 @@ block content
             option(value='2') Многопоточное программирование (Преподаватель К.К.)
             option(value='3') Машинное обучение (Преподаватель К.К.)
         label Выбор дисциплины
+
+        br
+        br
+
+        each val in [1, 2, 3, 4, 5]
+            div.row
+                div(class='col l8 m10 s12')
+                    div(class='card-panel blue')
+                        span.white-text
+                            h5 Вопрос анкеты #{val}?
+                            div.divider-line
+                            br
+                            form(action='#')
+                                each inner in [1, 2, 3, 4]
+                                    p
+                                        input(name='question#{val}' type='radio' id='#{val}-#{inner}')
+                                        label(class='white-text' for='#{val}-#{inner}') Ответ #{inner}
+
+
+        br
+
+        // TODO нужна обработка нажатия
+        a(class='btn-large modal-trigger waves-effect waves-light red lighten-2' href='#confirm') Отправить
+
+        div(id='confirm' class='modal')
+            div(class='modal-content')
+                h4 Вы подтверждаете отправку ответов?
+                p После подтверждения анкеты изменить ответы будет уже невозможно
+            div.modal-footer
+                // TODO нужны слушатели на кнопки!
+                a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
+                a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Да

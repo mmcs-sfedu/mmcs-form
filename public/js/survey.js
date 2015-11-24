@@ -11,6 +11,10 @@ var survey = {
         survey.all_selects = $('select');
         survey.all_selects.material_select();
 
+        $('.modal-trigger').leanModal();
+        // to open manually
+        // $('#confirm').openModal();
+
         $('div.select-wrapper li').on('click', function() {
             if ($(this).attr('class') != 'disabled') {
                 // TODO колбэк для выбора дисциплины
