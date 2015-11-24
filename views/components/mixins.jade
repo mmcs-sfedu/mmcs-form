@@ -1,0 +1,11 @@
+// using mixins is a one of ways to make dinamic extensions
+
+mixin col-proof(icon, text)
+    div(class='col m4 s12')
+        i(class='medium material-icons blue-text text-lighten-4')!= icon
+        br
+        br
+        // inserting variable's content; != equals that we use variable instead of text
+        div.t-spacing-col!= text
+        br
+        br

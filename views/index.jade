@@ -1,40 +1,67 @@
 extends layout
+include components/mixins
+// line above to use stated mixin(s)
 
 block content
 
-    nav
-        div(class='nav-wrapper')
-            a(href='#' class='brand-logo center') Logo
-            ul(id='nav-mobile' class='left hide-on-med-and-down')
+    //nav(class='blue lighten-2')
+    //    div(class='container center').
+    //        Институт математики, механики и компьютерных наук ЮФУ
+    //        в целях повышения образовательного качества проводит опрос студентов
 
-   //
-    br
-    br
-    div(class='container center')
-        h6.
-            Институт математики, механики и компьютерных наук ЮФУ
-            в целях повышения образовательного качества проводит опрос студентовa
-        h3.
-            Сервис анкетирования
+    div(class='container')
+
+        // |<br><br><br> to continue inner html of previous div
         br
-    div(class='container center')
-        a(class='waves-effect waves-light btn', href='maintaining') Принять участие!
-    br
-    br
-    div(class= 'row center')
-        div(class='col s4')
-            img(src='images/sample.jpg' class='fit_column')
-            br. Примите участие в голосовании
-            blockquote.
-                Lorem ipsum dolor sit amet, nec dicat nusquam id, ferri eligendi eam no. Ius eu ludus choro urbanitas, mei odio errem qualisque ut. Ad amet altera officiis nec, etiam graeco eripuit qui ad. No prompta petentium omittantur pri. Ad qui integre apeirian. Virtute prodesset ius et, ne pro audiam latine probatus.
-        div(class='col s4')
-            // i(class='large material-icons') thumbs_up_down
-            img(src='images/sample.jpg' class='fit_column')
-            br. Все анонимно
-            blockquote.
-                Lorem ipsum dolor sit amet, nec dicat nusquam id, ferri eligendi eam no. Ius eu ludus choro urbanitas, mei odio errem qualisque ut. Ad amet altera officiis nec, etiam graeco eripuit qui ad. No prompta petentium omittantur pri. Ad qui integre apeirian. Virtute prodesset ius et, ne pro audiam latine probatus.
-        div(class='col s4')
-            img(src='images/sample.jpg' class='fit_column')
-            br. Все открыто
-            blockquote(class='gray-text').
-                Lorem ipsum dolor sit amet, nec dicat nusquam id, ferri eligendi eam no. Ius eu ludus choro urbanitas, mei odio errem qualisque ut. Ad amet altera officiis nec, etiam graeco eripuit qui ad. No prompta petentium omittantur pri. Ad qui integre apeirian. Virtute prodesset ius et, ne pro audiam latine probatus.
+        br
+        br
+
+        // alternative spelling of class is below
+        div.row
+            div(class='col s12 center')
+                h5.
+                    Институт математики, механики и компьютерных наук ЮФУ
+                    в целях повышения образовательного качества проводит опрос студентов
+
+        br
+        br
+
+        div(class='row center')
+            a(class='btn waves-effect waves-light blue lighten-2') Принять участие
+
+        br
+        br
+        br
+
+
+
+        div(class='row center')
+            div(class='col m4 s12')
+                i(class='medium material-icons blue-text text-lighten-4') trending_up
+                br
+                br
+                // you should be careful using indentation with |
+                //|Приняв участие в опросе, вы поможете улучшить
+                //|качество преподаваемых дисциплин,
+                //|повысить их доступность и актуальность
+                div.t-spacing-col.
+                    Приняв участие в опросе, вы поможете улучшить
+                    качество преподаваемых дисциплин,
+                    повысить их доступность и актуальность
+                br
+                br
+
+                //div(class='card')
+                //    div(class='card-image')
+                //        img(src='/img/test.jpg')
+                //        // span(class='card-title') Заголовок карточки
+                //    div(class='card-content')
+                //        p.
+                //            Приняв участие в опросе, вы поможете улучшить
+                //            качество преподаваемых дисциплин,
+                //            повысить их доступность и актуальность
+
+            // sample of calling mixin, also can use mixin and mixin's name instead of +
+            +col-proof('recent_actors', 'Анонимность голосования достигается хранением идентификаторов проголосовавших без связывания их анкет с авторизационными данными')
+
+            +col-proof('code', 'Вы можете ознакомиться с актуальным исходным кодом проекта в <a href="https://github.com/a1tavista/mmcs-form" target="_blank">репозитории на Github</a>')
