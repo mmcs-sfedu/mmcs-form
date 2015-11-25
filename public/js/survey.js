@@ -24,5 +24,22 @@ var survey = {
 
         // for updating data of materialize selectors
         // $('select').material_select('destroy');
+    },
+
+    checkForms : function() {
+        var allChecked = true;
+        $('.survey-form').each(function() {
+            if ($(this).find(':checked').size() === 0) {
+                allChecked = false;
+            }
+//            $(this).find(':checked').each(function() {
+//                console.log($(this).attr('id')); // logging checked ids
+//            });
+        });
+
+        if (allChecked)
+            window.location = '/survey/finish';
+        else
+            Materialize.toast('Вы не ответили на все вопросы!', 5000)
     }
 };

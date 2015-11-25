@@ -12,6 +12,7 @@ function authChecker(req, res, next) {
 //    } else {
 //        res.redirect("/auth");
 //    }
+    next();
 }
 
 /* Root administrator's screen */
