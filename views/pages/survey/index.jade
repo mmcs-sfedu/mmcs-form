@@ -1,4 +1,4 @@
-extends layout
+extends ../../base/layout
 
 block includes
     link(rel='stylesheet' href='css/forms.css')
@@ -6,7 +6,7 @@ block includes
     script(src='js/survey.js')
 
 block content
-    include blocks/student-auth
+    include ../../blocks/student-auth
 
     div.container
         br
@@ -48,5 +48,5 @@ block content
                 p После подтверждения анкеты изменить ответы будет уже невозможно
             div.modal-footer
                 // TODO нужны слушатели на кнопки!
-                a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
-                a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Да
+                a(href='#' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
+                a(href='/survey/finish' class='modal-action modal-close waves-effect waves-teal btn-flat') Да
