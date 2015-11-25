@@ -5,7 +5,11 @@ var router = express.Router();
 
 /* Student's survey */
 router.get('/', function(req, res, next) {
-    res.render('pages/survey', { title: 'Страница опроса' });
+
+    /* test data */
+    var json = '{"feedbackForm": [{"title": "Насколько полезен с вашей точки зрения данный предмет?","type": "radio","options": ["5","4","3","2","1"]}]}';
+    var parsedJson = JSON.parse(json);
+    res.render('pages/survey', { title: 'Страница опроса' , data: parsedJson["feedbackForm"]});
 });
 
 /* Screen after finishing student's survey */
