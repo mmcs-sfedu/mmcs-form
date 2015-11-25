@@ -7,7 +7,8 @@ var bodyParser = require('body-parser');
 
 // here we are adding some routes (path to them in project's directory), if we want to use them as separate files
 var routes = require('./routes/index');
-//var users = require('./routes/users'); // this file should exist
+var survey = require('./routes/survey'); // this file should exist
+var maintaining = require('./routes/maintaining');
 
 var app = express();
 
@@ -26,7 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // and here we are stating our paths to routes in url access
 app.use('/', routes);
-// app.use('/users', users);
+app.use('/survey', survey);
+app.use('/maintaining', maintaining);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
