@@ -15,7 +15,8 @@
     "morgan": "~1.6.1",
     "pg": "^4.4.3",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^3.14.1",
+    "sequelize": "^3.14.2",
+    "sequelize-cli":"1.8.3",
     "serve-favicon": "~2.3.0"
   }
 }
