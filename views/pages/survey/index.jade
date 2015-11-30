@@ -34,7 +34,7 @@ block content
                             form(action='#' class='survey-form')
                                 each inner in val["options"]
                                     p
-                                        input(name='question-#{val["title"]}-#{inner}' type='radio' id='#{val["title"]}-#{inner}')
+                                        input(name='question-#{val["title"]}' type='radio' id='#{val["title"]}-#{inner}')
                                         label(class='white-text' for='#{val["title"]}-#{inner}') Ответ #{inner}
 
 
