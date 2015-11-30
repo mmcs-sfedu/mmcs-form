@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
     /* test data */
     var json = '{"feedbackForm": [{"title": "Насколько полезен с вашей точки зрения данный предмет?","type": "radio","options": ["5","4","3","2","1"]}]}';
     var parsedJson = JSON.parse(json);
-    res.render('pages/survey', { title: 'Страница опроса' , data: parsedJson["feedbackForm"]});
+    res.render('pages/survey', { title: 'Страница опроса', controller: surveyController, data: parsedJson["feedbackForm"] }); // now controller is available using second var
 });
 
 /* Screen after finishing student's survey */
