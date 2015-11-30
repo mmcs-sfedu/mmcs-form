@@ -23,16 +23,16 @@ block content
         br
 
         // this is an example of controller usage
-        each val in controller.getTestData()
+        each val in data
             div.row
                 div(class='col l8 m10 s12')
                     div(class='card-panel blue')
                         span.white-text
-                            h5 Вопрос анкеты #{val}?
+                            h5 #{val["title"]}
                             div.divider-line
                             br
                             form(action='#' class='survey-form')
-                                each inner in [1, 2, 3, 4]
+                                each inner in val["options"]
                                     p
                                         input(name='question#{val}' type='radio' id='#{val}-#{inner}')
                                         label(class='white-text' for='#{val}-#{inner}') Ответ #{inner}
