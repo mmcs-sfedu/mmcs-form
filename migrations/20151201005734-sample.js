@@ -2,6 +2,8 @@
  *
  * node_modules/.bin/sequelize migration:create --name sample
  *
+ * You can read about migrations here: http://docs.sequelizejs.com/en/latest/docs/migrations/
+ *
  * This is a sample migration. TODO: удалить потом */
 
 'use strict';

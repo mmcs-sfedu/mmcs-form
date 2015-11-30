@@ -10,6 +10,10 @@ router.get('/', function(req, res, next) {
 // TODO удалить потом вместе с моделью temp_user
 var models = require('../models'); // including models class to access DB rows
 router.get('/db-test', function(req, res, next) {
+    models.User.create({ // sample how to create model instances in DB
+        username: 'Some User ' + Math.random()
+    });
+
     models.User.findAll(
         // { include: [ models.Task ]}
     ).then(function(users) {
