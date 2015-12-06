@@ -7,20 +7,25 @@ router.get('/', function(req, res, next) {
 });
 
 // TODO сделал временно для проверки подключения к БД
-// TODO удалить потом вместе с моделью temp_user
+// TODO удалить потом
 var models = require('../models'); // including models class to access DB rows
 router.get('/db-test', function(req, res, next) {
-    models.User.create({ // sample how to create model instances in DB
-        username: 'Some User ' + Math.random()
-    });
+//    models.answers.create({ // sample how to create model instances in DB
+//        result: 1,
+//        stage_description_id: 2,
+//        question_id: 3,
+//        trash: "fadfaf"
+//    }).then(function() {
+//        console.log("kek");
+//    });
 
-    models.User.findAll(
-        // { include: [ models.Task ]}
-    ).then(function(users) {
-           res.send(users);
-    });
+    // models.sequelize.query("INSERT INTO discipline (teacher_id, subject_id, group_id) VALUES (1, 2, 3);");
 
-    models.sequelize.query("INSERT INTO answers (result, stagedescriptionid) VALUES (1, 2);");
+//    models.answers.findAll(
+//        // { include: [ models.Task ]}
+//    ).then(function(users) {
+//           res.send(users);
+//    });
 });
 
 module.exports = router;
