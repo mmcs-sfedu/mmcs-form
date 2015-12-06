@@ -1,26 +1,29 @@
 module.exports = function(sequelize, DataTypes) {
-    var stage_description = sequelize.define("stage_description", {
-            id: {
+    var answer = sequelize.define("answer", {
+            result: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
-                autoIncrement: true,
                 notNull: true
             },
-            discipline_id: {
+            stage_description_id: {
                 type: DataTypes.INTEGER,
+                primaryKey: true,
                 notNull: true,
                 references: {
-                    model: 'disciplines',
+                    model: 'stage_descriptions',
                     key: 'id'
                 },
                 onDelete: 'cascade',
                 onUpdate: 'cascade'
             },
-            feedback_stage_id: {
+            question_id: {
                 type: DataTypes.INTEGER,
+                primaryKey: true,
                 notNull: true,
-                references: 'feedback_stages',
-                referenceKey: 'id',
+                references: {
+                    model: 'questions',
+                    key: 'id'
+                },
                 onDelete: 'cascade',
                 onUpdate: 'cascade'
             }
@@ -29,5 +32,7 @@ module.exports = function(sequelize, DataTypes) {
             classMethods: { }
         });
 
-    return stage_description;
+    answer.removeAttribute('id');
+
+    return answer;
 };

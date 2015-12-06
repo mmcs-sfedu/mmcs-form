@@ -1,18 +1,29 @@
-/**
- * Created by vladimir on 06.12.15.
- */
-
 module.exports = function(sequelize, DataTypes) {
-    var questions = sequelize.define("question", {
-        name:DataTypes.STRING,
+    var question = sequelize.define("question", {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+            notNull: true
+        },
+        name: {
+            type: DataTypes.TEXT,
+            notNull: true
+        },
         feedback_form_id: {
-            references: "feedback_form",
-            referencesKey: "id"
+            type: DataTypes.INTEGER,
+            notNull: true,
+            references: {
+                model: "feedback_forms",
+                key: "id"
+            },
+            onDelete: 'cascade',
+            onUpdate: 'cascade'
         }
-    }, {
-        classMethods: {
-        }
-    });
+    },
+        {
+            classMethods: { }
+        });
 
-    return questions;
+    return question;
 };

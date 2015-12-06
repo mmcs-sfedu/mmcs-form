@@ -9,10 +9,12 @@ module.exports = function(sequelize, DataTypes) {
             feedback_form_id: {
                 type: DataTypes.INTEGER,
                 notNull: true,
-                references: 'feedback_forms',
-                referenceKey: 'id',
-                onDelete: 'CASCADE',
-                onUpdate: 'CASCADE'
+                references: {
+                    model: "feedback_forms",
+                    key: "id"
+                },
+                onDelete: 'cascade',
+                onUpdate: 'cascade'
             },
             date_from: {
                 type: DataTypes.DATE,
@@ -24,9 +26,7 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         {
-            classMethods: {
-
-            }
+            classMethods: { }
         });
 
     return feedback_stage;

@@ -1,14 +1,20 @@
-/**
- * Created by vladimir on 06.12.15.
- */
-
 module.exports = function(sequelize, DataTypes) {
+
     var feedback_form = sequelize.define("feedback_form", {
-        name:DataTypes.STRING
-    }, {
-        classMethods: {
-        }
-    });
+            id: {
+                type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true,
+                notNull: true
+            },
+            name: {
+                type: DataTypes.STRING,
+                notNull: true
+            }
+        },
+        {
+            classMethods: { }
+        });
 
     return feedback_form;
 };

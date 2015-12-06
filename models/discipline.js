@@ -20,9 +20,7 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         {
-            classMethods: {
-
-            }
+            classMethods: { }
         });
 
     return discipline;
