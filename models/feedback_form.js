@@ -3,16 +3,12 @@
  */
 
 module.exports = function(sequelize, DataTypes) {
-    var feedback_form = sequelize.define("FEEDBACK_FORM", {
-        name:DataTypes.STRING,
-        create_at: {
-            type:DataTypes.DATE,
-            defaultValue: Sequelize.NOW
-        }
+    var feedback_forms = sequelize.define("FEEDBACK_FORMS", {
+        name:DataTypes.STRING
     }, {
         classMethods: {
         }
     });
 
-    return feedback_form;
+    return feedback_forms;
 };
