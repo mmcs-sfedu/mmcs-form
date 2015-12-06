@@ -21,11 +21,11 @@ router.get('/db-test', function(req, res, next) {
 
     // models.sequelize.query("INSERT INTO discipline (teacher_id, subject_id, group_id) VALUES (1, 2, 3);");
 
-//    models.answers.findAll(
-//        // { include: [ models.Task ]}
-//    ).then(function(users) {
-//           res.send(users);
-//    });
+    models.stage_description.findAll(
+        // { include: [ models.Task ]}
+    ).then(function(users) {
+           res.send(users);
+    });
 });
 
 module.exports = router;
