@@ -19,6 +19,8 @@ router.get('/db-test', function(req, res, next) {
     ).then(function(users) {
            res.send(users);
     });
+
+    models.sequelize.query("INSERT INTO answers (result, stagedescriptionid) VALUES (1, 2);");
 });
 
 module.exports = router;
