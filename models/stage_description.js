@@ -19,8 +19,10 @@ module.exports = function(sequelize, DataTypes) {
             feedback_stage_id: {
                 type: DataTypes.INTEGER,
                 notNull: true,
-                references: 'feedback_stages',
-                referenceKey: 'id',
+                references: {
+                    model: 'feedback_stages',
+                    key: 'id'
+                },
                 onDelete: 'cascade',
                 onUpdate: 'cascade'
             }
