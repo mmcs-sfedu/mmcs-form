@@ -13,7 +13,9 @@ var models = require('../models'); // all db logic is in models
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var default_port = '3000';
+
+var port = normalizePort(process.env.PORT || default_port);
 app.set('port', port);
 
 /**
@@ -33,6 +35,7 @@ models.sequelize.sync().then(function() {
      */
 
     server.listen(port);
+    console.log('Сервер развёрнут, по умолчанию доступен по порту ' + default_port + '.');
     server.on('error', onError);
     server.on('listening', onListening);
 });
