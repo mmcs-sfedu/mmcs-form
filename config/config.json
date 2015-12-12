@@ -1,4 +1,4 @@
-{ "_comment": "BE CAREFUL! YOU SHOULD EXCLUDE THIS FILE FROM PUBLIC REPO OR DON'T TYPE PRODUCTION PASSWORDS HERE!",
+{ "_comment": "This file is gitignored.",
 
   "development": {
     "username": "postgres",
