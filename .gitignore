@@ -6,4 +6,4 @@ results
 build
 
 # Excluding database configs from repository updates:
-config/config.json
+# config/config.json
