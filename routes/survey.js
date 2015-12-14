@@ -14,7 +14,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* Screen after finishing student's survey */
-router.get('/finish', function(req, res, next) {
+router.post('/finish', function(req, res, next) {
     res.render('pages/survey/finish')
 });
 

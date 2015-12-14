@@ -1,28 +1,30 @@
 div(class='row w-100 blue lighten-2 z-depth-1')
-    // TODO если не авторизован
-    //div(class='col l2 m3')
-    //    div(class='input-field')
-    //        input(id='login' type='text' class='validate')
-    //        label(for='login') Логин или E-Mail
-    //div(class='col l2 m3')
-    //    div.input-field
-    //        input(id='password' type='password' class='validate')
-    //        label(for='password') Пароль
-    //div(class='col l1 m1')
-    //    br
-    //    // TODO запилить авторизацию, линк на авторизацию
-    //    a(href="")
-    //        i(class='small white-text material-icons') input
-    //div(class='col l7 m12')
-    //    div.hide-on-med-and-down
-    //        br
-    //    p.white-text Для авторизации используются данные <a class="blue-text text-darken-2" href="http://rating.mmcs.sfedu.ru" target="_blank">сервиса БРС</a>
-
-    // TODO если авторизован
-    div(class='col l11 m11 s10 right-align')
-        p.white-text Андрей Кошманский
-    div(class='col l1 m1 s2')
-        h6
-        // TODO заменить ссылкой на разавторизацию
-        a(href="")
-            i(class='small white-text material-icons') input
+    if controller.authModule.isStudentAuthorized()
+        // if student is unauthorized
+        div(class='col l11 m11 s10 right-align')
+            p.white-text Андрей Кошманский
+        div(class='col l1 m1 s2')
+            h6
+            a(href='student/logout')
+                i(class='small white-text material-icons') input
+    else
+        // if student is authorized
+        form(method='post', action='/survey/finish')
+            input(type='submit' class='hidden')
+            div(class='col l2 m3')
+                div(class='input-field')
+                    input(id='login' type='text' class='validate' name='login')
+                    label(for='login') Логин или E-Mail
+            div(class='col l2 m3')
+                div.input-field
+                    input(id='password' type='password' class='validate' name='password')
+                    label(for='password') Пароль
+            div(class='col l1 m1')
+                br
+                // TODO запилить авторизацию, линк на авторизацию
+                a(href="")
+                    i(class='small white-text material-icons') input
+            div(class='col l7 m12')
+                div.hide-on-med-and-down
+                    br
+                p.white-text Для авторизации используются данные <a class="blue-text text-darken-2" href="http://rating.mmcs.sfedu.ru" target="_blank">сервиса БРС</a>
