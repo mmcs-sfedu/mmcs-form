@@ -1,9 +1,13 @@
 // TODO хранить в сессии, реализовать авторизацию с БРС!
 
+var models = require('../models');
+
 module.exports =
 {
     studentLogout : function() {
         authControllerNamespace.userIdOrHash = null;
+        authControllerNamespace.userGroupId  = null;
+        authControllerNamespace.userName     = null;
     },
 
     studentAttemptLogin : function(login, password, callback) {
@@ -12,16 +16,28 @@ module.exports =
             return;
         }
 
-        authControllerNamespace.userIdOrHash = "someUserID";
-        callback(null);
+        // TODO осторожно, хардкод! Всё должно приходить от БРС!
+        // TODO для pgsql нужно хардкодить рандомную функцию!
+        return models.discipline.find({ order: "random()" })
+            .then(function(discipline) {
+                authControllerNamespace.userIdOrHash = "someUserID";
+                authControllerNamespace.userGroupId  = discipline.group_id;
+                authControllerNamespace.userName     = "Вася Пупкин";
+                callback(null);
+        });
     },
 
     isStudentAuthorized : function() {
         return authControllerNamespace.userIdOrHash;
+    },
+
+    getUserName : function() {
+        return authControllerNamespace.userName;
     }
 };
 
 var authControllerNamespace = {
     userIdOrHash : null,
-    userGroupId  : null
+    userGroupId  : null,
+    userName     : null
 };

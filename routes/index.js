@@ -16,7 +16,6 @@ router.get('/db-test', function(req, res, next) {
 
     models.feedback_form.findAll().then(function(feedback_forms) {
         res.send("" + feedback_forms.length);
-        return;
     });
 
     /* To create all tables in database. */

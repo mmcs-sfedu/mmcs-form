@@ -2,7 +2,7 @@ div(class='row w-100 blue lighten-2 z-depth-1')
     if controller.authModule.isStudentAuthorized()
         // if student is unauthorized
         div(class='col l11 m11 s10 right-align')
-            p.white-text Андрей Кошманский
+            p.white-text #{controller.authModule.getUserName()}
         div(class='col l1 m1 s2')
             h6
             a(href='/student/logout')
