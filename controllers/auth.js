@@ -3,7 +3,7 @@
 module.exports =
 {
     studentLogout : function() {
-        authControllerNamespace.auth = false;
+        authControllerNamespace.userIdOrHash = null;
     },
 
     studentAttemptLogin : function(login, password, callback) {
@@ -12,15 +12,16 @@ module.exports =
             return;
         }
 
-        authControllerNamespace.auth = true;
+        authControllerNamespace.userIdOrHash = "someUserID";
         callback(null);
     },
 
     isStudentAuthorized : function() {
-        return authControllerNamespace.auth;
+        return authControllerNamespace.userIdOrHash;
     }
 };
 
 var authControllerNamespace = {
-    auth : false
+    userIdOrHash : null,
+    userGroupId  : null
 };

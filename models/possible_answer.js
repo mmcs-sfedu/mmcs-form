@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-    var question = sequelize.define("question", {
+    var possible_answer = sequelize.define("possible_answer", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -10,11 +10,11 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.TEXT,
             notNull: true
         },
-        feedback_form_id: {
+        question_id: {
             type: DataTypes.INTEGER,
             notNull: true,
             references: {
-                model: "feedback_forms",
+                model: "questions",
                 key: "id"
             },
             onDelete: 'cascade',
@@ -25,5 +25,5 @@ module.exports = function(sequelize, DataTypes) {
             classMethods: { }
         });
 
-    return question;
+    return possible_answer;
 };

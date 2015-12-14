@@ -1,13 +1,13 @@
 module.exports = function(sequelize, DataTypes) {
     var answer = sequelize.define("answer", {
-            result: {
+            id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
-                notNull: true
+                notNull: true,
+                autoIncrement: true
             },
             stage_description_id: {
                 type: DataTypes.INTEGER,
-                primaryKey: true,
                 notNull: true,
                 references: {
                     model: 'stage_descriptions',
@@ -16,12 +16,11 @@ module.exports = function(sequelize, DataTypes) {
                 onDelete: 'cascade',
                 onUpdate: 'cascade'
             },
-            question_id: {
+            possible_answer_id: {
                 type: DataTypes.INTEGER,
-                primaryKey: true,
                 notNull: true,
                 references: {
-                    model: 'questions',
+                    model: 'possible_answers',
                     key: 'id'
                 },
                 onDelete: 'cascade',
