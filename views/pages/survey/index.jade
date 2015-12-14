@@ -11,18 +11,22 @@ block content
 
     if controller.authModule.isStudentAuthorized()
         div.container
-            br
-            div(class='col s12') Выберите дисциплину:
-            br
-            select
-                option(disabled selected) . . .
-                option(value='1') Микропрограммирование (Преподаватель К.К.)
-                option(value='2') Многопоточное программирование (Преподаватель К.К.)
-                option(value='3') Машинное обучение (Преподаватель К.К.)
-            label Выбор дисциплины
 
-            br
-            br
+
+            div.discipline-chooser
+                br
+                div(class='col s12') Выберите дисциплину:
+                br
+                select
+                    option(disabled selected) . . .
+                    option(value='1') Микропрограммирование (Преподаватель К.К.)
+                    option(value='2') Многопоточное программирование (Преподаватель К.К.)
+                    option(value='3') Машинное обучение (Преподаватель К.К.)
+                label Выбор дисциплины
+
+                br
+                br
+
 
             // this is an example of controller usage
             each val in controller.getTestData()

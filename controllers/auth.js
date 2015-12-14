@@ -33,6 +33,10 @@ module.exports =
 
     getUserName : function() {
         return authControllerNamespace.userName;
+    },
+
+    getGroupId : function() {
+        return authControllerNamespace.userGroupId;
     }
 };
 
