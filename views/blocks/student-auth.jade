@@ -5,11 +5,12 @@ div(class='row w-100 blue lighten-2 z-depth-1')
             p.white-text Андрей Кошманский
         div(class='col l1 m1 s2')
             h6
-            a(href='student/logout')
+            a(href='/student/logout')
                 i(class='small white-text material-icons') input
     else
         // if student is authorized
-        form(method='post', action='/survey/finish')
+        form(method='post', action='/student/login')
+            // to make enter key available
             input(type='submit' class='hidden')
             div(class='col l2 m3')
                 div(class='input-field')
@@ -21,8 +22,7 @@ div(class='row w-100 blue lighten-2 z-depth-1')
                     label(for='password') Пароль
             div(class='col l1 m1')
                 br
-                // TODO запилить авторизацию, линк на авторизацию
-                a(href="")
+                a(href='javascript:;' onclick='parentNode.parentNode.submit();')
                     i(class='small white-text material-icons') input
             div(class='col l7 m12')
                 div.hide-on-med-and-down
