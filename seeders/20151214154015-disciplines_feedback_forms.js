@@ -1,5 +1,7 @@
 'use strict';
 
+var models = require('../models');
+
 module.exports = {
   up: function (queryInterface, Sequelize) {
 
@@ -13,6 +15,7 @@ module.exports = {
               updatedAt: new Date().toISOString()
           });
       }
+      queryInterface.bulkInsert('disciplines', disciplines, {});
 
       var feedback_forms = [];
       for (i = 1; i <= 5; i++) {
@@ -22,8 +25,6 @@ module.exports = {
               updatedAt: new Date().toISOString()
           });
       }
-
-      queryInterface.bulkInsert('disciplines', disciplines, {});
       return queryInterface.bulkInsert('feedback_forms', feedback_forms, {});
 
   },
