@@ -4,6 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var uuid = require('uuid');
+var expressValidator = require('express-validator');
 
 // here we are adding some routes (path to them in project's directory), if we want to use them as separate files
 var routes = require('./routes/index');
@@ -25,6 +28,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(expressValidator());
+app.use(session({
+    secret: uuid.v1(),
+    resave: false,
+    saveUninitialized: true
+}));
 
 // and here we are stating our paths to routes in url access
 app.use('/', routes);

@@ -3,14 +3,19 @@ var router = express.Router();
 
 // importing controller to call server side js methods from it in jade template
 var surveyController = require('../controllers/survey');
+var errorsController = require('../controllers/errors');
 
 /* STUDENTS SECTION */
 
 /* Student's survey */
 router.get('/', function(req, res, next) {
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
+
     res.render('pages/survey', {
         title: 'Страница опроса',
-        controller: surveyController }); // now controller is available using second var
+        controller: surveyController, // now controller is available using second var
+        errors: possibleErrors
+    });
 });
 
 /* Screen after finishing student's survey */
