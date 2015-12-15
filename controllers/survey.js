@@ -16,11 +16,11 @@ module.exports =
         var groupId = authController.getGroupId(); // TODO возможно, запрос к БРС
         var userId  = authController.isStudentAuthorized();
 
+//         models.stage_description.belongsTo(models.discipline, {foreignKey: 'discipline_id'});
         models.stage_description.findAll({
             include: [
-                { model: models.voted_user, required: false }
+                { model: models.answer, required: false }
             ]
-            // attributes: ['voted_users.stage_description_id']
         }).then(function(lel) {
             callback(lel);
         });

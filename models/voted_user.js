@@ -21,6 +21,8 @@ module.exports = function(sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
+
+                    voted_user.belongsTo(models.stage_description, { foreignKey: 'stage_description_id' });
                 }
             }
         });

@@ -22,6 +22,8 @@ module.exports = function(sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
+
+                    question.belongsTo(models.feedback_form, { foreignKey: 'feedback_form_id' });
                 }
             }
         });

@@ -26,6 +26,8 @@ module.exports = function(sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
+
+                    feedback_stage.belongsTo(models.feedback_form, { foreignKey: 'feedback_form_id' });
                 }
             }
         });

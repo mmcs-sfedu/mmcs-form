@@ -26,6 +26,9 @@ module.exports = function(sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
+
+                    answer.belongsTo(models.stage_description, { foreignKey: 'stage_description_id' });
+                    answer.belongsTo(models.possible_answer,   { foreignKey: 'possible_answer_id' });
                 }
             }
         });
