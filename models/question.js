@@ -9,20 +9,21 @@ module.exports = function(sequelize, DataTypes) {
         text: {
             type: DataTypes.TEXT,
             notNull: true
-        },
-        feedback_form_id: {
-            type: DataTypes.INTEGER,
-            notNull: true,
-            references: {
-                model: "feedback_forms",
-                key: "id"
-            },
-            onDelete: 'cascade',
-            onUpdate: 'cascade'
         }
     },
         {
-            classMethods: { }
+            classMethods: {
+                associate: function(models) {
+                    models.feedback_form.hasMany(question, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'feedback_form_id',
+                            allowNull: false
+                        }
+                    });
+                }
+            }
         });
 
     return question;

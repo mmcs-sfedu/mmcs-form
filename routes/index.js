@@ -14,13 +14,9 @@ var models = require('../models'); // including models class to access DB rows
 
 router.get('/db-test', function(req, res, next) {
 
-    models.feedback_form.findAll().then(function(feedback_forms) {
-        res.send("" + feedback_forms.length);
-    });
-
-    /* To create all tables in database. */
-    models.feedback_stage.findAll().then(function(feedback_stages) {
-        res.send(feedback_stages);
+    var surveyController = require('../controllers/survey');
+    surveyController.getStageDescriptions(function(entities) {
+        res.send(entities);
     });
 
 //    models.answers.create({ // sample how to create model instances in DB

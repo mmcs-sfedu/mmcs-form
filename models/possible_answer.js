@@ -9,20 +9,21 @@ module.exports = function(sequelize, DataTypes) {
         text: {
             type: DataTypes.TEXT,
             notNull: true
-        },
-        question_id: {
-            type: DataTypes.INTEGER,
-            notNull: true,
-            references: {
-                model: "questions",
-                key: "id"
-            },
-            onDelete: 'cascade',
-            onUpdate: 'cascade'
         }
     },
         {
-            classMethods: { }
+            classMethods: {
+                associate: function(models) {
+                    models.question.hasMany(possible_answer, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'question_id',
+                            allowNull: false
+                        }
+                    });
+                }
+            }
         });
 
     return possible_answer;

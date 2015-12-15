@@ -5,33 +5,32 @@ module.exports = function(sequelize, DataTypes) {
                 primaryKey: true,
                 notNull: true,
                 autoIncrement: true
-            },
-            stage_description_id: {
-                type: DataTypes.INTEGER,
-                notNull: true,
-                references: {
-                    model: 'stage_descriptions',
-                    key: 'id'
-                },
-                onDelete: 'cascade',
-                onUpdate: 'cascade'
-            },
-            possible_answer_id: {
-                type: DataTypes.INTEGER,
-                notNull: true,
-                references: {
-                    model: 'possible_answers',
-                    key: 'id'
-                },
-                onDelete: 'cascade',
-                onUpdate: 'cascade'
             }
         },
         {
-            classMethods: { }
+            classMethods: {
+                associate: function(models) {
+                    models.stage_description.hasMany(answer, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'stage_description_id',
+                            allowNull: false
+                        }
+                    });
+                    models.possible_answer.hasMany(answer, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'possible_answer_id',
+                            allowNull: false
+                        }
+                    });
+                }
+            }
         });
 
-    answer.removeAttribute('id');
+    // answer.removeAttribute('id');
 
     return answer;
 };
