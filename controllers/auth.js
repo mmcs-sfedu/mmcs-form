@@ -20,7 +20,7 @@ module.exports =
         // TODO для pgsql нужно хардкодить рандомную функцию!
         return models.discipline.find({ order: "random()" })
             .then(function(discipline) {
-                authControllerNamespace.userIdOrHash = "someUserID";
+                authControllerNamespace.userIdOrHash = 11;
                 authControllerNamespace.userGroupId  = discipline.group_id;
                 authControllerNamespace.userName     = "Вася Пупкин";
                 callback(null);

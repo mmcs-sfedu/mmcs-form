@@ -7,27 +7,75 @@ module.exports =
 {
     authModule : authController,
 
+
+
     getTestData : function() {
         var json = '{"feedbackForm": [{"title": "Насколько полезен с вашей точки зрения данный предмет?","type": "radio","options": ["5","4","3","2","1"]}]}';
         return JSON.parse(json)['feedbackForm'];
     },
 
+
+
     getStageDescriptions : function(callback) {
         var groupId = authController.getGroupId(); // TODO возможно, запрос к БРС
         var userId  = authController.isStudentAuthorized();
 
-//         models.stage_description.belongsTo(models.discipline, {foreignKey: 'discipline_id'});
-        models.stage_description.findAll({
-            include: [
-                { model: models.answer, required: false }
-            ]
-        }).then(function(lel) {
-            callback(lel);
-        });
+        var dateNow = new Date();
 
-        // TODO теперь нужно получить локально актуальные (по дате и groupID, не должно быть для acc_id и stage_d_id в voted_users)
-        // TODO stage_description_id, teacher_id, subject_id, feedback_form_id
-        // TODO сделать запросы на БРС для получения имени учителя и названия предметая, расширить текущий массив
+        /* Выбираем все возможные тестирования. */
+        models.stage_description.findAll({
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            include: [
+                {
+                    attributes: { exclude: ['createdAt', 'updatedAt'] }, // добавляем записи о пользователях
+                    model: models.voted_user
+//                    where: { $not : { account_id: [userId] } },
+//                    required: false
+                },
+                {
+                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    model: models.discipline,
+                    where: { group_id: [groupId] } // для группы зарегистрировавшегося студента
+                },
+                {
+                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    model: models.feedback_stage,
+                    where: {
+                        date_to:   { $gt: dateNow.toISOString() }, // актуальные по времени проведения
+                        date_from: { $lt: dateNow.toISOString() }
+                    }
+                }
+            ]
+        }).then(function(result) {
+            var brsTeachers = brsDataController.getBrsTeachers(groupId); // берём от БРС списки учителей и предметов
+            var brsSubjects = brsDataController.getBrsSubjects(groupId);
+
+            var desiredStageDescriptions = [];
+            result.forEach(function(sd) { // постобработка - выкидываем записи, для которых пользователь уже проходил опрос
+                var shouldAdd = true;
+                sd['voted_users'].forEach(function(vUser) {
+                    if (vUser['account_id'] == userId) {
+                        shouldAdd = false;
+                    }
+                });
+                if (shouldAdd) {
+                    brsTeachers.forEach(function(teacher) { // добавляем имя преподавателя по id из БРС
+                        if (teacher['id'] == sd['discipline']['teacher_id']) {
+                            sd['discipline']['dataValues']['teacher'] = teacher['name']; // внимание, dataValues - хак структуры объекта в Sequelize
+                        }
+                    });
+                    brsSubjects.forEach(function(subject) { // добавляем название дисциплины по id из БРС
+                        if (subject['id'] == sd['discipline']['subject_id']) {
+                            sd['discipline']['dataValues']['subject'] = subject['name']; // внимание, dataValues - хак структуры объекта в Sequelize
+                        }
+                    });
+
+                    desiredStageDescriptions.push(sd);
+                }
+            });
+
+            callback(desiredStageDescriptions);
+        });
 
         // TODO вернуть этот безумный массив для парсинга селектора
         // TODO сохранить его в сессии для хранения айдишников (чтобы потом проще сэйвить в БД)
