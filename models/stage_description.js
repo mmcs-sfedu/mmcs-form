@@ -5,30 +5,32 @@ module.exports = function(sequelize, DataTypes) {
                 primaryKey: true,
                 autoIncrement: true,
                 notNull: true
-            },
-            discipline_id: {
-                type: DataTypes.INTEGER,
-                notNull: true,
-                references: {
-                    model: 'disciplines',
-                    key: 'id'
-                },
-                onDelete: 'cascade',
-                onUpdate: 'cascade'
-            },
-            feedback_stage_id: {
-                type: DataTypes.INTEGER,
-                notNull: true,
-                references: {
-                    model: 'feedback_stages',
-                    key: 'id'
-                },
-                onDelete: 'cascade',
-                onUpdate: 'cascade'
             }
         },
         {
-            classMethods: { }
+            classMethods: {
+                associate: function(models) {
+                    models.discipline.hasMany(stage_description, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'discipline_id',
+                            allowNull: false
+                        }
+                    });
+                    models.feedback_stage.hasMany(stage_description, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'feedback_stage_id',
+                            allowNull: false
+                        }
+                    });
+
+                    stage_description.belongsTo(models.discipline,     { foreignKey: 'discipline_id' });
+                    stage_description.belongsTo(models.feedback_stage, { foreignKey: 'feedback_stage_id' });
+                }
+            }
         });
 
     return stage_description;

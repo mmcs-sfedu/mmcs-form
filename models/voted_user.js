@@ -2,14 +2,7 @@ module.exports = function(sequelize, DataTypes) {
     var voted_user = sequelize.define("voted_user", {
             stage_description_id: {
                 type: DataTypes.INTEGER,
-                primaryKey: true,
-                notNull: true,
-                references: {
-                    model: 'stage_descriptions',
-                    key: 'id'
-                },
-                onDelete: 'cascade',
-                onUpdate: 'cascade'
+                primaryKey: true
             },
             account_id: {
                 type: DataTypes.INTEGER,
@@ -18,7 +11,20 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         {
-            classMethods: { }
+            classMethods: {
+                associate: function(models) {
+                    models.stage_description.hasMany(voted_user, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'stage_description_id',
+                            allowNull: false
+                        }
+                    });
+
+                    voted_user.belongsTo(models.stage_description, { foreignKey: 'stage_description_id' });
+                }
+            }
         });
 
     voted_user.removeAttribute('id');

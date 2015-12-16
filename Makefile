@@ -11,7 +11,8 @@ stupid-test:
 dev: dload-src
 	cd mmcs-form/; \
 	git checkout dev; \
-	npm update
+	npm update; \
+	node_modules/.bin/sequelize db:seed
 	# Проект готов для Вашего кода!
 	# Конфигурация базы данных лежит в config -> config.json
 

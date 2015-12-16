@@ -1,8 +1,16 @@
 var express = require('express');
 var router = express.Router();
 
+var models = require('../models');
+
+
 var authController = require('../controllers/auth');
 var errorsController = require('../controllers/errors');
+
+
+// array of functions which will be executed before
+var checklist = [authController.getStudentAuthChecker()];
+
 
 router.all('/logout', function(req, res, next) {
     authController.studentLogout();
@@ -28,6 +36,41 @@ router.post('/login', function(req, res, next) {
                 errorsController.saveErrorInSession(req, error);
             res.redirect('/survey');
     });
+});
+
+router.get('/forms'///:id'
+    , checklist, function(req, res, next) {
+        // console.log(req.params.id);
+        var stageDescId = req.query.stage_description_id;
+
+        models.feedback_form.findAll({
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            include: [
+                {
+                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    model: models.feedback_stage,
+                    include: [
+                        {
+                            attributes: { exclude: ['createdAt', 'updatedAt'] },
+                            model: models.stage_description,
+                            where: { id: stageDescId }
+                        }
+                    ]
+                },
+                {
+                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    model: models.question,
+                    include: [
+                        {
+                            attributes: { exclude: ['createdAt', 'updatedAt'] },
+                            model: models.possible_answer
+                        }
+                    ]
+                }
+            ]
+        }).then(function(forms) {
+            res.send(forms);
+        });
 });
 
 module.exports = router;

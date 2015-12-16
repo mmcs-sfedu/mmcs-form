@@ -6,16 +6,6 @@ module.exports = function(sequelize, DataTypes) {
                 autoIncrement: true,
                 notNull: true
             },
-            feedback_form_id: {
-                type: DataTypes.INTEGER,
-                notNull: true,
-                references: {
-                    model: "feedback_forms",
-                    key: "id"
-                },
-                onDelete: 'cascade',
-                onUpdate: 'cascade'
-            },
             date_from: {
                 type: DataTypes.DATE,
                 notNull: true
@@ -26,7 +16,20 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         {
-            classMethods: { }
+            classMethods: {
+                associate: function(models) {
+                    models.feedback_form.hasMany(feedback_stage, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'feedback_form_id',
+                            allowNull: false
+                        }
+                    });
+
+                    feedback_stage.belongsTo(models.feedback_form, { foreignKey: 'feedback_form_id' });
+                }
+            }
         });
 
     return feedback_stage;

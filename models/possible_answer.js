@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-    var question = sequelize.define("question", {
+    var possible_answer = sequelize.define("possible_answer", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -14,19 +14,19 @@ module.exports = function(sequelize, DataTypes) {
         {
             classMethods: {
                 associate: function(models) {
-                    models.feedback_form.hasMany(question, {
+                    models.question.hasMany(possible_answer, {
                         onDelete: 'cascade',
                         onUpdate: 'cascade',
                         foreignKey: {
-                            name: 'feedback_form_id',
+                            name: 'question_id',
                             allowNull: false
                         }
                     });
 
-                    question.belongsTo(models.feedback_form, { foreignKey: 'feedback_form_id' });
+                    possible_answer.belongsTo(models.question, { foreignKey: 'question_id' });
                 }
             }
         });
 
-    return question;
+    return possible_answer;
 };
