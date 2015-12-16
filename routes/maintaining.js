@@ -3,20 +3,8 @@ var router = express.Router();
 
 /* ADMIN SECTION */
 
-// array of functions which will be executed before
-var checklist = [authChecker];
-
-function authChecker(req, res, next) {
-//    if (req.session.auth || req.path==='/auth') {
-//        next();
-//    } else {
-//        res.redirect("/auth");
-//    }
-    next();
-}
-
 /* Root administrator's screen */
-router.get('/', checklist, function(req, res, next) {
+router.get('/', function(req, res, next) {
     res.render('pages/maintaining')
 });
 

@@ -15,3 +15,18 @@ var main = {
         // $('select').material_select('destroy');
     }
 };
+
+
+
+/* To make POST redirects from JS. */
+$.extend(
+    {
+        redirectPost: function(location, args)
+        {
+            var form = '';
+            $.each( args, function( key, value ) {
+                form += '<input type="hidden" name="'+key+'" value="'+value+'">';
+            });
+            $('<form action="'+location+'" method="POST">'+form+'</form>').appendTo('body').submit();
+        }
+    });

@@ -2,6 +2,18 @@
 
 var models = require('../models');
 
+
+var authControllerNamespace = {
+    userIdOrHash : null,
+    userGroupId  : null,
+    userName     : null,
+
+    isStudentAuthorized : function() {
+        return authControllerNamespace.userIdOrHash;
+    }
+};
+
+
 module.exports =
 {
     studentLogout : function() {
@@ -27,9 +39,7 @@ module.exports =
         });
     },
 
-    isStudentAuthorized : function() {
-        return authControllerNamespace.userIdOrHash;
-    },
+    isStudentAuthorized : authControllerNamespace.isStudentAuthorized,
 
     getUserName : function() {
         return authControllerNamespace.userName;
@@ -37,11 +47,16 @@ module.exports =
 
     getGroupId : function() {
         return authControllerNamespace.userGroupId;
-    }
-};
+    },
 
-var authControllerNamespace = {
-    userIdOrHash : null,
-    userGroupId  : null,
-    userName     : null
+
+    getStudentAuthChecker : function() {
+        return function(req, res, next) {
+            if (authControllerNamespace.isStudentAuthorized()) {
+                next();
+            } else {
+                res.redirect("/");
+            }
+        }
+    }
 };
