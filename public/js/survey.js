@@ -7,6 +7,10 @@ $(document).ready(function() {
 var survey = {
     all_selects : null,
 
+
+    chosenStageDescription : null,
+
+
     init : function() {
         survey.all_selects = $('select');
         survey.all_selects.material_select();
@@ -15,16 +19,26 @@ var survey = {
         // to open manually
         // $('#confirm').openModal();
 
-        $('div.select-wrapper li').on('click', function() {
-            if ($(this).attr('class') != 'disabled') {
-                // TODO колбэк для выбора дисциплины
-                console.log($(this).index());
-            }
-        });
+        $('div.select-wrapper li').on('click', survey.onSelectClickListener());
 
         // for updating data of materialize selectors
         // $('select').material_select('destroy');
     },
+
+
+    onSelectClickListener : function() {
+        if ($(this).attr('class') != 'disabled') {
+            var chosenIndex = $(this).index();
+            var indexPointer = 0;
+            $('select.initialized').find('option[value]').each(function() {
+                indexPointer++;
+                if (indexPointer == chosenIndex) {
+                    survey.chosenStageDescription = $(this).val();
+                }
+            })
+        }
+    },
+
 
     checkForms : function() {
         var allChecked = true;

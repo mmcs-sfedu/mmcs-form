@@ -16,6 +16,12 @@ module.exports =
 
 
 
+//    getSavedSurveysQuery : function() {
+//        return surveyControllerNamespace.savedSurveysQuery;
+//    },
+
+
+
     getStageDescriptions : function(callback) {
         var groupId = authController.getGroupId(); // TODO возможно, запрос к БРС
         var userId  = authController.isStudentAuthorized();
@@ -74,10 +80,14 @@ module.exports =
                 }
             });
 
+            /* Сохраняем полученные данные возможных опросов для получения идентификаторов в дальнейшем. */
+            // surveyControllerNamespace.savedSurveysQuery = desiredStageDescriptions; // возможно, при отправке формы его нужно будет обнулить
+
             callback(desiredStageDescriptions);
         });
-
-        // TODO вернуть этот безумный массив для парсинга селектора
-        // TODO сохранить его в сессии для хранения айдишников (чтобы потом проще сэйвить в БД)
     }
 };
+
+//var surveyControllerNamespace = {
+//    savedSurveysQuery : null
+//};

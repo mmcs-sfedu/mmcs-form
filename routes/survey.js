@@ -11,10 +11,13 @@ var errorsController = require('../controllers/errors');
 router.get('/', function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
-    res.render('pages/survey', {
-        title: 'Страница опроса',
-        controller: surveyController, // now controller is available using second var
-        errors: possibleErrors
+    surveyController.getStageDescriptions(function(entities) {
+        res.render('pages/survey', {
+            title: 'Страница опроса',
+            controller: surveyController, // now controller is available using second var
+            surveys: entities,            // unfortunately there is no way to pass actual surveys to view
+            errors: possibleErrors
+        });
     });
 });
 

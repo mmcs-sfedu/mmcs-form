@@ -5,7 +5,7 @@ module.exports =
         for (var i = 5; i >= 0; i--) {
             subjects.push({
                 id: i,
-                name: "Дисциплина " + i
+                name: "Дисциплина " + (5 - i)
             })
         }
 

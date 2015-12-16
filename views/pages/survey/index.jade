@@ -18,40 +18,38 @@ block content
                 br
                 select
                     option(disabled selected) . . .
-                    option(value='1') Микропрограммирование (Преподаватель К.К.)
-                    option(value='2') Многопоточное программирование (Преподаватель К.К.)
-                    option(value='3') Машинное обучение (Преподаватель К.К.)
+                    each survey in surveys
+                        option(value='#{survey.id}') #{survey.discipline.dataValues.subject} (#{survey.discipline.dataValues.teacher})
                 label Выбор дисциплины
 
                 br
                 br
 
-            // this is an example of controller usage
-            each val in controller.getTestData()
-                div.row
-                    div(class='col l8 m10 s12')
-                        div(class='card-panel blue')
-                            span.white-text
-                                h5 #{val["title"]}
-                                div.divider-line
-                                br
-                                form(action='#' class='survey-form')
-                                    each inner in val["options"]
-                                        p
-                                            input(name='question-#{val["title"]}' type='radio' id='#{val["title"]}-#{inner}')
-                                            label(class='white-text' for='#{val["title"]}-#{inner}') Ответ #{inner}
-
-
-            br
-
-            // TODO нужна обработка нажатия
-            a(class='btn-large modal-trigger waves-effect waves-light red lighten-2' href='#confirm') Отправить
-
-            div(id='confirm' class='modal')
-                div(class='modal-content')
-                    h4 Вы подтверждаете отправку ответов?
-                    p После подтверждения анкеты изменить ответы будет уже невозможно
-                div.modal-footer
-                    // TODO нужны слушатели на кнопки!
-                    a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
-                    a(href='#!' onclick='survey.checkForms();' class='modal-action modal-close waves-effect waves-teal btn-flat') Да
+            //// this is an example of controller usage
+            //each val in controller.getTestData()
+            //    div.row
+            //        div(class='col l8 m10 s12')
+            //            div(class='card-panel blue')
+            //                span.white-text
+            //                    h5 #{val["title"]}
+            //                    div.divider-line
+            //                    br
+            //                    form(action='#' class='survey-form')
+            //                        each inner in val["options"]
+            //                            p
+            //                                input(name='question-#{val["title"]}' type='radio' id='#{val["title"]}-#{inner}')
+            //                                label(class='white-text' for='#{val["title"]}-#{inner}') Ответ #{inner}
+            //
+            //
+            //br
+            //
+            //a(class='btn-large modal-trigger waves-effect waves-light red lighten-2' href='#confirm') Отправить
+            //
+            //div(id='confirm' class='modal')
+            //    div(class='modal-content')
+            //        h4 Вы подтверждаете отправку ответов?
+            //        p После подтверждения анкеты изменить ответы будет уже невозможно
+            //    div.modal-footer
+            //        // TODO нужны слушатели на кнопки!
+            //        a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
+            //        a(href='#!' onclick='survey.checkForms();' class='modal-action modal-close waves-effect waves-teal btn-flat') Да
