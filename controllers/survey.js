@@ -85,7 +85,57 @@ module.exports =
 
             callback(desiredStageDescriptions);
         });
+    },
+
+
+
+    /**
+     * Saves user's answer for survey.
+     * @param {Integer} stageDescriptionId Survey ID.
+     * @param {Array} possibleAnswers User's answers for that survey.
+     * @param {Object} res To draw response page.
+     * @return {Null} Returns nothing.
+     */
+    saveUsersAnswer : function(stageDescriptionId, possibleAnswers, res) {
+        /* Using same format to get possible answers (user's answers) IDs */
+        possibleAnswers = possibleAnswers.split(',');
+
+        /* Preparing array for bulk insert */
+        var answers = [];
+        for (var i = 0; i < possibleAnswers.length; i++) {
+            answers.push({
+                possible_answer_id: possibleAnswers[i],
+                stage_description_id: stageDescriptionId,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+        }
+
+
+
+        return models.sequelize.transaction({autocommit:false} ,function (t) {
+            return models.voted_user
+                .create({
+                stage_description_id: stageDescriptionId,
+                account_id: authController.isStudentAuthorized(),
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }, {transaction: t})
+                .then(function (user) {
+                return models.answer.bulkCreate(answers, {transaction: t});
+            });
+
+        }).then(function (result) {
+            // Transaction has been committed
+            // result is whatever the result of the promise chain returned to the transaction callback
+            res.render('pages/survey/finish');
+        }).catch(function (err) {
+            // Transaction has been rolled back
+            // err is whatever rejected the promise chain returned to the transaction callback
+            console.log("fs")
+        });
     }
+
 };
 
 //var surveyControllerNamespace = {
