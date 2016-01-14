@@ -30,13 +30,17 @@ module.exports =
 
         // TODO осторожно, хардкод! Всё должно приходить от БРС!
         // TODO для pgsql нужно хардкодить рандомную функцию!
-        return models.discipline.find({ order: "random()" })
+        return models.discipline
+            .find({ order: "random()" })
             .then(function(discipline) {
+                if (discipline == null) {
+                    callback("Ошибка базы данных - нет дисциплин!");
+                    return;
+                }
                 authControllerNamespace.userIdOrHash = 11;
                 authControllerNamespace.userGroupId  = discipline.group_id;
                 authControllerNamespace.userName     = "Вася Пупкин";
-                callback(null);
-        });
+                callback(null); })
     },
 
     isStudentAuthorized : authControllerNamespace.isStudentAuthorized,
