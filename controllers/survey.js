@@ -111,28 +111,27 @@ module.exports =
             });
         }
 
-
-
-        return models.sequelize.transaction({autocommit:false} ,function (t) {
+        /* Transaction to insert both voted user and his answers data */
+        return models.sequelize.transaction(
+            { autocommit: false },   // without false param returns an error
+            function (t) {
             return models.voted_user
-                .create({
+                .create({            // creating voted user record
                 stage_description_id: stageDescriptionId,
                 account_id: authController.isStudentAuthorized(),
                 createdAt: new Date(),
                 updatedAt: new Date()
-            }, {transaction: t})
-                .then(function (user) {
-                return models.answer.bulkCreate(answers, {transaction: t});
+            }, { transaction: t })
+                .then(function () { // when voted user data inserted, adding his answers
+                return models.answer.bulkCreate(answers, { transaction: t });
             });
-
-        }).then(function (result) {
-            // Transaction has been committed
-            // result is whatever the result of the promise chain returned to the transaction callback
+        }).then(function (result) { // when transaction successfully completed
             res.render('pages/survey/finish');
-        }).catch(function (err) {
-            // Transaction has been rolled back
-            // err is whatever rejected the promise chain returned to the transaction callback
-            console.log("fs")
+        }).catch(function (err) {   // when an error occurred with transaction
+            res.render('error', {
+                message: "Произошла ошибка в транзакции записи результата голосования!",
+                error: {}
+            });
         });
     }
 
