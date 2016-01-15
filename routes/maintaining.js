@@ -1,26 +1,78 @@
 var express = require('express');
 var router = express.Router();
 
+/* Importing controllers */
+var errorsController      = require('../controllers/errors');
+var authController        = require('../controllers/auth');
+var maintainingController = require('../controllers/maintaining');
+
+/* Pre-routing check functions */
+var checklist = [
+    /* Checks if user authorized as student */
+    function(req, res, next) {
+        if (authController.isStudentAuthorized()) { // if student - go to main page, you can't maintain
+            res.redirect("/");
+        } else {
+            next();                                 // in other case - you can access maintaining
+        }
+}];
+
 /* ADMIN SECTION */
 
 /* Root administrator's screen */
-router.get('/', function(req, res, next) {
-    res.render('pages/maintaining')
+router.get('/', checklist, function(req, res, next) {
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
+
+    res.render('pages/maintaining', {
+        title: 'Администрирование системы анкетирования',
+        controller: maintainingController,                // controller to check authorizations and else
+        errors: possibleErrors
+    })
 });
 
 /* Here admin can add new surveys */
-router.get('/create', function(req, res, next) {
+router.get('/create', checklist, function(req, res, next) {
     res.render('pages/maintaining/create')
 });
 
 /* Here admin can schedule surveys */
-router.get('/schedule', function(req, res, next) {
+router.get('/schedule', checklist, function(req, res, next) {
     res.render('pages/maintaining/schedule')
 });
 
 /* Results of surveys */
-router.get('/results', function(req, res, next) {
+router.get('/results', checklist, function(req, res, next) {
     res.render('pages/maintaining/results')
+});
+
+
+/* To authorize admin */
+router.post('/login', checklist, function(req, res, next) {
+    /* Checking administrator's input first */
+    req.checkBody('login').notEmpty();
+    req.checkBody('password').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) {
+        errorsController.saveErrorInSession(req, "Заполните все поля!");
+        res.redirect('/maintaining');
+        return;
+    }
+
+    /* If all fields are provided - trying to login */
+    authController.adminAttemptLogin(
+        req.body['login'],
+        req.body['password'],
+        function(error) { // callback with auth result
+            if (error)
+                errorsController.saveErrorInSession(req, error);
+            res.redirect('/maintaining');
+        });
+});
+
+/* To finish admin session */
+router.all('/logout', function(req, res, next) {
+    authController.adminLogout();
+    res.redirect('/maintaining');
 });
 
 module.exports = router;
