@@ -1,4 +1,14 @@
 extends ../../base/layout
 
+// Some additional includes of styles and scripts
+block includes
+    link(rel='stylesheet' href='css/forms.css')
+
+// Login block and module to show errors
 block content
-    p Создание опроса
+    include ../../blocks/admin-auth
+    include ../../blocks/errors-toaster
+
+    div(class='container')
+
+        - controller.getExistingFormsData()

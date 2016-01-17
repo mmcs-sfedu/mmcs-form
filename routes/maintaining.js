@@ -8,14 +8,29 @@ var maintainingController = require('../controllers/maintaining');
 
 /* Pre-routing check functions */
 var checklist = [
-    /* Checks if user authorized as student */
+    /* Checks if user authorized as student or not authorized as admin */
     function(req, res, next) {
-        if (authController.isStudentAuthorized()) { // if student - go to main page, you can't maintain
-            res.redirect("/");
-        } else {
-            next();                                 // in other case - you can access maintaining
+        if (authController.isStudentAuthorized()) {   // if student - go to main page, you can't maintain
+            res.redirect('/');
+        } else {                                      // in other case - you can access maintaining
+            if (authController.isAdminAuthorized()) { // admin is authorized, everything is ok
+                next();
+            } else {                                  // in other case redirecting him on maintaining
+
+                if (req.path == '/login') {           // to allow admin log in
+                    next();
+                    return;
+                }
+
+                if (req.path == '/') {
+                    next();                           // to avoid same route collision
+                } else {
+                    res.redirect('/maintaining')
+                }
+            }
         }
-}];
+    }
+];
 
 /* ADMIN SECTION */
 
@@ -32,7 +47,13 @@ router.get('/', checklist, function(req, res, next) {
 
 /* Here admin can add new surveys */
 router.get('/create', checklist, function(req, res, next) {
-    res.render('pages/maintaining/create')
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
+
+    res.render('pages/maintaining/create', {
+        title: 'Формы',
+        controller: maintainingController,
+        errors: possibleErrors
+    })
 });
 
 /* Here admin can schedule surveys */
