@@ -15,8 +15,18 @@ var models = require('../models'); // including models class to access DB rows
 router.get('/db-test', function(req, res, next) {
 
     var maintainingController = require('../controllers/maintaining');
-    maintainingController.getExistingFormsData(function(forms) {
-        res.send(forms)
+    models.feedback_form
+        .findOne({
+            where: {id: 8},
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            include: [
+                {
+                    attributes: { exclude: ['createdAt', 'updatedAt'] }, // добавляем записи о пользователях
+                    model: models.feedback_stage
+                }
+            ]})
+        .then(function(l) {
+        res.send(l);
     });
 
 //    var authC = require('../controllers/auth');

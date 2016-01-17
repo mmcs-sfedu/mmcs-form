@@ -1,6 +1,7 @@
 /* Called when page was loaded. */
 $(document).ready(function() {
-
+    /* Setting onclick listeners for forms list. */
+    $("li.collection-item a.secondary-content i").on('click', forms.deleteForm);
 });
 
 /* Namespace for forms scripts. */
@@ -13,14 +14,55 @@ var forms = {
      * @returns {String} An HTML code of created list element.
      * */
     generateFormsListItem: function(id, name, stages) {
-        return('' +
+        /* First part of form element. */
+        var formHtml = '' +
             '<li class="collection-item">' +
-            '<div>' + name +                       // form's name
-            '<a href="http://google.com"' +        // delete form url (if has no stages)
-            ' class="secondary-content">' +
-            '<i class="material-icons">send</i>' + // delete icon (if has no stages)
-            '</a>' +
+            '<div>' + name;                                                      // form's name
+
+        if (stages != 0) {
+            formHtml = formHtml +
+                '<br>(используется в опросах: ' + stages + ')';              // showing stages count
+        }
+
+        /* If form doesn't have stages, adding delete button for it. */
+        if (stages == 0) {
+            formHtml = formHtml +
+                '<a href="#!"' +
+                ' class="secondary-content">' +
+                '<i id="' + id +                                                 // form's id to delete it
+                '" class="material-icons red-text text-lighten-3">delete</i>' +  // delete icon (if has no stages)
+                '</a>'
+        }
+
+        /* Closing form block. */
+        formHtml = formHtml +
             '</div>' +
-            '</li>')
+            '</li>';
+
+        return formHtml;
+    },
+
+    /**
+     * Deletes chosen form. */
+    deleteForm: function() {
+        /* Getting form id. */
+        var form = $(this);
+        var formID = form.attr('id');
+
+        /* Describing delete request for form. */
+        var request = $.ajax({
+            url: '/maintaining/form',
+            method: 'DELETE',
+            data: { id : formID },
+            dataType: "json"
+        });
+        /* Deleting form from list, if everything is ok. */
+        request.done(function(response) {
+            form.parent().parent().parent().remove();
+        });
+        /* Showing an error in another case. */
+        request.fail(function(jqXHR, textStatus) {
+            Materialize.toast('Не удалось удалить форму ' + formID, 5000)
+        });
     }
 };

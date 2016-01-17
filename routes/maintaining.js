@@ -99,4 +99,22 @@ router.all('/logout', function(req, res, next) {
     res.redirect('/maintaining');
 });
 
+
+
+/* API SECTION */
+router.delete('/form', checklist, function(req, res, next) {
+    /* Checking request. */
+    req.checkBody('id').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) { // if there is no provided form ID, ajax will show error
+        res.send(null);
+        return;
+    }
+
+    /* Deleting form using controller function. */
+    maintainingController.deleteForm(req.body['id'], function(result) {
+        res.send(result);
+    });
+});
+
 module.exports = router;
