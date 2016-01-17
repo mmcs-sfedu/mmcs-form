@@ -6,6 +6,7 @@ $(document).ready(function() {
     /* Setting onclick listener for add question button. */
     $('a#addQuestion').on('click', forms.addQuestion);
 
+    /* Setting submit questions button onclick listener. */
     $('a#submitQuestions').on('click', forms.submitQuestions);
 
     /* Turning on dialog windows. */
@@ -52,7 +53,8 @@ var forms = {
     },
 
     /**
-     * Deletes chosen form. */
+     * Deletes chosen form.
+     * */
     deleteForm: function() {
         /* Getting form id. */
         var form = $(this);
@@ -137,7 +139,13 @@ var forms = {
         questionsBlock.append(questionRow);
     },
 
+    /**
+     * Checks fields and submits new form.
+     * */
     submitQuestions: function() {
+        // TODO проверить заполненность (поля, наличие вопросов и ответов)
+        // TODO генерация запроса
+        // TODO обработка результата
         alert("submitted!");
     }
 };
