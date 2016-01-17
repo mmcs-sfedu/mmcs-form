@@ -29,6 +29,9 @@ function getExistingFormsData(callback) {
                 return;
             }
 
+            /* To convert this value to usual object and make it client-side-readable. */
+            result = result.map(function(form){ return form.toJSON() });
+
             callback(result);
         }
     );

@@ -3,21 +3,27 @@ extends ../../base/layout
 // Some additional includes of styles and scripts
 block includes
     link(rel='stylesheet' href='/css/forms.css')
+    script(src='/js/forms.js')
 
-// Login block and module to show errors
+// Login block and module to show errors, mixins usage
 block content
     include ../../blocks/admin-auth
     include ../../blocks/errors-toaster
+    include ../../components/mixins
 
     div(class='container')
 
+        +section-title('Управление формами')
+
+        // Here will be our forms
+        ul(class='collection')
+
         - each val in forms
-            - if (val.feedback_stages.length == 0)
-                // TODO прорисовка элемента в списке с кнопкой удаления
-                p #{val.name} - пушто
-            - else
-                // TODO same, но без удаления
-                p #{val.name} имеет #{val.feedback_stages.length} опросов
-                // TODO добавление и прорисовку звать здесь в скрипте
-                script.
-                    console.log("t")
+            script.
+                /* Getting values here, because Jade has bad convert rules (destroys objects). */
+                var id = '#{val.id}';
+                var name = '#{val.name}';
+                var stages = '#{val.feedback_stages.length}';
+
+                /* Adding forms in list. */
+                $(".collection").append(forms.generateFormsListItem(id, name, stages))
