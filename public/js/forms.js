@@ -3,6 +3,11 @@ $(document).ready(function() {
     /* Setting onclick listeners for forms list. */
     $("li.collection-item a.secondary-content i").on('click', forms.deleteForm);
 
+    /* Setting onclick listener for add question button. */
+    $('a#addQuestion').on('click', forms.addQuestion);
+
+    $('a#submitQuestions').on('click', forms.submitQuestions);
+
     /* Turning on dialog windows. */
     $('.modal-trigger').leanModal();
 });
@@ -68,5 +73,67 @@ var forms = {
         request.fail(function(jqXHR, textStatus) {
             Materialize.toast('Не удалось удалить форму ' + formID, 5000)
         });
+    },
+
+    /* Some counters to avoid intersections. */
+    questionsCounter: 0,
+    answersCounter:   0,
+
+    /**
+     * Adds a question to form.
+     * */
+    addQuestion: function() {
+        /* A div where to add question fields. */
+        var questionsBlock = $(".questions");
+
+        /* Increasing count (id) of questions. */
+        forms.questionsCounter++;
+
+        /* Creating question row. */
+        var questionRow = '' +
+            // Adding also some top brs.
+            '<div class="w-90 margin-to-right"><br><br>' +
+            // Enter question name field.
+            '<div class="input-field">' +
+            '<input id="question_' + forms.questionsCounter + '" type="text" class="validate" autocomplete="off">' +
+            '<label for="question_' + forms.questionsCounter + '">Текст вопроса</label>' +
+            '</div>' +
+            // Answers block.
+            '<div class="answers w-90 margin-to-right"></div>' +
+            // Add answer button.
+            '<a href="#!" class="add-answer">' +
+            '<i class="material-icons green-text text-lighten-3">add</i>' +
+            '<span class="green-text text-lighten-3">Добавить ответ</span>' +
+            '</a>' +
+            '</div>';
+
+        /* Setting listener for add answer button. */
+        questionRow = $($.parseHTML(questionRow)); // to convert text to jQuery object
+        questionRow.find('a.add-answer').on('click', function() {
+            /* Block with all answers. */
+            var answersBlock = questionRow.find('div.answers');
+
+            /* Increasing count (id) of answers. */
+            forms.answersCounter++;
+
+            /* Field for possible answer. */
+            var possibleAnswer = '' +
+                // Field for answer label.
+                '<div class="input-field">' +
+                '<input id="possible_answer_' + forms.questionsCounter + '_' + forms.answersCounter + '"' +
+                ' type="text" class="validate" autocomplete="off">' +
+                '<label for="possible_answer_' + forms.questionsCounter + '_' + forms.answersCounter + '">Возможный ответ</label>' +
+                '</div>';
+
+            /* Adding possible answer field. */
+            answersBlock.append(possibleAnswer);
+        });
+
+        /* Adding question field. */
+        questionsBlock.append(questionRow);
+    },
+
+    submitQuestions: function() {
+        alert("submitted!");
     }
 };
