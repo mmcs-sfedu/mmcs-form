@@ -14,10 +14,22 @@ module.exports =
 
 /**
  * Provides data to draw list of existing forms (to delete them) with short info.
+ * @param {Function} callback Used to asynchronously return data.
  * */
-function getExistingFormsData() {
-    models.feedback_form.findAll()
-        .then(function(result) {
-            return result;
-    })
+function getExistingFormsData(callback) {
+    models.feedback_form.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] }, // we don't like data with dates
+        include: {
+            attributes: ['id'],
+            model: models.feedback_stage
+        }
+    }).then(function(result) {
+            if (result == null) {
+                callback([]);
+                return;
+            }
+
+            callback(result);
+        }
+    );
 }

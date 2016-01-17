@@ -11,4 +11,8 @@ block content
 
     div(class='container')
 
-        - controller.getExistingFormsData()
+        - each val in forms
+            - if (val.feedback_stages.length == 0)
+                p #{val.name} - пушто
+            - else
+                p #{val.name} имеет #{val.feedback_stages.length} опросов

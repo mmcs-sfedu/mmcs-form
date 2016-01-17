@@ -14,13 +14,18 @@ var models = require('../models'); // including models class to access DB rows
 
 router.get('/db-test', function(req, res, next) {
 
-    var authC = require('../controllers/auth');
-    authC.studentAttemptLogin("sfsfsffsf", "sffsfs", function(d) {
-        var surveyController = require('../controllers/survey');
-        surveyController.getStageDescriptions(function(entities) {
-            res.send(entities);
-        });
+    var maintainingController = require('../controllers/maintaining');
+    maintainingController.getExistingFormsData(function(forms) {
+        res.send(forms)
     });
+
+//    var authC = require('../controllers/auth');
+//    authC.studentAttemptLogin("sfsfsffsf", "sffsfs", function(d) {
+//        var surveyController = require('../controllers/survey');
+//        surveyController.getStageDescriptions(function(entities) {
+//            res.send(entities);
+//        });
+//    });
 
 //    models.answers.create({ // sample how to create model instances in DB
 //        result: 1,

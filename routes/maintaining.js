@@ -49,11 +49,14 @@ router.get('/', checklist, function(req, res, next) {
 router.get('/create', checklist, function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
-    res.render('pages/maintaining/create', {
-        title: 'Формы',
-        controller: maintainingController,
-        errors: possibleErrors
-    })
+    maintainingController.getExistingFormsData(function(forms) {
+        res.render('pages/maintaining/create', {
+            title: 'Формы',
+            controller: maintainingController,
+            forms: forms,
+            errors: possibleErrors
+        })
+    });
 });
 
 /* Here admin can schedule surveys */
