@@ -95,6 +95,8 @@ var forms = {
             '<div class="w-90 margin-to-right"><br><br>' +
             // Enter question name field.
             '<div class="input-field">' +
+            // Delete question button.
+            '<i onclick="parentNode.parentNode.remove();" class="material-icons red-text text-lighten-3 pointer prefix">delete</i>' +
             '<input id="question_' + forms.questionsCounter + '" type="text" class="validate" autocomplete="off">' +
             '<label for="question_' + forms.questionsCounter + '">Текст вопроса</label>' +
             '</div>' +
@@ -120,6 +122,8 @@ var forms = {
             var possibleAnswer = '' +
                 // Field for answer label.
                 '<div class="input-field">' +
+                // Delete answer button.
+                '<i onclick="parentNode.remove();" class="material-icons red-text text-lighten-3 pointer prefix">delete</i>' +
                 '<input id="possible_answer_' + forms.questionsCounter + '_' + forms.answersCounter + '"' +
                 ' type="text" class="validate" autocomplete="off">' +
                 '<label for="possible_answer_' + forms.questionsCounter + '_' + forms.answersCounter + '">Возможный ответ</label>' +
