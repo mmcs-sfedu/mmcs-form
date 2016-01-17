@@ -28,3 +28,32 @@ block content
 
                 /* Adding forms in list. */
                 $(".collection").append(forms.generateFormsListItem(id, name, stages))
+
+
+        // Adding spaces
+        br
+        span &nbsp &nbsp &nbsp &nbsp &nbsp
+
+        // Button to add new form
+        a(class='modal-trigger btn-floating btn-large waves-effect waves-light green lighten-1' href="#addForm")
+            i(class='material-icons') add
+
+        // Add form dialog
+        div(id='addForm' class='modal')
+            // Content of the dialog
+            div.modal-content
+                h5 Создание формы для опросов
+                br
+                // Path for API to create form
+                form(id='addForm' method='post', action='/maintaining/form')
+                    // To make enter key available
+                    input(type='submit' class='hidden')
+                    // Form name block
+                    div(class='input-field')
+                        input(id='name' type='text' class='validate' name='name' autocomplete='off')
+                        label(for='name') Название формы
+
+            // Action buttons for dialog
+            div.modal-footer
+                a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
+                a(href='javascript:;' class='waves-effect waves-teal btn-flat' onclick='$("form#addForm").submit();') Создать

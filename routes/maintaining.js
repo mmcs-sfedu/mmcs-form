@@ -102,6 +102,8 @@ router.all('/logout', function(req, res, next) {
 
 
 /* API SECTION */
+
+/* Delete form by ID */
 router.delete('/form', checklist, function(req, res, next) {
     /* Checking request. */
     req.checkBody('id').notEmpty();
@@ -115,6 +117,11 @@ router.delete('/form', checklist, function(req, res, next) {
     maintainingController.deleteForm(req.body['id'], function(result) {
         res.send(result);
     });
+});
+
+/* Add form */
+router.post('/form', checklist, function(req, res, next) {
+    res.send('KEK')
 });
 
 module.exports = router;

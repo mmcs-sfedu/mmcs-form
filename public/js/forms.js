@@ -2,6 +2,9 @@
 $(document).ready(function() {
     /* Setting onclick listeners for forms list. */
     $("li.collection-item a.secondary-content i").on('click', forms.deleteForm);
+
+    /* Turning on dialog windows. */
+    $('.modal-trigger').leanModal();
 });
 
 /* Namespace for forms scripts. */
@@ -19,9 +22,10 @@ var forms = {
             '<li class="collection-item">' +
             '<div>' + name;                                                      // form's name
 
+        /* Adding stages count label, if we have some. */
         if (stages != 0) {
             formHtml = formHtml +
-                '<br>(используется в опросах: ' + stages + ')';              // showing stages count
+                '<br>(используется в опросах: ' + stages + ')';                  // showing stages count
         }
 
         /* If form doesn't have stages, adding delete button for it. */
