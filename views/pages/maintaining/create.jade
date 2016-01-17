@@ -2,7 +2,7 @@ extends ../../base/layout
 
 // Some additional includes of styles and scripts
 block includes
-    link(rel='stylesheet' href='css/forms.css')
+    link(rel='stylesheet' href='/css/forms.css')
 
 // Login block and module to show errors
 block content
@@ -13,6 +13,11 @@ block content
 
         - each val in forms
             - if (val.feedback_stages.length == 0)
+                // TODO прорисовка элемента в списке с кнопкой удаления
                 p #{val.name} - пушто
             - else
+                // TODO same, но без удаления
                 p #{val.name} имеет #{val.feedback_stages.length} опросов
+                // TODO добавление и прорисовку звать здесь в скрипте
+                script.
+                    console.log("t")
