@@ -1,5 +1,6 @@
 /* Importing controllers */
 var authController = require('../controllers/auth');
+var brsDataController = require('../controllers/brs');
 
 /* Importing db models helper */
 var models = require('../models');
@@ -10,6 +11,8 @@ module.exports =
     authModule: authController,
 
     getExistingFormsData: getExistingFormsData,
+
+    getAllStagesData: getAllStagesData,
 
     deleteForm: deleteForm,
 
@@ -42,6 +45,124 @@ function getExistingFormsData(callback) {
             callback(result);
         }
     );
+}
+
+/**
+ * Provides a data to draw a list of existing stages (to delete them) with short info.
+ * @param {Object} res In a case of error res will be used to instantly render error page.
+ * @param {Function} callback Used to asynchronously return data.
+ * */
+function getAllStagesData(res, callback) {
+    /* Getting all feedback stages. */
+    models.feedback_stage.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] }, // sour data
+        order: 'date_to', // last proceeded stage will be at the top
+        include: [
+            {   // Including form name for that stage.
+                attributes: ['name'],
+                model: models.feedback_form
+            },
+            {   // To get an information about disciplines next.
+                attributes: ['id', 'discipline_id'],
+                model: models.stage_description,
+                include: { // To get an information about discipline, it's teacher and group from BRS
+                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    model: models.discipline
+                }
+            }]
+        // Fetching result here.
+    }).then(function(result) {
+        // If something went wrong return empty array.
+        if (result == null) {
+            callback([]);
+            return;
+        }
+
+        /* To convert this value to usual object and make it client-side-readable. */
+        result = result.map(function(stage){ return stage.toJSON() });
+
+        /* Getting data about discipline from BRS. */
+        var brsGroups   = brsDataController.getBrsGroups();
+        var brsTeachers = brsDataController.getBrsTeachers(null);
+        var brsSubjects = brsDataController.getBrsSubjects(null);
+
+        /* Checking BRS data. */
+        if (brsGroups == null)   { renderError('Не удалось загрузить список групп от БРС'); return; }
+        if (brsTeachers == null) { renderError('Не удалось загрузить список преподавателей от БРС'); return; }
+        if (brsSubjects == null) { renderError('Не удалось загрузить список предметов от БРС'); return; }
+
+        /* Renders error with description. */
+        function renderError(description) {
+            res.render('error', {
+                message: description,
+                error: {}
+            });
+        }
+
+        /* We'll use that template if BRS data is not specified. */
+        var noDataTemplate = 'Нет данных';
+
+        
+        /* Scary merge with BRS data. Don't forget to change BRS data structure when it'll work with true BRS! */
+        for (var stageIndex in result) {
+            var stageDescriptions = result[stageIndex]['stage_descriptions'];
+            for (var stageDescriptionIndex in stageDescriptions) {
+                var stageDescription = stageDescriptions[stageDescriptionIndex];
+                var discipline = stageDescription['discipline'];
+
+                // To use template text if not found in BRS.
+                var brsItemFound = false;
+                
+                // Looking for groups intersections.
+                for (var groupIndex in brsGroups) {
+                    var group = brsGroups[groupIndex];
+                    if (discipline['group_id'] == group['id']) {
+                        discipline['group'] = group['name'];
+                        brsItemFound = true;
+                        break;
+                    }
+                }
+                // Setting template if not found in BRS.
+                if (!brsItemFound) {
+                    discipline['group'] = noDataTemplate;
+                }
+                
+                brsItemFound = false;
+
+                // Looking for teachers intersections.
+                for (var teacherIndex in brsTeachers) {
+                    var teacher = brsTeachers[teacherIndex];
+                    if (discipline['teacher_id'] == teacher['id']) {
+                        discipline['teacher'] = teacher['name'];
+                        brsItemFound = true;
+                        break;
+                    }
+                }
+                // Setting template if not found in BRS.
+                if (!brsItemFound) {
+                    discipline['teacher'] = noDataTemplate;
+                }
+
+                brsItemFound = false;
+
+                // Looking for subjects intersections.
+                for (var subjectIndex in brsSubjects) {
+                    var subject = brsSubjects[subjectIndex];
+                    if (discipline['subject_id'] == subject['id']) {
+                        discipline['subject'] = subject['name'];
+                        brsItemFound = true;
+                        break;
+                    }
+                }
+                // Setting template if not found in BRS.
+                if (!brsItemFound) {
+                    discipline['subject'] = noDataTemplate;
+                }
+            }
+        }
+
+        callback(result);
+    })
 }
 
 /**

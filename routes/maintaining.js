@@ -49,6 +49,7 @@ router.get('/', checklist, function(req, res, next) {
 router.get('/create', checklist, function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
+    // Preparing data about forms for page.
     maintainingController.getExistingFormsData(function(forms) {
         res.render('pages/maintaining/create', {
             title: 'Формы',
@@ -63,11 +64,15 @@ router.get('/create', checklist, function(req, res, next) {
 router.get('/schedule', checklist, function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
-    res.render('pages/maintaining/schedule', {
-        title: 'Опросы',
-        controller: maintainingController,
-        errors: possibleErrors
-    })
+    // Preparing data about stages for page.
+    maintainingController.getAllStagesData(res, function(stages) {
+        res.render('pages/maintaining/schedule', {
+            title: 'Опросы',
+            controller: maintainingController,
+            stages: stages,
+            errors: possibleErrors
+        })
+    });
 });
 
 /* Results of surveys */

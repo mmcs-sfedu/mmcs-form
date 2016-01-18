@@ -12,12 +12,13 @@ router.get('/', function(req, res, next) {
 // TODO удалить потом
 var models = require('../models'); // including models class to access DB rows
 
-router.post('/db-test', function(req, res, next) {
+router.get('/db-test', function(req, res, next) {
 
     var maintainingController = require('../controllers/maintaining');
-    /* Adding form and sending result. */
-    maintainingController.addForm(req.body, function(result) {
-        res.send(result);
+
+    // Preparing data about stages for page.
+    maintainingController.getAllStagesData(res, function(stages) {
+        res.send(stages);
     });
 
 //    var authC = require('../controllers/auth');

@@ -11,28 +11,29 @@ block content
     include ../../blocks/errors-toaster
     include ../../components/mixins
 
+    // All page content will be here
     div(class='container')
 
         +section-title('Управление опросами')
 
+        // A list of existing stages
         ul.collection
-            li.collection-item
-                div Дата проведения: с 21.12.93 по 12.11.94
-                    br
-                    span Используется форма Форма-1
-                    br
-                    span Для дисциплины Машинное обучение (Гуда С.А.) в группе ММ-1
-                    a(href='#!' class='secondary-content')
-                        i(id='1' class='material-icons red-text text-lighten-3') delete
-            li.collection-item
-                div Дата проведения: с 21.12.93 по 12.11.94
-                    br
-                    span Используется форма Форма-1
-                    br
-                    span Для дисциплины Машинное обучение (Гуда С.А.) в группе ММ-1
-                    a(href='#!' class='secondary-content')
-                        i(id='1' class='material-icons red-text text-lighten-3') delete
 
+        // Adding existing stages to list
+        - each val in stages
+            script.
+                /* Getting values here, because Jade has bad convert rules (destroys objects). */
+                var id          = '#{val.id}';
+                var dateFrom    = '#{val.date_from}';
+                var dateTo      = '#{val.date_to}';
+                var formName    = '#{val.feedback_form.name}';
+                var disciplines = '#{val.stage_descriptions}';
+
+                /* Adding stages in list. */
+                stages.appendStageToStagesList($(".collection"), id, dateFrom, dateTo, formName, disciplines);
+
+
+        // A button to create new stage
         +create-action-button('addStage', null)
 
         // Add stage dialog
