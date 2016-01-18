@@ -92,28 +92,37 @@ function addForm(body, callback) {
         return;
     }
 
+    /* That var will contain created form ID. */
     var createdFormID = null;
+
+    /* Beginning transaction (because it's impossible to add a form without questions and answers). */
     models.sequelize.transaction(
-        {autocommit: false},
+        { autocommit: false }, // transactions don't work without that param
         function(t) {
+            // Creating feedback form first.
             return models.feedback_form.create({
                 name: name,
                 createdAt: new Date(),
                 updatedAt: new Date()
-            }, {transaction: t})
+            }, { transaction: t }) // in the same transaction
                 .then(function(feedback_form) {
+                    // Saving created form ID.
                     createdFormID = feedback_form.id;
-                    for (var questionID in questions) {
-                        var question = questions[questionID];
-                        if (question['text'] == null || question['answers'] == null || question['answers'].length == 0) {
-                            throw new Error();
-                        }
-                    }
 
-                    var rightQuestionsToInsert = [];
+                    /* Preparing data to insert. */
+                    var checkedQuestionsToInsert = [];
+
+                    // Walking throw passed by user questions to check that they has all necessary data.
                     for (var questionID in questions) {
+                        // Current question.
                         var question = questions[questionID];
-                        rightQuestionsToInsert.push({
+                        // Question must have it's text, and some answers.
+                        if (question['text'] == null || question['answers'] == null || question['answers'].length == 0) {
+                            throw new Error(); // that error will rollback transaction, if some data corrupted
+                        }
+
+                        // If data is valid, inserting it in prepared array.
+                        checkedQuestionsToInsert.push({
                             feedback_form_id: createdFormID,
                             text: question['text'],
                             createdAt: new Date(),
@@ -121,32 +130,45 @@ function addForm(body, callback) {
                         });
                     }
 
-                    return models.question.bulkCreate(rightQuestionsToInsert, {transaction: t, returning: true})
+                    /* Inserting prepared questions in database. */
+                    return models.question
+                        .bulkCreate(checkedQuestionsToInsert, {
+                            transaction: t,    // using same transaction
+                            returning: true }) // must specify returning param to make ORM return created elements' ids
                         .then(function(insertedQuestions) {
 
-                            var rightAnswers = [];
-                            var i = -1;
-                                    for (var questionID in questions) {
-                                        var oldQuestion = questions[questionID];
-                                        i++;
-                                        for (var possibleAnswer in oldQuestion['answers']) {
-                                            rightAnswers.push({
-                                                question_id: insertedQuestions[i].id,
-                                                text: oldQuestion['answers'][possibleAnswer],
-                                                createdAt: new Date(),
-                                                updatedAt: new Date()
-                                            });
-                                        }
-                                    }
+                            /* Questions are inserted, now preparing answers for them. */
+                            var checkedAnswersToInsert = [];
+                            // To iterate synchronously with inserted questions (to get their IDs).
+                            var iqPointer = -1;
 
-                            return models.possible_answer.bulkCreate(rightAnswers, {transaction: t, returning: true});
+                            // We should differentiate questions (passed by user) and insertedQuestions (which already has IDs).
+                            for (var questionID in questions) {
+                                var usersPassedQuestion = questions[questionID];
+                                iqPointer++; // increasing pointer synchronously with user's questions
+
+                                /* Preparing answers for current question (answers located only in raw source questions). */
+                                for (var possibleAnswer in usersPassedQuestion['answers']) {
+                                    checkedAnswersToInsert.push({
+                                        question_id: insertedQuestions[iqPointer].id,
+                                        text: usersPassedQuestion['answers'][possibleAnswer],
+                                        createdAt: new Date(),
+                                        updatedAt: new Date()
+                                    });
+                                }
+                            }
+
+                            /* And making multiple insert with the same params. */
+                            return models.possible_answer.bulkCreate(checkedAnswersToInsert, { transaction: t, returning: true });
                         })
                 });
-        }
-    ).then(function(result) {
-            var escape = require('escape-html');
-            callback({id:createdFormID, name: escape(name), stages:0});
-    }).catch(function(err) {
+
+            /* Here we are approaching two possible results of our big transaction. */
+        }).then(function(result) { // if everything is ok
+            /* Must escape to protect from XSS. */
+            var escape = require('escape-html'); // importing module for that
+            callback({ id: createdFormID, name: escape(name), stages: 0}); // obviously we don't have feedback stages yet
+        }).catch(function(error) { // if something went wrong or source data was invalid
             callback(null)
-    });
+        });
 }
