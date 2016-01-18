@@ -56,7 +56,7 @@ function getAllStagesData(res, callback) {
     /* Getting all feedback stages. */
     models.feedback_stage.findAll({
         attributes: { exclude: ['createdAt', 'updatedAt'] }, // sour data
-        order: 'date_to', // last proceeded stage will be at the top
+        order: 'date_to DESC', // last proceeded stage will be at the top
         include: [
             {   // Including form name for that stage.
                 attributes: ['name'],
