@@ -144,7 +144,8 @@ function addForm(body, callback) {
                 });
         }
     ).then(function(result) {
-            callback({id:createdFormID, name: name, stages:0});
+            var escape = require('escape-html');
+            callback({id:createdFormID, name: escape(name), stages:0});
     }).catch(function(err) {
             callback(null)
     });
