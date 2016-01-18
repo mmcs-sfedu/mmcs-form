@@ -12,21 +12,12 @@ router.get('/', function(req, res, next) {
 // TODO удалить потом
 var models = require('../models'); // including models class to access DB rows
 
-router.get('/db-test', function(req, res, next) {
+router.post('/db-test', function(req, res, next) {
 
     var maintainingController = require('../controllers/maintaining');
-    models.feedback_form
-        .findOne({
-            where: {id: 8},
-            attributes: { exclude: ['createdAt', 'updatedAt'] },
-            include: [
-                {
-                    attributes: { exclude: ['createdAt', 'updatedAt'] }, // добавляем записи о пользователях
-                    model: models.feedback_stage
-                }
-            ]})
-        .then(function(l) {
-        res.send(l);
+    /* Adding form and sending result. */
+    maintainingController.addForm(req.body, function(result) {
+        res.send(result);
     });
 
 //    var authC = require('../controllers/auth');

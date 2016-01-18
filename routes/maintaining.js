@@ -121,7 +121,10 @@ router.delete('/form', checklist, function(req, res, next) {
 
 /* Add form */
 router.post('/form', checklist, function(req, res, next) {
-    res.send(req.body)
+    /* Adding form and sending result. */
+    maintainingController.addForm(req.body, function(result) {
+        res.send(result);
+    });
 });
 
 module.exports = router;

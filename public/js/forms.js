@@ -99,7 +99,7 @@ var forms = {
             '<div class="input-field">' +
             // Delete question button.
             '<i onclick="parentNode.parentNode.remove();" class="material-icons red-text text-lighten-3 pointer prefix">delete</i>' +
-            '<input id="question_' + forms.questionsCounter + '" type="text" class="validate" autocomplete="off">' +
+            '<input id="question_' + forms.questionsCounter + '" type="text" class="validate question" autocomplete="off">' +
             '<label for="question_' + forms.questionsCounter + '">Текст вопроса</label>' +
             '</div>' +
             // Answers block.
@@ -143,9 +143,109 @@ var forms = {
      * Checks fields and submits new form.
      * */
     submitQuestions: function() {
-        // TODO проверить заполненность (поля, наличие вопросов и ответов)
-        // TODO генерация запроса
-        // TODO обработка результата
-        alert("submitted!");
+        /* Request JSON. */
+        var requestBody = {};
+        requestBody["questions"] = {}; // init questions field
+
+        /* Checking if form name is not empty. */
+        var formName = $('div.input-field input#name').val();
+        if (formName.length == 0) {
+            Materialize.toast('Укажите название формы!', 5000);
+            return;
+        } else {
+            /** Adding form name to request. */
+            requestBody["name"] = formName;
+        }
+
+        /* A div containing all questions. */
+        var questionsBlock = $('div.questions');
+
+        /* Checking if forms has no answers. */
+        if (questionsBlock.children().length == 0) {
+            Materialize.toast('Добавьте хотя бы один вопрос для формы!', 5000);
+            return;
+        }
+
+        /* Checking if all fields are not empty. */
+        var allFieldsStated = true;    // to check if all fields are named
+        var allAnswersNotEmpty = true; // to check if all answers are not empty
+        questionsBlock.children().each(function() {
+            // Current observable question row.
+            var currentQuestionRow = $(this);
+
+            $(this).find('input').each(function() { // looking for every input
+                var input = $(this);
+                if (input.val() == 0) { // an input wasn't filled
+                    allFieldsStated = false;
+                    return allFieldsStated;
+                } else {
+                    /** Adding field to request. */
+                    if (input.hasClass('question')) { // question was encountered
+                        requestBody["questions"][input.attr('id')] = { text: input.val(), answers: [] };
+                    } else {                          // answer was encountered
+                        requestBody["questions"][currentQuestionRow.find('input.question').attr('id')]["answers"].push(input.val());
+                    }
+                }
+            });
+            if (!allFieldsStated) {
+                return false; // return from each
+            }
+            $(this).find('.answers').each(function() { // looking for every answers block
+                if ($(this).children().length == 0) {  // an answers block doesn't have rows
+                    allAnswersNotEmpty = false;
+                    return allAnswersNotEmpty;
+                }
+            });
+            if (!allAnswersNotEmpty) {
+                return false; // stopping each if some question already doesn't have answer
+            }
+        });
+
+        // If some inputs weren't filled, showing an error.
+        if (!allFieldsStated) {
+            Materialize.toast('Некоторые поля остались незаполненными!', 5000);
+            return;
+        }
+        // If some questions don't have answers.
+        if (!allAnswersNotEmpty) {
+            Materialize.toast('Некоторые вопросы не имеют возможных ответов!', 5000);
+            return;
+        }
+
+        /* END OF FORMS CHECK */
+
+
+        /* Binding UI elements. */
+        var buttonsFooter = $('#addForm .modal-footer');
+        var btnSubmit = buttonsFooter.find('#submitQuestions');
+        var btnCancel = buttonsFooter.find('#cancelForm');
+
+        /* Describing add form request. */
+        var request = $.ajax({
+            url: '/maintaining/form',
+            method: 'POST',
+            data: JSON.stringify(requestBody), // string will be parsed into json
+            dataType: 'json',                  // you must specify these type params to make NodeJS read query
+            contentType: 'application/json'
+        });
+        /* If everything is ok. */
+        request.done(function(response) {
+            // Adding new form to list.
+            try {
+                $(".collection").append(forms.generateFormsListItem(response.id, response.name, response.stages));
+                btnCancel.click(); // closing dialog
+                Materialize.toast('Форма успешно добавлена', 5000);
+            } catch (exc) {
+                proceedFail();
+            }
+        });
+        /* In another case. */
+        request.fail(function(jqXHR, textStatus) {
+            proceedFail();
+        });
+        /* A function to proceed fail. */
+        function proceedFail() {
+            Materialize.toast('Не удалось создать форму', 5000);
+        }
     }
 };
