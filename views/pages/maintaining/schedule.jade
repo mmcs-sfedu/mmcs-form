@@ -1,4 +1,16 @@
 extends ../../base/layout
 
+// Some additional includes of styles and scripts
+block includes
+    link(rel='stylesheet' href='/css/forms.css')
+    script(src='/js/stages.js')
+
+// Login block and module to show errors, mixins usage
 block content
-    p Управление текущими опросами
+    include ../../blocks/admin-auth
+    include ../../blocks/errors-toaster
+    include ../../components/mixins
+
+    div(class='container')
+
+        +section-title('Запуск опросов')

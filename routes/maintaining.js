@@ -61,7 +61,13 @@ router.get('/create', checklist, function(req, res, next) {
 
 /* Here admin can schedule surveys */
 router.get('/schedule', checklist, function(req, res, next) {
-    res.render('pages/maintaining/schedule')
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
+
+    res.render('pages/maintaining/schedule', {
+        title: 'Опросы',
+        controller: maintainingController,
+        errors: possibleErrors
+    })
 });
 
 /* Results of surveys */
