@@ -1,7 +1,7 @@
 /* Called when page was loaded. */
 $(document).ready(function() {
     /* Setting onclick listeners for forms list. */
-    $("li.collection-item a.secondary-content i").on('click', forms.deleteForm);
+    forms.updateDeleteButtonsListeners();
 
     /* Setting onclick listener for add question button. */
     $('a#addQuestion').on('click', forms.addQuestion);
@@ -15,6 +15,13 @@ $(document).ready(function() {
 
 /* Namespace for forms scripts. */
 var forms = {
+    /**
+     * Sets onclick listeners for all appropriate delete buttons on the screen.
+     * */
+    updateDeleteButtonsListeners: function() {
+        $("li.collection-item a.secondary-content i").on('click', forms.deleteForm);
+    },
+
     /**
      * Creates html code for forms list item depending on it's type.
      * @param {Number} id Form's ID.
@@ -69,7 +76,7 @@ var forms = {
         });
         /* Deleting form from list, if everything is ok. */
         request.done(function(response) {
-            form.parent().parent().parent().remove();
+            form.parents('li.collection-item').first().remove();
         });
         /* Showing an error in another case. */
         request.fail(function(jqXHR, textStatus) {
@@ -99,7 +106,7 @@ var forms = {
             '<div class="input-field">' +
             // Delete question button.
             '<i onclick="parentNode.parentNode.remove();" class="material-icons red-text text-lighten-3 pointer prefix">delete</i>' +
-            '<input id="question_' + forms.questionsCounter + '" type="text" class="validate question" autocomplete="off">' +
+            '<input id="question_'  + forms.questionsCounter + '" type="text" class="validate question" autocomplete="off">' +
             '<label for="question_' + forms.questionsCounter + '">Текст вопроса</label>' +
             '</div>' +
             // Answers block.
@@ -126,7 +133,7 @@ var forms = {
                 '<div class="input-field">' +
                 // Delete answer button.
                 '<i onclick="parentNode.remove();" class="material-icons red-text text-lighten-3 pointer prefix">delete</i>' +
-                '<input id="possible_answer_' + forms.questionsCounter + '_' + forms.answersCounter + '"' +
+                '<input id="possible_answer_'  + forms.questionsCounter + '_' + forms.answersCounter + '"' +
                 ' type="text" class="validate" autocomplete="off">' +
                 '<label for="possible_answer_' + forms.questionsCounter + '_' + forms.answersCounter + '">Возможный ответ</label>' +
                 '</div>';
@@ -167,48 +174,53 @@ var forms = {
         }
 
         /* Checking if all fields are not empty. */
-        var allFieldsStated = true;    // to check if all fields are named
-        var allAnswersNotEmpty = true; // to check if all answers are not empty
+        var allFieldsStated = true; // to check if all fields are named
         questionsBlock.children().each(function() {
             // Current observable question row.
             var currentQuestionRow = $(this);
 
-            $(this).find('input').each(function() { // looking for every input
+            // If current question doesn't have any answers.
+            if (currentQuestionRow.find('.answers').children().length == 0) {
+                // Then stopping each and leaving with next error.
+                allFieldsStated = false;
+                return allFieldsStated;
+            }
+
+            // Looking for every input.
+            currentQuestionRow.find('input').each(function() {
                 var input = $(this);
                 if (input.val() == 0) { // an input wasn't filled
                     allFieldsStated = false;
                     return allFieldsStated;
                 } else {
+
                     /** Adding field to request. */
-                    if (input.hasClass('question')) { // question was encountered
-                        requestBody["questions"][input.attr('id')] = { text: input.val(), answers: [] };
-                    } else {                          // answer was encountered
-                        requestBody["questions"][currentQuestionRow.find('input.question').attr('id')]["answers"].push(input.val());
+                    // Question was encountered.
+                    if (input.hasClass('question')) {
+                        // Adding question in request array.
+                        requestBody
+                            ["questions"]
+                            [input.attr('id')] = { text: input.val(), answers: [] };
+                    // Answer was encountered.
+                    } else {
+                        // Adding answer for parent question node in request array.
+                        requestBody
+                            ["questions"]
+                            [currentQuestionRow.find('input.question').attr('id')]
+                            ["answers"].push(input.val());
                     }
+
                 }
             });
+
             if (!allFieldsStated) {
-                return false; // return from each
-            }
-            $(this).find('.answers').each(function() { // looking for every answers block
-                if ($(this).children().length == 0) {  // an answers block doesn't have rows
-                    allAnswersNotEmpty = false;
-                    return allAnswersNotEmpty;
-                }
-            });
-            if (!allAnswersNotEmpty) {
-                return false; // stopping each if some question already doesn't have answer
+                return false; // return from each: some fields are not stated
             }
         });
 
-        // If some inputs weren't filled, showing an error.
+        // If some inputs weren't filled or questions don't have answers, showing an error.
         if (!allFieldsStated) {
-            Materialize.toast('Некоторые поля остались незаполненными!', 5000);
-            return;
-        }
-        // If some questions don't have answers.
-        if (!allAnswersNotEmpty) {
-            Materialize.toast('Некоторые вопросы не имеют возможных ответов!', 5000);
+            Materialize.toast('Некоторые поля остались незаполненными или вопросам не добавлены ответы!', 5000);
             return;
         }
 
@@ -233,6 +245,7 @@ var forms = {
             // Adding new form to list.
             try {
                 $(".collection").append(forms.generateFormsListItem(response.id, response.name, response.stages));
+                forms.updateDeleteButtonsListeners(); // adding onclick listener for new form item
                 btnCancel.click(); // closing dialog
                 Materialize.toast('Форма успешно добавлена', 5000);
             } catch (exc) {
