@@ -25,6 +25,7 @@ module.exports =
 function getExistingFormsData(callback) {
     models.feedback_form.findAll({
         attributes: { exclude: ['createdAt', 'updatedAt'] }, // we don't like data with dates
+        order: 'id',
         include: {
             attributes: ['id'],
             model: models.feedback_stage
