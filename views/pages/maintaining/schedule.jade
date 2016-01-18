@@ -13,13 +13,11 @@ block content
 
     div(class='container')
 
-        +section-title('Запуск опросов')
+        +section-title('Управление опросами')
 
         ul.collection
             li.collection-item
-                div Опрос хороший
-                    br
-                    span Дата проведения: с 21.12.93 по 12.11.94
+                div Дата проведения: с 21.12.93 по 12.11.94
                     br
                     span Используется форма Форма-1
                     br
@@ -27,9 +25,7 @@ block content
                     a(href='#!' class='secondary-content')
                         i(id='1' class='material-icons red-text text-lighten-3') delete
             li.collection-item
-                div Опрос ещё лучше
-                    br
-                    span Дата проведения: с 21.12.93 по 12.11.94
+                div Дата проведения: с 21.12.93 по 12.11.94
                     br
                     span Используется форма Форма-1
                     br
@@ -37,4 +33,18 @@ block content
                     a(href='#!' class='secondary-content')
                         i(id='1' class='material-icons red-text text-lighten-3') delete
 
-        +create-action-button(null, null)
+        +create-action-button('addStage', null)
+
+        // Add stage dialog
+        div(id='addStage' class='modal modal-large')
+            // Content of the dialog
+            div.modal-content
+                h5 Запуск нового опроса
+                br
+
+                span Здесь что-то будет...
+
+            // Action buttons for dialog
+            div.modal-footer
+                a(id='cancelStage' href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
+                a(id='submitStage' class='waves-effect waves-teal btn-flat') Запустить

@@ -1,6 +1,9 @@
 // called when document is rendered
 $(document).ready(function() {
     // main.init();
+
+    /* Turning on dialog windows. */
+    $('.modal-trigger').leanModal();
 });
 
 // using namespace main

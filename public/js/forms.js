@@ -8,9 +8,6 @@ $(document).ready(function() {
 
     /* Setting submit questions button onclick listener. */
     $('a#submitQuestions').on('click', forms.submitQuestions);
-
-    /* Turning on dialog windows. */
-    $('.modal-trigger').leanModal();
 });
 
 /* Namespace for forms scripts. */
