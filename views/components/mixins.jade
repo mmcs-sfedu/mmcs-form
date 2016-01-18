@@ -10,9 +10,27 @@ mixin col-proof(icon, text)
         br
         br
 
+
 mixin section-title(title)
     div.row
         div(class='col s12')
             h5
                 =title
             br
+
+
+// Pass null as args if you don't need this button as modal trigger and it doesn't need onclick function.
+mixin create-action-button(modalID, onclick)
+    - var classDefinition = 'btn-floating btn-large waves-effect waves-light green lighten-1';
+    - var hrefDefinition = '#!';
+    - if (modalID != null) {
+        - classDefinition = classDefinition + ' modal-trigger';
+        - hrefDefinition = '#' + modalID;
+    - }
+
+    // adding spaces for button
+    br
+    span &nbsp &nbsp &nbsp &nbsp &nbsp
+
+    a(class='#{classDefinition}' href='#{hrefDefinition}' onclick='#{onclick}')
+        i(class='material-icons') add

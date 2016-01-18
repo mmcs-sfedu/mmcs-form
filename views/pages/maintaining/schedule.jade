@@ -14,3 +14,27 @@ block content
     div(class='container')
 
         +section-title('Запуск опросов')
+
+        ul.collection
+            li.collection-item
+                div Опрос хороший
+                    br
+                    span Дата проведения: с 21.12.93 по 12.11.94
+                    br
+                    span Используется форма Форма-1
+                    br
+                    span Для дисциплины Машинное обучение (Гуда С.А.) в группе ММ-1
+                    a(href='#!' class='secondary-content')
+                        i(id='1' class='material-icons red-text text-lighten-3') delete
+            li.collection-item
+                div Опрос ещё лучше
+                    br
+                    span Дата проведения: с 21.12.93 по 12.11.94
+                    br
+                    span Используется форма Форма-1
+                    br
+                    span Для дисциплины Машинное обучение (Гуда С.А.) в группе ММ-1
+                    a(href='#!' class='secondary-content')
+                        i(id='1' class='material-icons red-text text-lighten-3') delete
+
+        +create-action-button(null, null)

@@ -29,15 +29,9 @@ block content
                 /* Adding forms in list. */
                 $(".collection").append(forms.generateFormsListItem(id, name, stages))
 
-
-        // Adding spaces
-        br
-        span &nbsp &nbsp &nbsp &nbsp &nbsp
-
         // Button to add new form
         // Also clears last form fields
-        a(class='modal-trigger btn-floating btn-large waves-effect waves-light green lighten-1' href='#addForm' onclick='$(".questions").empty();$("input#name").val("");')
-            i(class='material-icons') add
+        +create-action-button('addForm', '$(".questions").empty();$("input#name").val("");')
 
         // Add form dialog
         div(id='addForm' class='modal modal-large')
