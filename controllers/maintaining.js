@@ -157,9 +157,10 @@ function getAllBrsDisciplines(res, callback) {
 /**
  * Provides a data about all surveys' results.
  * @param {Function} callback Used to asynchronously return data.
+ * @param {Object} res To redirect on error page in a bad case.
  * */
-function getSurveysResults(callback) {
-    /* It's very difficult to describe: we need all of our full data, excepting voted users to build graphs. */
+function getSurveysResults(res, callback) {
+    /* It's very difficult to describe: we need all of our full data, excepting voted users IDs to build graphs. */
     models.feedback_stage.findAll({
         attributes: { exclude: ['createdAt', 'updatedAt'] }, // we don't like data with dates
         order: 'date_to DESC',
@@ -177,6 +178,11 @@ function getSurveysResults(callback) {
                     {
                         attributes: { exclude: ['createdAt', 'updatedAt'] },
                         model: models.discipline,
+                        required: true
+                    },
+                    {
+                        attributes: ['stage_description_id'],
+                        model: models.voted_user,
                         required: true
                     }
                 ]
@@ -206,6 +212,24 @@ function getSurveysResults(callback) {
 
             /* To convert this value to usual object and make it client-side-readable. */
             results = results.map(function(result){ return result.toJSON() });
+
+            /**
+             *  TODO и в третий раз всё тоже нерациональное решение (см. предыдущие комментарии).
+             *  */
+            /* Getting data about discipline from BRS. */
+            var brsGroups   = brsDataController.getBrsGroups();
+            var brsTeachers = brsDataController.getBrsTeachers(null);
+            var brsSubjects = brsDataController.getBrsSubjects(null);
+            /* Checking BRS data. */
+            if (brsGroups == null)   { renderError(res, 'Не удалось загрузить список групп от БРС'); return; }
+            if (brsTeachers == null) { renderError(res, 'Не удалось загрузить список преподавателей от БРС'); return; }
+            if (brsSubjects == null) { renderError(res, 'Не удалось загрузить список предметов от БРС'); return; }
+            /* Scary merge with BRS data. Don't forget to change BRS data structure when it'll work with true BRS! */
+            for (var i = 0; i < results.length; i++) {     // looking throw all feedback stages
+                mergeStageDescriptionsWithBRS(
+                    results[i]['stage_descriptions'],      // stage descriptions from database
+                    brsGroups, brsTeachers, brsSubjects);  // BRS data arrays
+            }
 
             callback(results);
         }

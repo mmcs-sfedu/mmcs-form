@@ -17,6 +17,20 @@ var utils = {
             + date.getFullYear() + '-'
             + date.getHours() + ':'
             + date.getMinutes();
+    },
+
+    /**
+     * Creates an object from Jade parse string.
+     * @param {String} source Jade object after JSON.stringify.
+     * @returns {Object} Parsed JS object.
+     * */
+    parseObjectFromJadeStringified: function(source) {
+        // Replacing quote symbol on normal everywhere using regexp.
+        source = source.replace(/&quot;/g, '"');
+        // Parsing to object.
+        source = JSON.parse(source);
+
+        return source;
     }
 
 };

@@ -16,7 +16,7 @@ router.get('/db-test', function(req, res, next) {
 
     // Preparing data about results of surveys.
     var maintainingController = require('../controllers/maintaining');
-    maintainingController.getSurveysResults(function(results) {
+    maintainingController.getSurveysResults(res, function(results) {
         res.send(results);
     });
 

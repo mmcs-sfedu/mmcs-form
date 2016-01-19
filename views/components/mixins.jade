@@ -34,3 +34,33 @@ mixin create-action-button(modalID, onclick)
 
     a(class='#{classDefinition}' href='#{hrefDefinition}' onclick='#{onclick}')
         i(class='material-icons') add
+
+
+// Creates survey item graph to represent it's results. All params are necessary.
+mixin create-graph-result(questionsAndAnswers, answers, usersCount)
+    p
+        - for (var i = 0; i < questionsAndAnswers.length; i++) {
+        -   var totalVotesInQuestion = 0;
+            b= questionsAndAnswers[i].text
+            br
+            br
+        -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
+        -       var count = 0;
+        -       for (var k = 0; k < answers.length; k++) {
+        -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
+        -               count++;
+        -               totalVotesInQuestion++;
+        -           }
+        -       }
+                span= questionsAndAnswers[i].possible_answers[j].text
+                span &nbsp
+                span= count
+                br
+        -   }
+            i Всего проголосовавших:&nbsp
+            i= totalVotesInQuestion
+        -   if (i != questionsAndAnswers.length - 1)
+            br
+            br
+            br
+        - }

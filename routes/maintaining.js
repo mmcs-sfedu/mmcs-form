@@ -89,7 +89,7 @@ router.get('/results', checklist, function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
     // Preparing data about results of surveys.
-    maintainingController.getSurveysResults(function(results) {
+    maintainingController.getSurveysResults(res, function(results) {
         res.render('pages/maintaining/results', {
             title: 'Результаты',
             controller: maintainingController,
