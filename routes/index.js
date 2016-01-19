@@ -14,11 +14,17 @@ var models = require('../models'); // including models class to access DB rows
 
 router.get('/db-test', function(req, res, next) {
 
-    var surveyController = require('../controllers/survey');
-
-    surveyController.getStageDescriptions(function(entities) {
-        res.send(entities);
+    // Preparing data about results of surveys.
+    var maintainingController = require('../controllers/maintaining');
+    maintainingController.getSurveysResults(function(results) {
+        res.send(results);
     });
+
+//    var surveyController = require('../controllers/survey');
+//
+//    surveyController.getStageDescriptions(function(entities) {
+//        res.send(entities);
+//    });
 
 //    var authC = require('../controllers/auth');
 //    authC.studentAttemptLogin("sfsfsffsf", "sffsfs", function(d) {

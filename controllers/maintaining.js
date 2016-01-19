@@ -16,6 +16,8 @@ module.exports =
 
     getAllBrsDisciplines: getAllBrsDisciplines,
 
+    getSurveysResults: getSurveysResults,
+
     deleteForm: deleteForm,
 
     addForm: addForm,
@@ -151,6 +153,66 @@ function getAllBrsDisciplines(res, callback) {
 
     callback(disciplines);
 }
+
+/**
+ * Provides a data about all surveys' results.
+ * @param {Function} callback Used to asynchronously return data.
+ * */
+function getSurveysResults(callback) {
+    /* It's very difficult to describe: we need all of our full data, excepting voted users to build graphs. */
+    models.feedback_stage.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] }, // we don't like data with dates
+        order: 'date_to DESC',
+        include: [
+            {
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.stage_description,
+                required: true,
+                include: [
+                    {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.answer,
+                        required: true
+                    },
+                    {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.discipline,
+                        required: true
+                    }
+                ]
+            },
+            {
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.feedback_form,
+                required: true,
+                include: {
+                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    model: models.question,
+                    required: true,
+                    include: {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.possible_answer,
+                        required: true
+                    }
+                }
+            }
+        ]
+    }).then(function(results) {
+            // Something went wrong.
+            if (results == null) {
+                callback([]);
+                return;
+            }
+
+            /* To convert this value to usual object and make it client-side-readable. */
+            results = results.map(function(result){ return result.toJSON() });
+
+            callback(results);
+        }
+    );
+}
+
+/* DELETE OR ADD FUNCTIONS */
 
 /**
  * Deletes form by ID.
