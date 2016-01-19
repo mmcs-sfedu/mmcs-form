@@ -174,7 +174,7 @@ var stages = {
         }
         // Preparing dates: setting current hours and minutes.
         var currentDate = new Date();
-        dateFrom = new Date(dateFrom); dateFrom.setHours(currentDate.getHours()); dateFrom.setMinutes(currentDate.getMinutes());
+        dateFrom = new Date(dateFrom); dateFrom.setHours(currentDate.getHours()); dateFrom.setMinutes(currentDate.getMinutes() + 5); // or we won't be able to add today's date
         dateTo   = new Date(dateTo);   dateTo.setHours(currentDate.getHours());   dateTo.setMinutes(currentDate.getMinutes());
         // Dates to timestamp.
         dateFrom = dateFrom.getTime();
