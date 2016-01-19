@@ -52,6 +52,7 @@ block content
                 h5 Запуск нового опроса
                 br
 
+                // Dates block
                 span Выберите дату начала и завершения опроса
                 - var minDate = new Date();
                 - var maxDate = new Date(minDate);
@@ -63,14 +64,37 @@ block content
                         input(type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
                 br
 
-                span.
-                    Укажите через точку с запятой критерии для выбора дисциплин<br>
-                    Дисциплины, оставшиеся в списке ниже, будут рассматриваться для опроса
-                div(class='input-field')
-                    i(class='material-icons prefix') search
-                    input(id='disciplineSearch' type='text' class='validate' autocomplete='off')
-                    label(for='disciplineSearch') Поисковой запрос
+                // Block for search query and form chooser
+                div.row
+                    // Form chooser column
+                    div(class='col l6 m6 s12')
+                        // If we don't have any forms yet
+                        - if (forms.length == 0) {
+                            div(class='center red-text') Для начала необходимо создать хоть одну форму!
+                        // Populating forms chooser
+                        - } else {
+                            div(class='input-field col s12')
+                                select.forms
+                                    - each form in forms
+                                        option(value='#{form.id}') #{form.name}
+                                label Выберите форму для опроса
+                        - }
+                    // Some spaces for proper dividing on small screens
+                    div.hide-on-med-and-up
+                        br
+                        br
+                        br
+                    // Search input column
+                    div(class='col l6 m6 s12')
+                        span.
+                            Укажите через точку с запятой критерии для выбора дисциплин<br>
+                            Дисциплины в списке ниже будут использоваться для опроса
+                        div(class='input-field')
+                            i(class='material-icons prefix') search
+                            input(id='disciplineSearch' type='text' class='validate' autocomplete='off')
+                            label(for='disciplineSearch') Поисковой запрос
 
+                // Disciplines chosen list
                 div.overflow-list
                     ul(class='collection disciplines')
                         - each discipline in disciplines
@@ -80,7 +104,8 @@ block content
             // Action buttons for dialog
             div.modal-footer
                 a(id='cancelStage' href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
-                a(id='submitStage' class='waves-effect waves-teal btn-flat') Запустить
+                - if (forms.length != 0) // adding run button only if we have forms at all
+                    a(id='submitStage' class='waves-effect waves-teal btn-flat') Запустить
 
 
         // Delete stage prompt
