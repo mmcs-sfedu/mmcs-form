@@ -14,11 +14,15 @@ module.exports =
 
     getAllStagesData: getAllStagesData,
 
+    getAllBrsDisciplines: getAllBrsDisciplines,
+
     deleteForm: deleteForm,
 
     addForm: addForm,
 
-    deleteStage: deleteStage
+    deleteStage: deleteStage,
+
+    formatDateForHtml: formatDateForHtml
 };
 
 
@@ -89,17 +93,9 @@ function getAllStagesData(res, callback) {
         var brsSubjects = brsDataController.getBrsSubjects(null);
 
         /* Checking BRS data. */
-        if (brsGroups == null)   { renderError('Не удалось загрузить список групп от БРС'); return; }
-        if (brsTeachers == null) { renderError('Не удалось загрузить список преподавателей от БРС'); return; }
-        if (brsSubjects == null) { renderError('Не удалось загрузить список предметов от БРС'); return; }
-
-        /* Renders error with description. */
-        function renderError(description) {
-            res.render('error', {
-                message: description,
-                error: {}
-            });
-        }
+        if (brsGroups == null)   { renderError(res, 'Не удалось загрузить список групп от БРС'); return; }
+        if (brsTeachers == null) { renderError(res, 'Не удалось загрузить список преподавателей от БРС'); return; }
+        if (brsSubjects == null) { renderError(res, 'Не удалось загрузить список предметов от БРС'); return; }
 
         /* We'll use that template if BRS data is not specified. */
         var noDataTemplate = 'Нет данных';
@@ -165,6 +161,45 @@ function getAllStagesData(res, callback) {
 
         callback(result);
     })
+}
+
+/**
+ * Provides a data to draw a list of existing on BRS disciplines.
+ * @param {Object} res In a case of error res will be used to instantly render error page.
+ * @param {Function} callback Used to asynchronously return data.
+ * */
+function getAllBrsDisciplines(res, callback) {
+    /* Getting data about discipline from BRS. */
+    var brsGroups   = brsDataController.getBrsGroups();
+    var brsTeachers = brsDataController.getBrsTeachers(null);
+    var brsSubjects = brsDataController.getBrsSubjects(null);
+
+    /* Checking BRS data. */
+    if (brsGroups == null)   { renderError(res, 'Не удалось загрузить список групп от БРС'); return; }
+    if (brsTeachers == null) { renderError(res, 'Не удалось загрузить список преподавателей от БРС'); return; }
+    if (brsSubjects == null) { renderError(res, 'Не удалось загрузить список предметов от БРС'); return; }
+
+    /* Generating disciplines array */
+    var minOfAll = Math.min(brsGroups.length, brsTeachers.length, brsSubjects.length);
+    var disciplines = [];
+    for (var i = 0; i < minOfAll; i++) {
+        disciplines.push({
+            group: {
+                id: brsGroups[i].id,
+                name: brsGroups[i].name
+            },
+            teacher: {
+                id: brsTeachers[i].id,
+                name: brsTeachers[i].name
+            },
+            subject: {
+                id: brsSubjects[i].id,
+                name: brsSubjects[i].name
+            }
+        });
+    }
+
+    callback(disciplines);
 }
 
 /**
@@ -318,4 +353,34 @@ function addForm(body, callback) {
         }).catch(function(error) { // if something went wrong or source data was invalid
             callback(null)
         });
+}
+
+
+
+/* SUPPORT FUNCTIONS (PRIVATE) */
+
+/* Renders error with description. */
+function renderError(res, description) {
+    res.render('error', {
+        message: description,
+        error: {}
+    });
+}
+
+/**
+ * Prepares JS date for html min and max appropriate values.
+ * @param {Date} srcDate A Date to format.
+ * @returns {String} Formatted date string.
+ * */
+function formatDateForHtml(srcDate) {
+    // To make a proper month or day format (e.g. 01).
+    function addZero(number) {
+        if (number <= 9)
+            return '0' + number;
+        return number;
+    }
+
+    return srcDate.getFullYear() + '-'
+        + addZero((srcDate.getMonth() + 1)) + '-'
+        + addZero(srcDate.getDate());
 }

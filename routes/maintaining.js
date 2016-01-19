@@ -66,11 +66,15 @@ router.get('/schedule', checklist, function(req, res, next) {
 
     // Preparing data about stages for page.
     maintainingController.getAllStagesData(res, function(stages) {
-        res.render('pages/maintaining/schedule', {
-            title: 'Опросы',
-            controller: maintainingController,
-            stages: stages,
-            errors: possibleErrors
+        // Than getting all disciplines from BRS.
+        maintainingController.getAllBrsDisciplines(res, function(disciplines) {
+            res.render('pages/maintaining/schedule', {
+                title: 'Опросы',
+                controller: maintainingController,
+                stages: stages,
+                disciplines: disciplines,
+                errors: possibleErrors
+            })
         })
     });
 });

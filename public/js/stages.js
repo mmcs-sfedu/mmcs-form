@@ -1,6 +1,9 @@
 /* Called when page was loaded. */
 $(document).ready(function() {
     // $.getScript("/js/utils.js"); // async import script
+
+    /* Setting on text change listener for search request input. */
+    $('#disciplineSearch').on('input', stages.onSearchRequestChanged);
 });
 
 /* Namespace for stages scripts. */
@@ -102,6 +105,49 @@ var stages = {
         request.fail(function(jqXHR, textStatus) {
             Materialize.toast('Не удалось удалить опрос ' + stageID, 5000)
         });
+    },
+
+    /**
+     * Analyzes search query and hides wrong list items.
+     * */
+    onSearchRequestChanged: function() {
+        /* What user has typed in search field. */
+        var searchQuery =  $(this).val();
+
+        /* Default divider symbol. */
+        var divider = ';';
+
+        /* Block with all disciplines. */
+        var items = $('.collection.disciplines .collection-item');
+
+        /* If some dividers found. */
+        if (searchQuery.indexOf(divider) != -1) {
+            checkItems(searchQuery.split(divider));
+        } else {
+            checkItems([searchQuery]);
+        }
+
+        /**
+         * Checks if in list items values found some queries.
+         * @param {Array} substrings Must contain at least one substring to compare.
+         * */
+        function checkItems(substrings) {
+            items.each(function() {                           // loop throw all items
+                for (var i = 0; i < substrings.length; i++) { // loop throw all substrings
+                    if (substrings[i].length == 0) // because it's bad idea to compare empty strings
+                        continue;
+
+                    if ($(this).text().toLowerCase().indexOf(substrings[i].toLowerCase()) != -1) {
+                        // Found substring in item, no need to check all other substrings.
+                        $(this).removeClass('hide');
+                        break;
+                    } else {
+                        // Hiding item, if it doesn't have any match
+                        $(this).addClass('hide');
+                    }
+                }
+            })
+        }
     }
 
 };

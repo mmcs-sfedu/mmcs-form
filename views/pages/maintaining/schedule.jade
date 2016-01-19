@@ -3,6 +3,7 @@ extends ../../base/layout
 // Some additional includes of styles and scripts
 block includes
     link(rel='stylesheet' href='/css/forms.css')
+    link(rel='stylesheet' href='/css/stages.css')
     script(src='/js/stages.js')
     // To format dates
     script(src='/js/utils.js')
@@ -19,7 +20,7 @@ block content
         +section-title('Управление опросами')
 
         // A list of existing stages
-        ul.collection
+        ul(class='collection stages')
 
         // Adding existing stages to list
         - each val in stages
@@ -37,7 +38,7 @@ block content
                 stageDescriptions = JSON.parse(stageDescriptions);
 
                 /* Adding stages in list. */
-                stages.appendStageToStagesList($(".collection"), id, dateFrom, dateTo, formName, stageDescriptions);
+                stages.appendStageToStagesList($(".collection.stages"), id, dateFrom, dateTo, formName, stageDescriptions);
 
 
         // A button to create new stage
@@ -47,11 +48,34 @@ block content
         // Add stage dialog
         div(id='addStage' class='modal modal-large')
             // Content of the dialog
-            div.modal-content
+            div(class='modal-content')
                 h5 Запуск нового опроса
                 br
 
-                span Здесь что-то будет...
+                span Выберите дату начала и завершения опроса
+                - var minDate = new Date();
+                - var maxDate = new Date(minDate);
+                - maxDate.setYear(minDate.getFullYear() + 5);
+                div.row
+                    div(class='col l6 m6 s6')
+                        input(type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
+                    div(class='col l6 m6 s6')
+                        input(type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
+                br
+
+                span.
+                    Укажите через точку с запятой критерии для выбора дисциплин<br>
+                    Дисциплины, оставшиеся в списке ниже, будут рассматриваться для опроса
+                div(class='input-field')
+                    i(class='material-icons prefix') search
+                    input(id='disciplineSearch' type='text' class='validate' autocomplete='off')
+                    label(for='disciplineSearch') Поисковой запрос
+
+                div.overflow-list
+                    ul(class='collection disciplines')
+                        - each discipline in disciplines
+                            li(class='collection-item' subjectID='#{discipline.subject.id}' teacherID='#{discipline.teacher.id}' groupID='#{discipline.group.id}').
+                                #{discipline.subject.name} (#{discipline.teacher.name}) #{discipline.group.name}
 
             // Action buttons for dialog
             div.modal-footer
