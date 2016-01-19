@@ -160,119 +160,99 @@ var stages = {
      * Checks all prepared data for stage and submits it on server.
      * */
     submitStage: function() {
+        /* Getting and checking dates. */
+        var dateFrom = $('#dateFrom').val();
+        var dateTo   = $('#dateTo').val();
+        // Dates must be filled.
+        if (dateFrom.length == 0) {
+            Materialize.toast('Укажите правильную дату начала опроса', 5000);
+            return;
+        }
+        if (dateTo.length == 0) {
+            Materialize.toast('Укажите правильную дату завершения опроса', 5000);
+            return;
+        }
+        // Preparing dates: setting current hours and minutes.
+        var currentDate = new Date();
+        dateFrom = new Date(dateFrom); dateFrom.setHours(currentDate.getHours()); dateFrom.setMinutes(currentDate.getMinutes());
+        dateTo   = new Date(dateTo);   dateTo.setHours(currentDate.getHours());   dateTo.setMinutes(currentDate.getMinutes());
+        // Dates to timestamp.
+        dateFrom = dateFrom.getTime();
+        dateTo   = dateTo.getTime();
+        if (dateFrom >= dateTo) {
+            Materialize.toast('Дата начала опроса не может быть больше даты завершения', 5000);
+            return;
+        }
 
-        alert("YES!");
+        /* Getting chosen form ID. */
+        var feedbackFormId = $('select.forms').val();
 
-//        /* Request JSON. */
-//        var requestBody = {};
-//        requestBody["questions"] = {}; // init questions field
-//
-//        /* Checking if form name is not empty. */
-//        var formName = $('div.input-field input#name').val();
-//        if (formName.length == 0) {
-//            Materialize.toast('Укажите название формы!', 5000);
-//            return;
-//        } else {
-//            /** Adding form name to request. */
-//            requestBody["name"] = formName;
-//        }
-//
-//        /* A div containing all questions. */
-//        var questionsBlock = $('div.questions');
-//
-//        /* Checking if forms has no answers. */
-//        if (questionsBlock.children().length == 0) {
-//            Materialize.toast('Добавьте хотя бы один вопрос для формы!', 5000);
-//            return;
-//        }
-//
-//        /* Checking if all fields are not empty. */
-//        var allFieldsStated = true; // to check if all fields are named
-//        questionsBlock.children().each(function() {
-//            // Current observable question row.
-//            var currentQuestionRow = $(this);
-//
-//            // If current question doesn't have any answers.
-//            if (currentQuestionRow.find('.answers').children().length == 0) {
-//                // Then stopping each and leaving with next error.
-//                allFieldsStated = false;
-//                return allFieldsStated;
-//            }
-//
-//            // Looking for every input.
-//            currentQuestionRow.find('input').each(function() {
-//                var input = $(this);
-//                if (input.val() == 0) { // an input wasn't filled
-//                    allFieldsStated = false;
-//                    return allFieldsStated;
-//                } else {
-//
-//                    /** Adding field to request. */
-//                    // Question was encountered.
-//                    if (input.hasClass('question')) {
-//                        // Adding question in request array.
-//                        requestBody
-//                            ["questions"]
-//                            [input.attr('id')] = { text: input.val(), answers: [] };
-//                        // Answer was encountered.
-//                    } else {
-//                        // Adding answer for parent question node in request array.
-//                        requestBody
-//                            ["questions"]
-//                            [currentQuestionRow.find('input.question').attr('id')]
-//                            ["answers"].push(input.val());
-//                    }
-//
-//                }
-//            });
-//
-//            if (!allFieldsStated) {
-//                return false; // return from each: some fields are not stated
-//            }
-//        });
-//
-//        // If some inputs weren't filled or questions don't have answers, showing an error.
-//        if (!allFieldsStated) {
-//            Materialize.toast('Некоторые поля остались незаполненными или вопросам не добавлены ответы!', 5000);
-//            return;
-//        }
-//
-//        /* END OF FORMS CHECK */
-//
-//
-//        /* Binding UI elements. */
-//        var buttonsFooter = $('#addForm .modal-footer');
-//        var btnSubmit = buttonsFooter.find('#submitQuestions');
-//        var btnCancel = buttonsFooter.find('#cancelForm');
-//
-//        /* Describing add form request. */
-//        var request = $.ajax({
-//            url: '/maintaining/form',
-//            method: 'POST',
-//            data: JSON.stringify(requestBody), // string will be parsed into json
-//            dataType: 'json',                  // you must specify these type params to make NodeJS read query
-//            contentType: 'application/json'
-//        });
-//        /* If everything is ok. */
-//        request.done(function(response) {
-//            // Adding new form to list.
-//            try {
-//                $(".collection").append(forms.generateFormsListItem(response.id, response.name, response.stages));
-//                forms.updateDeleteButtonsListeners(); // adding onclick listener for new form item
-//                btnCancel.click(); // closing dialog
-//                Materialize.toast('Форма успешно добавлена', 5000);
-//            } catch (exc) {
-//                proceedFail();
-//            }
-//        });
-//        /* In another case. */
-//        request.fail(function(jqXHR, textStatus) {
-//            proceedFail();
-//        });
-//        /* A function to proceed fail. */
-//        function proceedFail() {
-//            Materialize.toast('Не удалось создать форму', 5000);
-//        }
+        /* Getting chosen disciplines data. */
+        var disciplinesList = $('ul.collection.disciplines');
+        /* Getting all chosen disciplines. */
+        var disciplinesItems = disciplinesList.children().not('.hide');
+        if (disciplinesItems.length == 0) { // checking if user chose something
+            Materialize.toast('Выберите по меньшей мере одну дисциплину', 5000);
+            return;
+        }
+        /* Walking throw all chosen disciplines to prepare request array. */
+        var disciplines = [];
+        disciplinesItems.each(function() {
+            disciplines.push({
+                teacher_id: $(this).attr('teacherID'),
+                subject_id: $(this).attr('subjectID'),
+                group_id:   $(this).attr('groupID')
+            });
+        });
+
+        /* ALL DATA VALIDATED AND PREPARED */
+
+
+        /* Binding UI elements. */
+        var buttonsFooter = $('#addStage .modal-footer');
+        var btnSubmit = buttonsFooter.find('#submitStage');
+        var btnCancel = buttonsFooter.find('#cancelStage');
+
+        /* SENDING DATA ASYNC */
+
+        /* Describing add stage request. */
+        var request = $.ajax({
+            url: '/maintaining/stage',
+            method: 'POST',
+            data: JSON.stringify({             // string will be parsed into json
+                date_from        : dateFrom,
+                date_to          : dateTo,
+                feedback_form_id : feedbackFormId,
+                disciplines      : disciplines
+            }),
+            dataType: 'json',                  // you must specify these type params to make NodeJS read query
+            contentType: 'application/json'
+        });
+        /* If everything is ok. */
+        request.done(function(response) {
+            // Adding new stage to list.
+            try {
+                stages.appendStageToStagesList(
+                    $(".collection.stages"),
+                    response.id,
+                    response.dateFrom,
+                    response.dateTo,
+                    response.formName,
+                    response.stageDescriptions);
+                btnCancel.click(); // closing dialog
+                Materialize.toast('Опрос успешно добавлен', 5000);
+            } catch (exc) {
+                proceedFail();
+            }
+        });
+        /* In another case. */
+        request.fail(function(jqXHR, textStatus) {
+            proceedFail();
+        });
+        /* A function to proceed fail. */
+        function proceedFail() {
+            Materialize.toast('Не удалось создать опрос', 5000);
+        }
     }
 
 };

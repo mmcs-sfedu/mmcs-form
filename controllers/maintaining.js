@@ -22,6 +22,8 @@ module.exports =
 
     deleteStage: deleteStage,
 
+    addStage: addStage,
+
     formatDateForHtml: formatDateForHtml
 };
 
@@ -87,77 +89,25 @@ function getAllStagesData(res, callback) {
         /* To convert this value to usual object and make it client-side-readable. */
         result = result.map(function(stage){ return stage.toJSON() });
 
+
+        /**
+         *  TODO в этом блоке достаточно нерациональное решение (как заглушка) слияния данных с БРС.
+         *  TODO в перспективе лучше для каждого stage description (дисциплины внутри) запрашивать имя по ID от БРС. */
         /* Getting data about discipline from BRS. */
         var brsGroups   = brsDataController.getBrsGroups();
         var brsTeachers = brsDataController.getBrsTeachers(null);
         var brsSubjects = brsDataController.getBrsSubjects(null);
-
         /* Checking BRS data. */
         if (brsGroups == null)   { renderError(res, 'Не удалось загрузить список групп от БРС'); return; }
         if (brsTeachers == null) { renderError(res, 'Не удалось загрузить список преподавателей от БРС'); return; }
         if (brsSubjects == null) { renderError(res, 'Не удалось загрузить список предметов от БРС'); return; }
-
-        /* We'll use that template if BRS data is not specified. */
-        var noDataTemplate = 'Нет данных';
-
-        
         /* Scary merge with BRS data. Don't forget to change BRS data structure when it'll work with true BRS! */
-        for (var stageIndex in result) {
-            var stageDescriptions = result[stageIndex]['stage_descriptions'];
-            for (var stageDescriptionIndex in stageDescriptions) {
-                var stageDescription = stageDescriptions[stageDescriptionIndex];
-                var discipline = stageDescription['discipline'];
-
-                // To use template text if not found in BRS.
-                var brsItemFound = false;
-                
-                // Looking for groups intersections.
-                for (var groupIndex in brsGroups) {
-                    var group = brsGroups[groupIndex];
-                    if (discipline['group_id'] == group['id']) {
-                        discipline['group'] = group['name'];
-                        brsItemFound = true;
-                        break;
-                    }
-                }
-                // Setting template if not found in BRS.
-                if (!brsItemFound) {
-                    discipline['group'] = noDataTemplate;
-                }
-                
-                brsItemFound = false;
-
-                // Looking for teachers intersections.
-                for (var teacherIndex in brsTeachers) {
-                    var teacher = brsTeachers[teacherIndex];
-                    if (discipline['teacher_id'] == teacher['id']) {
-                        discipline['teacher'] = teacher['name'];
-                        brsItemFound = true;
-                        break;
-                    }
-                }
-                // Setting template if not found in BRS.
-                if (!brsItemFound) {
-                    discipline['teacher'] = noDataTemplate;
-                }
-
-                brsItemFound = false;
-
-                // Looking for subjects intersections.
-                for (var subjectIndex in brsSubjects) {
-                    var subject = brsSubjects[subjectIndex];
-                    if (discipline['subject_id'] == subject['id']) {
-                        discipline['subject'] = subject['name'];
-                        brsItemFound = true;
-                        break;
-                    }
-                }
-                // Setting template if not found in BRS.
-                if (!brsItemFound) {
-                    discipline['subject'] = noDataTemplate;
-                }
-            }
+        for (var i = 0; i < result.length; i++) {     // looking throw all feedback stages
+            mergeStageDescriptionsWithBRS(
+                result[i]['stage_descriptions'],      // stage descriptions from database
+                brsGroups, brsTeachers, brsSubjects); // BRS data arrays
         }
+
 
         callback(result);
     })
@@ -355,9 +305,233 @@ function addForm(body, callback) {
         });
 }
 
+/**
+ * Adds stage with its disciplines.
+ * @param {Array} body Contents of future stage.
+ * @param {Function} callback Pass null to it to throw error and return created stage as json to signal about success (see the format in frontend).
+ * */
+function addStage(body, callback) {
+    /* Getting and checking dates fields. */
+    var dateFrom = new Date(body['date_from']);
+    var dateTo   = new Date(body['date_to']);
+    var currentDate = new Date();
+    // Checking dates' validity
+    if (dateFrom >= dateTo || dateFrom <= currentDate || dateTo <= currentDate) {
+        callback(null);
+        return;
+    }
+
+    /* Checking that disciplines array is not empty. */
+    var disciplines = body['disciplines'];
+    if (!Array.isArray(disciplines) || disciplines.length == 0) {
+        callback(null);
+        return;
+    }
+
+    /* Setting feedback form field to var. */
+    var feedbackFormId = body['feedback_form_id'];
+
+    /* DATA PREPARATIONS COMPLETED, BEGINNING DB INSERT TRANSACTION */
+
+
+    /* Preparing vars to store some db transaction intermediate results. */
+    var createdStageId = null;
+    var createdStageDescriptions = null;
+    var usedFeedbackFormName = null;
+
+    /* Beginning transaction (because it's impossible to add a stage without disciplines). */
+    models.sequelize.transaction(
+        { autocommit: false }, // transactions don't work without this param
+        function(t) {
+
+            /* Creating feedback stage first */
+            return models.feedback_stage.create({
+                date_from:        dateFrom,
+                date_to:          dateTo,
+                feedback_form_id: feedbackFormId,
+                createdAt:        new Date(),
+                updatedAt:        new Date()
+            }, { transaction: t })
+
+                /* When feedback stage was created, inserting disciplines for it. */
+                .then(function(feedback_stage) {
+                    createdStageId = feedback_stage.id;
+                    // We should populate raw disciplines with such dates for successful insertion.
+                    for (var i = 0; i < disciplines.length; i++) {
+                        disciplines[i]['createdAt'] = new Date();
+                        disciplines[i]['updatedAt'] = new Date();
+                    }
+                    // Inserting all disciplines for stage in database.
+                    return models.discipline.bulkCreate(disciplines,
+                        { transaction: t, returning: true }) // must provide returning param to create IDs
+
+                        .then(function(disciplines) {
+                            // Creating stage description for every created disciplines. Preparing array first.
+                            var stageDescriptions = [];
+                            for (var i = 0; i < disciplines.length; i++) {
+                                stageDescriptions.push({
+                                    discipline_id:     disciplines[i].id,
+                                    feedback_stage_id: feedback_stage.id,
+                                    createdAt:         new Date(),
+                                    updatedAt:         new Date()
+                                })
+                            }
+                            // Inserting stage descriptions in database
+                            return models.stage_description.bulkCreate(stageDescriptions,
+                                { transaction: t, returning: true }) // to create IDs
+
+                                .then(function(stage_descriptions) {
+                                    // Not very perfect move, but we must return stage descriptions with disciplines to frontend.
+                                    return models.stage_description.findAll({
+                                        where: { feedback_stage_id: createdStageId },        // only for created feedback stage
+                                        attributes: ['discipline_id'],
+                                        include: [
+                                            {
+                                                // Including disciplines.
+                                                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                                model: models.discipline
+                                            }
+                                        ], transaction: t})
+
+                                        .then(function(stage_descriptions) {
+                                            // Stopping if something wrong while getting stage descriptions.
+                                            if (stage_descriptions == null) {
+                                                callback(null);
+                                                return;
+                                            }
+                                            // Converting db response to usual JS array.
+                                            stage_descriptions = stage_descriptions.map(function(stage) { return stage.toJSON() });
+
+
+                                            /* Getting data about discipline from BRS. */
+                                            var brsGroups   = brsDataController.getBrsGroups();
+                                            var brsTeachers = brsDataController.getBrsTeachers(null);
+                                            var brsSubjects = brsDataController.getBrsSubjects(null);
+                                            /* Checking BRS data. */
+                                            if (brsGroups == null || brsTeachers == null || brsSubjects == null) {
+                                                callback(null);
+                                                return;
+                                            }
+                                            // To refer it from out the db interactions.
+                                            createdStageDescriptions = stage_descriptions;
+                                            /**
+                                             * TODO опять-таки прежний изъян с работой с данными БРС. Избыточные данные - очень плохо!
+                                             * TODO для большей информации см. аналогичный комментарий выше. */
+                                            mergeStageDescriptionsWithBRS(createdStageDescriptions, brsGroups, brsTeachers, brsSubjects);
+
+
+                                            // Looking for name for passed to this method form (by ID).
+                                            return models.feedback_form.findOne({
+                                                    where: { id: feedbackFormId },
+                                                    attributes: ['name'],
+                                                    transaction: t
+                                                })
+
+                                                    .then(function(feedback_form) {
+                                                    // If data about form is valid
+                                                    if (feedback_form != null) {
+                                                        usedFeedbackFormName = feedback_form.name; // saving for next read
+                                                    } else {
+                                                        callback(null);
+                                                    }
+                                                })
+                                        })
+                                })
+                        })
+                });
+
+        /* If everything is ok in our big transaction. */
+        }).then(function(result) {
+            // Every data was modified, so XSSs are impossible.
+            callback({
+                id:                createdStageId,
+                dateFrom:          dateFrom,
+                dateTo:            dateTo,
+                formName:          usedFeedbackFormName,
+                stageDescriptions: createdStageDescriptions });
+        }).catch(function(error) {
+            // If something went wrong or source data was invalid.
+            callback(null)
+        });
+
+}
+
 
 
 /* SUPPORT FUNCTIONS (PRIVATE) */
+
+/**
+ * This is template function to merge stage descriptions from local database and BRS.
+ * We are merging names of entities by IDs.
+ * Doesn't return anything, 'cause can change data variables by links.
+ * @param {Array} stageDescriptions Source stage descriptions from database.
+ * @param {Array} brsGroups Groups with names from BRS.
+ * @param {Array} brsTeachers Teachers from BRS.
+ * @param {Array} brsSubjects Subjects from BRS.
+ * */
+function mergeStageDescriptionsWithBRS(stageDescriptions, brsGroups, brsTeachers, brsSubjects) {
+    /* We'll use that value if data from BRS wouldn't be found. */
+    var noDataTemplate = 'Нет данных';
+
+    /* Walking throw all stage descriptions. */
+    for (var stageDescriptionIndex in stageDescriptions) {
+        // Current stage description and it's discipline from db
+        var stageDescription = stageDescriptions[stageDescriptionIndex];
+        var discipline = stageDescription['discipline'];
+
+        // To use template text if not found in BRS.
+        var brsItemFound = false;
+
+        // Looking for groups intersections.
+        for (var groupIndex in brsGroups) {
+            var group = brsGroups[groupIndex];
+            if (discipline['group_id'] == group['id']) {
+                // Setting name if found intersection
+                discipline['group'] = group['name'];
+                brsItemFound = true;
+                break; // no need to walk throw other items
+            }
+        }
+        // Setting template if not found in BRS.
+        if (!brsItemFound) {
+            discipline['group'] = noDataTemplate;
+        }
+
+        /* All other block are equal. */
+        brsItemFound = false;
+
+        // Looking for teachers intersections.
+        for (var teacherIndex in brsTeachers) {
+            var teacher = brsTeachers[teacherIndex];
+            if (discipline['teacher_id'] == teacher['id']) {
+                discipline['teacher'] = teacher['name'];
+                brsItemFound = true;
+                break;
+            }
+        }
+        // Setting template if not found in BRS.
+        if (!brsItemFound) {
+            discipline['teacher'] = noDataTemplate;
+        }
+
+        brsItemFound = false;
+
+        // Looking for subjects intersections.
+        for (var subjectIndex in brsSubjects) {
+            var subject = brsSubjects[subjectIndex];
+            if (discipline['subject_id'] == subject['id']) {
+                discipline['subject'] = subject['name'];
+                brsItemFound = true;
+                break;
+            }
+        }
+        // Setting template if not found in BRS.
+        if (!brsItemFound) {
+            discipline['subject'] = noDataTemplate;
+        }
+    }
+
+}
 
 /* Renders error with description. */
 function renderError(res, description) {

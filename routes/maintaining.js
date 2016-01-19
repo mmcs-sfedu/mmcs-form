@@ -162,4 +162,23 @@ router.delete('/stage', checklist, function(req, res, next) {
     });
 });
 
+/* Add stage */
+router.post('/stage', checklist, function(req, res, next) {
+    /* Checking request. */
+    req.checkBody('date_from').notEmpty();
+    req.checkBody('date_to').notEmpty();
+    req.checkBody('feedback_form_id').notEmpty();
+    req.checkBody('disciplines').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) { // if there is some data which is not provided
+        res.send(null);
+        return;
+    }
+
+    /* Adding stage and sending result. */
+    maintainingController.addStage(req.body, function(result) {
+        res.send(result);
+    });
+});
+
 module.exports = router;

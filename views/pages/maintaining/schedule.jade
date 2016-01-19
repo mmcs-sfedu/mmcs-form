@@ -59,9 +59,9 @@ block content
                 - maxDate.setYear(minDate.getFullYear() + 5);
                 div.row
                     div(class='col l6 m6 s6')
-                        input(type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
+                        input(id='dateFrom' type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
                     div(class='col l6 m6 s6')
-                        input(type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
+                        input(id='dateTo' type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
                 br
 
                 // Block for search query and form chooser
@@ -75,8 +75,13 @@ block content
                         - } else {
                             div(class='input-field col s12')
                                 select.forms
-                                    - each form in forms
-                                        option(value='#{form.id}') #{form.name}
+                                    // First form should be selected
+                                    - for (var i = 0; i < forms.length; i++) {
+                                        - if (i == 0) {
+                                            option(value='#{forms[i].id}' selected) #{forms[i].name}
+                                        - } else {
+                                            option(value='#{forms[i].id}') #{forms[i].name}
+                                        - } }
                                 label Выберите форму для опроса
                         - }
                     // Some spaces for proper dividing on small screens
