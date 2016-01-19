@@ -138,4 +138,20 @@ router.post('/form', checklist, function(req, res, next) {
     });
 });
 
+/* Delete stage by ID */
+router.delete('/stage', checklist, function(req, res, next) {
+    /* Checking request. */
+    req.checkBody('id').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) { // if there is no provided form ID, ajax will show error
+        res.send(null);
+        return;
+    }
+
+    /* Deleting stage using controller function. */
+    maintainingController.deleteStage(req.body['id'], function(result) {
+        res.send(result);
+    });
+});
+
 module.exports = router;

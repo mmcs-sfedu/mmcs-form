@@ -44,7 +44,8 @@ var stages = {
 
         /* Adding delete button. */
         stageItemHtml += '' +
-            '<a href="#!" class="secondary-content">' +
+            // This button will show deletion prompt first in modal dialog.
+            '<a href="#deleteStage" class="secondary-content modal-trigger">' +
             '<i id="' + id + '" class="material-icons red-text text-lighten-3">delete</i>' +
             '</a>';
 
@@ -55,11 +56,52 @@ var stages = {
             '</li>';
 
 
-        // TODO ДОБАВИТЬ СЛУШАТЕЛЬ ДЛЯ КНОПКИ УДАЛЕНИЯ - ПОКАЗЫВАТЬ ДИАЛОГ С УВЕДОМЛЕНИЕМ!
+        /* Converting html code to object to add listener for button. */
+        stageItemHtml = $($.parseHTML(stageItemHtml));
+
+        // Adding onclick listener.
+        stageItemHtml.find('i#'+id).on('click', stages.prepareDeletionModal);
 
 
         /* And finally adding row to list. */
         node.append(stageItemHtml);
+    },
+
+    /**
+     * Initiates modal deletion dialog buttons actions.
+     * */
+    prepareDeletionModal: function() {
+        /* Getting stage ID which will be deleted. */
+        var stageIdToDelete = $(this).attr('id');
+
+        /* Getting UI button to set onclick listener. */
+        var btnSubmit = $('.modal #submitDeletion');
+
+        /* Onclick deletion listener. */
+        btnSubmit.off('click'); // removing old listeners first
+        btnSubmit.on('click', function() { stages.deleteStage(stageIdToDelete) });
+    },
+
+    /**
+     * Deletes chosen stage.
+     * */
+    deleteStage: function(stageID) {
+        /* Describing delete request for stage. */
+        var request = $.ajax({
+            url: '/maintaining/stage',
+            method: 'DELETE',
+            data: { id : stageID },
+            dataType: "json"
+        });
+        /* Deleting stage from list, if everything is ok. */
+        request.done(function(response) {
+            $('.modal #cancelDeletion').click(); // closing dialog
+            $('i#' + stageID).parents('.collection-item').first().remove();
+        });
+        /* Showing an error in another case. */
+        request.fail(function(jqXHR, textStatus) {
+            Materialize.toast('Не удалось удалить опрос ' + stageID, 5000)
+        });
     }
 
 };

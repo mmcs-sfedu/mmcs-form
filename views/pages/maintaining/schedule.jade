@@ -43,6 +43,7 @@ block content
         // A button to create new stage
         +create-action-button('addStage', null)
 
+
         // Add stage dialog
         div(id='addStage' class='modal modal-large')
             // Content of the dialog
@@ -56,3 +57,18 @@ block content
             div.modal-footer
                 a(id='cancelStage' href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
                 a(id='submitStage' class='waves-effect waves-teal btn-flat') Запустить
+
+
+        // Delete stage prompt
+        div(id='deleteStage' class='modal')
+            // Content of the dialog
+            div.modal-content
+                h5 Вы действительно хотите удалить этот этап анкетирования?
+                br
+
+                span Это действие также приведёт к потере данных о результатах выбранного опроса
+
+            // Action buttons for dialog
+            div.modal-footer
+                a(id='cancelDeletion' href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
+                a(id='submitDeletion' class='waves-effect waves-teal btn-flat') Удалить

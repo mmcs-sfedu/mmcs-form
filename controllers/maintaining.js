@@ -16,7 +16,9 @@ module.exports =
 
     deleteForm: deleteForm,
 
-    addForm: addForm
+    addForm: addForm,
+
+    deleteStage: deleteStage
 };
 
 
@@ -192,6 +194,29 @@ function deleteForm(id, callback) {
         }).catch(function() {            // returning null in callback to show error
                 callback(null);
             });
+}
+
+/**
+ * Deletes stage by ID.
+ * @param {Number} id Stage's ID.
+ * @param {Function} callback Pass null to it to throw error and some JSON to signal about success.
+ * */
+function deleteStage(id, callback) {
+    /* Looking for that form and it child stages. */
+    return models.feedback_stage.findOne({
+        where: { id: id },
+        attributes: { exclude: ['createdAt', 'updatedAt'] }
+    }).then(function(feedback_stage) {
+            /* Destroying stage. */
+            if (feedback_stage != null) {
+                feedback_stage.destroy(); // destroying found stage and callback some json to success
+                callback({ deleted_feedback_stage_id: id });
+            } else {
+                callback(null);           // if stage was not found returning null to throw error
+            }
+        }).catch(function() {             // returning null in callback to show error
+            callback(null);
+        });
 }
 
 /**

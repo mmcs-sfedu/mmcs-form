@@ -14,11 +14,10 @@ var models = require('../models'); // including models class to access DB rows
 
 router.get('/db-test', function(req, res, next) {
 
-    var maintainingController = require('../controllers/maintaining');
+    var surveyController = require('../controllers/survey');
 
-    // Preparing data about stages for page.
-    maintainingController.getAllStagesData(res, function(stages) {
-        res.send(stages);
+    surveyController.getStageDescriptions(function(entities) {
+        res.send(entities);
     });
 
 //    var authC = require('../controllers/auth');
