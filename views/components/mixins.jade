@@ -38,23 +38,33 @@ mixin create-action-button(modalID, onclick)
 
 // Creates survey item graph to represent it's results. All params are necessary.
 mixin create-graph-result(questionsAndAnswers, answers, usersCount)
-    p
+    div.as-p-padding
         - for (var i = 0; i < questionsAndAnswers.length; i++) {
         -   var totalVotesInQuestion = 0;
             b= questionsAndAnswers[i].text
             br
             br
         -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
+        -       for (var k = 0; k < answers.length; k++) {
+        -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
+        -               totalVotesInQuestion++;
+        -           }
+        -       }
+        -   }
+        -
+        -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
         -       var count = 0;
         -       for (var k = 0; k < answers.length; k++) {
         -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
         -               count++;
-        -               totalVotesInQuestion++;
         -           }
         -       }
+        -       var proportion = count / totalVotesInQuestion * 100;
                 span= questionsAndAnswers[i].possible_answers[j].text
-                span &nbsp
+                span &nbsp-&nbsp
                 span= count
+                br
+                div(class='vote-line' style='width:#{proportion}%;')
                 br
         -   }
             i Всего проголосовавших:&nbsp
