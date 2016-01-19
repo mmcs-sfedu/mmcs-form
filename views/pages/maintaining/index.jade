@@ -1,4 +1,49 @@
 extends ../../base/layout
 
+// Some additional includes of styles and scripts
+block includes
+    link(rel='stylesheet' href='css/forms.css')
+
 block content
-    p Корневая страница для администратора
+    include ../../blocks/admin-auth
+    include ../../blocks/errors-toaster
+
+    div(class='container')
+
+        // If admin has authorized, showing him navigation menu
+        if controller.authModule.isAdminAuthorized()
+            div(class='row center')
+                // Hiding spacing on small screens
+                div.hide-on-small-only
+                    br
+                    br
+                br
+                h5 Выберите необходимый раздел
+                // Navigation buttons
+                div(class='col l4 m4 s12')
+                    br
+                    br
+                    a(class='btn btn-fit-div waves-effect waves-light blue lighten-2' href='/maintaining/create') Формы
+                    p Здесь вы можете создавать формы для дальнейших опросов
+                div(class='col l4 m4 s12')
+                    br
+                    br
+                    a(class='btn btn-fit-div waves-effect waves-light blue lighten-2' href='/maintaining/schedule') Опросы
+                    p Запуск опросов и управление активными голосованиями
+                div(class='col l4 m4 s12')
+                    br
+                    br
+                    a(class='btn btn-fit-div waves-effect waves-light blue lighten-2' href='/maintaining/results') Результаты
+                    p Просмотр результатов проведенных для студентов опросов
+
+        else
+            // In other case showing prompt about authorization
+            br
+            br
+            br
+            div.row
+                div(class='col s12 center')
+                    h5.
+                        Чтобы получить доступ к управлению формами опросов,
+                        а также запускать анкетирования
+                        и отслеживать результаты голосований, необходимо авторизоваться

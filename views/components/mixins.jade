@@ -9,3 +9,68 @@ mixin col-proof(icon, text)
         div.t-spacing-col!= text
         br
         br
+
+
+mixin section-title(title)
+    div.row
+        div(class='col s12')
+            h5
+                =title
+            br
+
+
+// Pass null as args if you don't need this button as modal trigger and it doesn't need onclick function.
+mixin create-action-button(modalID, onclick)
+    - var classDefinition = 'btn-floating btn-large waves-effect waves-light green lighten-1';
+    - var hrefDefinition = '#!';
+    - if (modalID != null) {
+        - classDefinition = classDefinition + ' modal-trigger';
+        - hrefDefinition = '#' + modalID;
+    - }
+
+    // adding spaces for button
+    br
+    span &nbsp &nbsp &nbsp &nbsp &nbsp
+
+    a(class='#{classDefinition}' href='#{hrefDefinition}' onclick='#{onclick}')
+        i(class='material-icons') add
+
+
+// Creates survey item graph to represent it's results. All params are necessary.
+mixin create-graph-result(questionsAndAnswers, answers, usersCount)
+    div.as-p-padding
+        - for (var i = 0; i < questionsAndAnswers.length; i++) {
+        -   var totalVotesInQuestion = 0;
+            b= questionsAndAnswers[i].text
+            br
+            br
+        -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
+        -       for (var k = 0; k < answers.length; k++) {
+        -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
+        -               totalVotesInQuestion++;
+        -           }
+        -       }
+        -   }
+        -
+        -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
+        -       var count = 0;
+        -       for (var k = 0; k < answers.length; k++) {
+        -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
+        -               count++;
+        -           }
+        -       }
+        -       var proportion = count / totalVotesInQuestion * 100;
+                span= questionsAndAnswers[i].possible_answers[j].text
+                span &nbsp-&nbsp
+                span= count
+                br
+                div(class='vote-line' style='width:#{proportion}%;')
+                br
+        -   }
+            i Всего проголосовавших:&nbsp
+            i= totalVotesInQuestion
+        -   if (i != questionsAndAnswers.length - 1)
+            br
+            br
+            br
+        - }

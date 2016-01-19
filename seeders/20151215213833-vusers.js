@@ -5,6 +5,9 @@ var models = require('../models');
 module.exports = {
   up: function (queryInterface, Sequelize) {
 
+      /* We have to wait to fire that seed successfully first time. */
+      sleepFor(500);
+
       return models.stage_description.findAll().then(function(stage_descriptions) {
           var voted_users = [];
           for (var j = 0; j < stage_descriptions.length; j++) {
@@ -29,3 +32,9 @@ module.exports = {
 
   }
 };
+
+/* Freezes main process for stated time. */
+function sleepFor(msecs) {
+    var now = new Date().getTime();
+    while (new Date().getTime() < now + msecs) { }
+}

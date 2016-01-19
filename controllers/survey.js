@@ -85,7 +85,56 @@ module.exports =
 
             callback(desiredStageDescriptions);
         });
+    },
+
+
+
+    /**
+     * Saves user's answer for survey.
+     * @param {Integer} stageDescriptionId Survey ID.
+     * @param {Array} possibleAnswers User's answers for that survey.
+     * @param {Object} res To draw response page.
+     * @return {Null} Returns nothing.
+     */
+    saveUsersAnswer : function(stageDescriptionId, possibleAnswers, res) {
+        /* Using same format to get possible answers (user's answers) IDs */
+        possibleAnswers = possibleAnswers.split(',');
+
+        /* Preparing array for bulk insert */
+        var answers = [];
+        for (var i = 0; i < possibleAnswers.length; i++) {
+            answers.push({
+                possible_answer_id: possibleAnswers[i],
+                stage_description_id: stageDescriptionId,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+        }
+
+        /* Transaction to insert both voted user and his answers data */
+        return models.sequelize.transaction(
+            { autocommit: false },   // without false param returns an error
+            function (t) {
+            return models.voted_user
+                .create({            // creating voted user record
+                stage_description_id: stageDescriptionId,
+                account_id: authController.isStudentAuthorized(),
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }, { transaction: t })
+                .then(function () { // when voted user data inserted, adding his answers
+                return models.answer.bulkCreate(answers, { transaction: t });
+            });
+        }).then(function (result) { // when transaction successfully completed
+            res.render('pages/survey/finish');
+        }).catch(function (err) {   // when an error occurred with transaction
+            res.render('error', {
+                message: "Произошла ошибка в транзакции записи результата голосования!",
+                error: {}
+            });
+        });
     }
+
 };
 
 //var surveyControllerNamespace = {
