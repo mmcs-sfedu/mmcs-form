@@ -1,4 +1,59 @@
 extends ../../base/layout
 
+// Some additional includes of styles and scripts
+block includes
+    link(rel='stylesheet' href='/css/forms.css')
+    script(src='/js/forms.js')
+
+// Login block and module to show errors, mixins usage
 block content
-    p Создание опроса
+    include ../../blocks/admin-auth
+    include ../../blocks/errors-toaster
+    include ../../components/mixins
+
+    div(class='container')
+
+        +section-title('Управление формами')
+
+        // Here will be our forms
+        ul(class='collection')
+
+        // Adding existing forms to list
+        - each val in forms
+            script.
+                /* Getting values here, because Jade has bad convert rules (destroys objects). */
+                var id = '#{val.id}';
+                var name = '#{val.name}';
+                var stages = '#{val.feedback_stages.length}';
+
+                /* Adding forms in list. */
+                $(".collection").append(forms.generateFormsListItem(id, name, stages))
+
+        // Button to add new form
+        // Also clears last form fields
+        +create-action-button('addForm', '$(".questions").empty();$("input#name").val("");')
+
+        // Add form dialog
+        div(id='addForm' class='modal modal-large')
+            // Content of the dialog
+            div.modal-content
+                h5 Создание формы для опросов
+                br
+                // Form name block
+                div(class='input-field')
+                    input(id='name' type='text' class='validate' autocomplete='off')
+                    label(for='name') Название формы
+
+                // Here will be question with answers for form
+                div(class='questions')
+
+                br
+
+                // Button to add question
+                a(id='addQuestion' class='btn-floating btn-medium waves-effect waves-light green lighten-1')
+                    i(class='material-icons') add
+
+            // Action buttons for dialog
+            div.modal-footer
+                a(id='cancelForm' href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
+                a(id='submitQuestions' class='waves-effect waves-teal btn-flat') Создать

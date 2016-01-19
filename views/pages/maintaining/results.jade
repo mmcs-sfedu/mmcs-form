@@ -1,4 +1,57 @@
 extends ../../base/layout
 
+// Some additional includes of styles and scripts
+block includes
+    link(rel='stylesheet' href='/css/forms.css')
+    link(rel='stylesheet' href='/css/results.css')
+    script(src='/js/results.js')
+    // To format dates
+    script(src='/js/utils.js')
+
+// Login block and module to show errors, mixins usage
 block content
-    p Здесь представлены результаты опросов
+    include ../../blocks/admin-auth
+    include ../../blocks/errors-toaster
+    include ../../components/mixins
+
+
+    // All page content will be here
+    div(class='container')
+
+        +section-title('Просмотр результатов опросов')
+
+        // Accordion with all results
+        ul(class='collapsible popout' data-collapsible='accordion')
+            - each feedbackStage in results
+                - each stageDescription in feedbackStage.stage_descriptions
+                    // Result item
+                    li
+
+                        // Header
+                        div(class='collapsible-header' id='#{stageDescription.id}')
+                            // Icon on the left
+                            i.material-icons trending_up
+                            // Form name
+                            | #{feedbackStage.feedback_form.name}
+                            script.
+                                // Getting current item object in DOM
+                                var stageDescriptionId = '#{stageDescription.id}';
+                                var currentItemRow = $('.collapsible-header#' + stageDescriptionId);
+
+                                // Formatting and appending date
+                                var dateFrom = '#{feedbackStage.date_from}';
+                                var dateTo   = '#{feedbackStage.date_to}';
+                                currentItemRow.append(' (' + utils.formatDateForStage(dateFrom));
+                                currentItemRow.append(' -- ' + utils.formatDateForStage(dateFrom) + ')');
+
+                                // Appending discipline
+                                var discipline = '#{JSON.stringify(stageDescription.discipline)}';
+                                discipline = utils.parseObjectFromJadeStringified(discipline);
+                                currentItemRow.append('' +
+                                 ' по ' + discipline.subject + '' +
+                                  ' (' + discipline.teacher + ') ' +
+                                   'у ' + discipline.group);
+
+                        // Inner block (hidden)
+                        div.collapsible-body
+                            +create-graph-result(feedbackStage.feedback_form.questions, stageDescription.answers, stageDescription.voted_users.length)

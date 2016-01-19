@@ -22,5 +22,18 @@ module.exports =
         }
 
         return teachers;
+    },
+
+    getBrsGroups : function() {
+        var groups = [];
+        for (var i = 0; i <= 5; i++) {
+            groups.push({
+                id: i,
+                name: "Группа " + i
+            });
+        }
+
+        return groups;
     }
+
 };
