@@ -34,6 +34,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+// here are some modules which available globally in our app
 
 // and here we are stating our paths to routes in url access
 app.use('/', routes);

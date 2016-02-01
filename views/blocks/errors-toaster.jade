@@ -1,4 +1,8 @@
+// If we've got some errors from server
 - if (errors != null)
     script.
-        errors="#{errors}";
-                Materialize.toast(errors, 5000)
+        // Lambda-function to avoid intersections of variables in code
+        (function () {
+            var errors = "#{errors}";
+            Materialize.toast(errors, 5000)
+        }());

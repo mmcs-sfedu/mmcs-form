@@ -12,11 +12,11 @@ html
     script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js')
     link(href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet')
 
-    // local styles
+    // local styles (global - used in every derived page)
     link(rel='stylesheet', href='/css/main.css')
     link(rel='stylesheet', href='/css/sticky-footer.css')
 
-    // local scripts
+    // local scripts (global for derived pages)
     script(src='/js/main.js' type='text/javascript')
 
     // for additional includes of styles and javascripts
@@ -26,6 +26,7 @@ html
     // block for extension
     block content
 
+    // a base footer which will be visible in all pages
     br
     footer(class='page-footer transparent')
       div.container
