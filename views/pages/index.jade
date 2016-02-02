@@ -9,23 +9,20 @@ block content
     //        Институт математики, механики и компьютерных наук ЮФУ
     //        в целях повышения образовательного качества проводит опрос студентов
 
-    div(class='container')
+    // all content of page will be here
+    div(class='container home-context')
 
         // |<br><br><br> to continue inner html of previous div
         br
         br
         br
 
-        // alternative spelling of class is below
-        div.row
-            div(class='col s12 center')
-                h5.
-                    Институт математики, механики и компьютерных наук ЮФУ
-                    в целях повышения образовательного качества проводит опрос студентов
+        // adding centered title
+        +section-title('Институт математики, механики и компьютерных наук ЮФУ в целях повышения образовательного качества проводит опрос студентов', true)
 
         br
-        br
 
+        // start survey button
         div(class='row center')
             a(class='btn waves-effect waves-light blue lighten-2' href='/survey') Принять участие
 
@@ -43,7 +40,9 @@ block content
 
 
 
+        // block with columns of descriptions
         div(class='row center')
+            // hardcoded first column to show how it works
             div(class='col m4 s12')
                 i(class='medium material-icons blue-text text-lighten-4') trending_up
                 br
@@ -72,4 +71,5 @@ block content
             // sample of calling mixin, also can use mixin and mixin's name instead of +
             +col-proof('recent_actors', 'Анонимность голосования достигается хранением идентификаторов проголосовавших без связывания их анкет с авторизационными данными')
 
+            // using mixins to create other 2 columns
             +col-proof('code', 'Вы можете ознакомиться с актуальным исходным кодом проекта в <a href="https://github.com/a1tavista/mmcs-form" target="_blank">репозитории на Github</a>')

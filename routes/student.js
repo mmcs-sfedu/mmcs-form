@@ -6,6 +6,7 @@ var models = require('../models');
 
 var authController = require('../controllers/auth');
 var errorsController = require('../controllers/errors');
+var utilsController = require('../controllers/utils');
 
 
 // array of functions which will be executed before
@@ -69,7 +70,7 @@ router.get('/forms'///:id'
                 }
             ]
         }).then(function(forms) {
-            res.send(forms);
+            res.send(utilsController.toNormalArray(forms)[0]);
         });
 });
 

@@ -1,8 +1,9 @@
 // using mixins is a one of ways to make dynamic extensions
 
+// Creates a column for 1/3 of total width with icon and text
 mixin col-proof(icon, text)
     div(class='col m4 s12')
-        i(class='medium material-icons blue-text text-lighten-4')!= icon
+        i(class='medium material-icons blue-text text-lighten-4')= icon
         br
         br
         // inserting variable's content; != equals that we use variable instead of text
@@ -11,9 +12,12 @@ mixin col-proof(icon, text)
         br
 
 
-mixin section-title(title)
+// Creates a title for full grid width
+mixin section-title(title, isCentered)
+    - var classDefinition = 'col s12';
+    - if (isCentered) classDefinition = classDefinition + ' center';
     div.row
-        div(class='col s12')
+        div(class='#{classDefinition}')
             h5
                 =title
             br
@@ -32,18 +36,23 @@ mixin create-action-button(modalID, onclick)
     br
     span &nbsp &nbsp &nbsp &nbsp &nbsp
 
+    // onclick action for button
     a(class='#{classDefinition}' href='#{hrefDefinition}' onclick='#{onclick}')
         i(class='material-icons') add
 
 
 // Creates survey item graph to represent it's results. All params are necessary.
 mixin create-graph-result(questionsAndAnswers, answers, usersCount)
+    // margins
     div.as-p-padding
         - for (var i = 0; i < questionsAndAnswers.length; i++) {
+        // counting total amount of voted users for that question
         -   var totalVotesInQuestion = 0;
+            // printing question's text
             b= questionsAndAnswers[i].text
             br
             br
+        // counting total answers
         -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
         -       for (var k = 0; k < answers.length; k++) {
         -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
@@ -52,6 +61,7 @@ mixin create-graph-result(questionsAndAnswers, answers, usersCount)
         -       }
         -   }
         -
+        // counting answers for specific question
         -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
         -       var count = 0;
         -       for (var k = 0; k < answers.length; k++) {
@@ -59,11 +69,14 @@ mixin create-graph-result(questionsAndAnswers, answers, usersCount)
         -               count++;
         -           }
         -       }
+        // getting part of votes for that answer from total votes count
         -       var proportion = count / totalVotesInQuestion * 100;
+                // rendering answer text
                 span= questionsAndAnswers[i].possible_answers[j].text
                 span &nbsp-&nbsp
                 span= count
                 br
+                // drawing ratio line
                 div(class='vote-line' style='width:#{proportion}%;')
                 br
         -   }

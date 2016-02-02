@@ -1,14 +1,17 @@
 @import "colors";
 
+// Style for items in chooser
 div.select-wrapper span {
   color : @materialize-blue;
 }
 
-input[type="radio"]:checked+label:after {
+// Style for checkbox button
+input[type="radio"]:checked + label:after {
   background-color: @main-white;
   border: 2px @main-white;
 }
 
+// Legacy (maybe unused)
 .divider-line {
   width:      100%;
   height:     2px;

@@ -1,5 +1,6 @@
 var authController = require('../controllers/auth');
 var brsDataController = require('../controllers/brs');
+var utilsController = require('../controllers/utils');
 
 var models = require('../models');
 
@@ -56,8 +57,10 @@ module.exports =
             var brsTeachers = brsDataController.getBrsTeachers(groupId); // берём от БРС списки учителей и предметов
             var brsSubjects = brsDataController.getBrsSubjects(groupId);
 
+            var normalJsResult = utilsController.toNormalArray(result);
+
             var desiredStageDescriptions = [];
-            result.forEach(function(sd) { // постобработка - выкидываем записи, для которых пользователь уже проходил опрос
+            normalJsResult.forEach(function(sd) { // постобработка - выкидываем записи, для которых пользователь уже проходил опрос
                 var shouldAdd = true;
                 sd['voted_users'].forEach(function(vUser) {
                     if (vUser['account_id'] == userId) {
@@ -67,12 +70,12 @@ module.exports =
                 if (shouldAdd) {
                     brsTeachers.forEach(function(teacher) { // добавляем имя преподавателя по id из БРС
                         if (teacher['id'] == sd['discipline']['teacher_id']) {
-                            sd['discipline']['dataValues']['teacher'] = teacher['name']; // внимание, dataValues - хак структуры объекта в Sequelize
+                            sd['discipline']['teacher'] = teacher['name']; // внимание, dataValues - хак структуры объекта в Sequelize
                         }
                     });
                     brsSubjects.forEach(function(subject) { // добавляем название дисциплины по id из БРС
                         if (subject['id'] == sd['discipline']['subject_id']) {
-                            sd['discipline']['dataValues']['subject'] = subject['name']; // внимание, dataValues - хак структуры объекта в Sequelize
+                            sd['discipline']['subject'] = subject['name']; // внимание, dataValues - хак структуры объекта в Sequelize
                         }
                     });
 
