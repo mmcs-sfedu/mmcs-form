@@ -14,6 +14,8 @@ module.exports =
 
     getStageDescriptions : getStageDescriptions,
 
+    getFormsQuestionsForStage : getFormsQuestionsForStage,
+
     saveUsersAnswer : saveUsersAnswer
 };
 
@@ -107,6 +109,47 @@ function getStageDescriptions(callback) {
 
         /* Returning prepared data about surveys. */
         callback(desiredStageDescriptions);
+    });
+}
+
+/**
+ * Returns found form in a callback. Form can be null, if something went wrong.
+ * @param {Integer} stageDescriptionId ID of the stage to choose right form.
+ * @param {Function} callback A callback which returns null or found form.
+ * */
+function getFormsQuestionsForStage(stageDescriptionId, callback) {
+    /* Getting feedback form. */
+    models.feedback_form.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] }, // useless trash
+        include: [
+            {
+                // Where stage description equals stated in source param.
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.feedback_stage,
+                include: [
+                    {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.stage_description,
+                        where: { id: stageDescriptionId }
+                    }
+                ]
+            },
+            {
+                // Getting also question for that form.
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.question,
+                include: [
+                    {
+                        // And answers for question.
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.possible_answer
+                    }
+                ]
+            }
+        ]
+    }).then(function(forms) {
+        /* Returning found form to student. */
+        callback(utilsController.toNormalArray(forms)[0]);
     });
 }
 

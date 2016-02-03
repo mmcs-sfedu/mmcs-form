@@ -7,4 +7,4 @@ build
 
 # Excluding database configs from repository updates:
 config/config.json
-config/admins.json
+#config/admins.json

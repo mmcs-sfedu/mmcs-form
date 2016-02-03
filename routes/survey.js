@@ -50,4 +50,15 @@ router.post('/finish', checklist, function(req, res, next) {
     );
 });
 
+/* To return questions with answers for chosen stage. For async ajax request. */
+router.get('/forms', checklist, function(req, res, next) {
+    /* Getting stage description ID from request. */
+    var stageDescriptionId = req.query.stage_description_id;
+
+    /* Sending found form back (can be null, if stage ID is malformed). */
+    surveyController.getFormsQuestionsForStage(stageDescriptionId, function(form) {
+        res.send(form);
+    });
+});
+
 module.exports = router;

@@ -33,7 +33,5 @@ module.exports = function(sequelize, DataTypes) {
             }
         });
 
-    // answer.removeAttribute('id');
-
     return answer;
 };

@@ -61,7 +61,7 @@ var survey = {
 
         // Describing request to get forms.
         var request = $.ajax({
-            url: '/student/forms',
+            url: '/survey/forms',
             method: 'GET',
             data: { stage_description_id : survey.chosenStageDescription },
             dataType: "json"
