@@ -1,6 +1,6 @@
 div(class='student-auth-context')
     div(class='row w-100 blue lighten-2 z-depth-1')
-        if controller.authModule.isStudentAuthorized()
+        if controller.authModule.getStudentsAuthorization()
             // if student is authorized
             div(class='col l11 m11 s10 right-align')
                 p.white-text #{controller.authModule.getUserName()}

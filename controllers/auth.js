@@ -10,7 +10,7 @@ var authControllerNamespace = {
     userGroupId  : null,
     userName     : null,
 
-    isStudentAuthorized : function() {
+    getStudentsAuthorization : function() {
         return authControllerNamespace.userIdOrHash;
     },
 
@@ -64,20 +64,22 @@ module.exports =
                 callback(null); })
     },
 
-    isStudentAuthorized : authControllerNamespace.isStudentAuthorized,
+    getStudentsAuthorization : function() {
+        return authControllerNamespace.userIdOrHash;
+    },
 
     getUserName : function() {
         return authControllerNamespace.userName;
     },
 
-    getGroupId : function() {
+    getStudentsGroupId : function() {
         return authControllerNamespace.userGroupId;
     },
 
 
     getStudentAuthChecker : function() {
         return function(req, res, next) {
-            if (authControllerNamespace.isStudentAuthorized()) {
+            if (authControllerNamespace.getStudentsAuthorization()) {
                 next();
             } else {
                 res.redirect("/");

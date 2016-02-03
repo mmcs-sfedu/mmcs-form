@@ -1,21 +1,13 @@
 // called when document is rendered
 $(document).ready(function() {
-    // main.init();
-
-    /* Turning on dialog windows. */
-    $('.modal-trigger').leanModal();
+    main.init();
 });
 
 // using namespace main
 var main = {
-    all_selects : null,
-
     init : function() {
-        main.all_selects = $('select');
-        main.all_selects.material_select();
-
-        // for updating data of materialize selectors
-        // $('select').material_select('destroy');
+        /* Turning on dialog triggers for modal windows. */
+        $('.modal-trigger').leanModal();
     }
 };
 
@@ -27,9 +19,11 @@ $.extend(
         redirectPost: function(location, args)
         {
             var form = '';
-            $.each( args, function( key, value ) {
+            $.each(args, function(key, value) {
+                // Preparing form inputs.
                 form += '<input type="hidden" name="'+key+'" value="'+value+'">';
             });
+            // Adding form with inputs to html page and submitting that form.
             $('<form action="'+location+'" method="POST">'+form+'</form>').appendTo('body').submit();
         }
     });

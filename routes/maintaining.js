@@ -10,7 +10,7 @@ var maintainingController = require('../controllers/maintaining');
 var checklist = [
     /* Checks if user authorized as student or not authorized as admin */
     function(req, res, next) {
-        if (authController.isStudentAuthorized()) {   // if student - go to main page, you can't maintain
+        if (authController.getStudentsAuthorization()) {   // if student - go to main page, you can't maintain
             res.redirect('/');
         } else {                                      // in other case - you can access maintaining
             if (authController.isAdminAuthorized()) { // admin is authorized, everything is ok

@@ -13,7 +13,7 @@ block content
     include ../../blocks/errors-toaster
 
     // Showing disciplines chooser only if user has authorized
-    if controller.authModule.isStudentAuthorized()
+    if controller.authModule.getStudentsAuthorization()
         // Context for jQuery
         div(class='container survey-index-context')
 

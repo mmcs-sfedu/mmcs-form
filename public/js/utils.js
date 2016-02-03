@@ -11,6 +11,7 @@ var utils = {
     formatDateForStage: function(dateString) {
         var date = new Date(dateString);
 
+        /* Date will look like: 8.12.2016-22:35 */
         return ''
             + date.getDate() + '.'
             + (date.getMonth() + 1) + '.'
