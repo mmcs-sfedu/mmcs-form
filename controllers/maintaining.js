@@ -1,6 +1,7 @@
 /* Importing controllers */
 var authController = require('../controllers/auth');
 var brsDataController = require('../controllers/brs');
+var utilsController = require('../controllers/utils');
 
 /* Importing db models helper */
 var models = require('../models');
@@ -36,14 +37,17 @@ module.exports =
  * @param {Function} callback Used to asynchronously return data.
  * */
 function getExistingFormsData(callback) {
+    /* Getting all forms. */
     models.feedback_form.findAll({
         attributes: { exclude: ['createdAt', 'updatedAt'] }, // we don't like data with dates
         order: 'id',
         include: {
+            /* With feedback stages. */
             attributes: ['id'],
             model: models.feedback_stage
         }
     }).then(function(result) {
+            /* If something went wrong returning empty array (it's safe). */
             if (result == null) {
                 callback([]);
                 return;
@@ -52,6 +56,7 @@ function getExistingFormsData(callback) {
             /* To convert this value to usual object and make it client-side-readable. */
             result = result.map(function(form){ return form.toJSON() });
 
+            /* Returning result. */
             callback(result);
         }
     );
@@ -75,7 +80,8 @@ function getAllStagesData(res, callback) {
             {   // To get an information about disciplines next.
                 attributes: ['id', 'discipline_id'],
                 model: models.stage_description,
-                include: { // To get an information about discipline, it's teacher and group from BRS
+                include: {
+                    // To get an information about discipline, it's teacher and group from BRS.
                     attributes: { exclude: ['createdAt', 'updatedAt'] },
                     model: models.discipline
                 }
@@ -121,6 +127,11 @@ function getAllStagesData(res, callback) {
  * @param {Function} callback Used to asynchronously return data.
  * */
 function getAllBrsDisciplines(res, callback) {
+    /**
+     * TODO данный метод стоит определить в контроллере для получения данных от БРС.
+     * TODO текущее получение дисциплин от БРС (заглушка) оставляет желать лучшего.
+     * */
+
     /* Getting data about discipline from BRS. */
     var brsGroups   = brsDataController.getBrsGroups();
     var brsTeachers = brsDataController.getBrsTeachers(null);
@@ -214,7 +225,7 @@ function getSurveysResults(res, callback) {
             results = results.map(function(result){ return result.toJSON() });
 
             /**
-             *  TODO и в третий раз всё тоже нерациональное решение (см. предыдущие комментарии).
+             *  TODO и в третий раз всё то же нерациональное решение (см. предыдущие комментарии).
              *  */
             /* Getting data about discipline from BRS. */
             var brsGroups   = brsDataController.getBrsGroups();
@@ -231,6 +242,7 @@ function getSurveysResults(res, callback) {
                     brsGroups, brsTeachers, brsSubjects);  // BRS data arrays
             }
 
+
             callback(results);
         }
     );
@@ -244,9 +256,9 @@ function getSurveysResults(res, callback) {
  * @param {Function} callback Pass null to it to throw error and some JSON to signal about success.
  * */
 function deleteForm(id, callback) {
-    /* Looking for that form and it child stages. */
+    /* Looking for that form and its child stages. */
     return models.feedback_form.findOne({
-        where: {id: id},
+        where: { id: id },
         attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [
             {
@@ -258,6 +270,7 @@ function deleteForm(id, callback) {
             /* Destroying form only if it has no stages. */
             if (feedback_form != null && feedback_form['feedback_stages'].length == 0) {
                 feedback_form.destroy(); // destroying found form and callback some json to success
+                // Good callback which will be parsed.
                 callback({ deleted_feedback_form_id: id });
             } else {
                 callback(null);          // if form was not found returning null to throw error
@@ -273,7 +286,7 @@ function deleteForm(id, callback) {
  * @param {Function} callback Pass null to it to throw error and some JSON to signal about success.
  * */
 function deleteStage(id, callback) {
-    /* Looking for that form and it child stages. */
+    /* Looking for this stage. */
     return models.feedback_stage.findOne({
         where: { id: id },
         attributes: { exclude: ['createdAt', 'updatedAt'] }
@@ -281,6 +294,7 @@ function deleteStage(id, callback) {
             /* Destroying stage. */
             if (feedback_stage != null) {
                 feedback_stage.destroy(); // destroying found stage and callback some json to success
+                // Good callback to be parsed.
                 callback({ deleted_feedback_stage_id: id });
             } else {
                 callback(null);           // if stage was not found returning null to throw error
@@ -366,10 +380,10 @@ function addForm(body, callback) {
                                 iqPointer++; // increasing pointer synchronously with user's questions
 
                                 /* Preparing answers for current question (answers located only in raw source questions). */
-                                for (var possibleAnswer in usersPassedQuestion['answers']) {
+                                for (var possibleAnswerID in usersPassedQuestion['answers']) {
                                     checkedAnswersToInsert.push({
                                         question_id: insertedQuestions[iqPointer].id,
-                                        text: usersPassedQuestion['answers'][possibleAnswer],
+                                        text: usersPassedQuestion['answers'][possibleAnswerID],
                                         createdAt: new Date(),
                                         updatedAt: new Date()
                                     });
@@ -486,7 +500,7 @@ function addStage(body, callback) {
                                                 return;
                                             }
                                             // Converting db response to usual JS array.
-                                            stage_descriptions = stage_descriptions.map(function(stage) { return stage.toJSON() });
+                                            stage_descriptions = utilsController.toNormalArray(stage_descriptions);
 
 
                                             /* Getting data about discipline from BRS. */
@@ -640,6 +654,7 @@ function formatDateForHtml(srcDate) {
         return number;
     }
 
+    /* Date will look like: 2015-02-22 */
     return srcDate.getFullYear() + '-'
         + addZero((srcDate.getMonth() + 1)) + '-'
         + addZero(srcDate.getDate());
