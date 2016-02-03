@@ -41,6 +41,15 @@ mixin create-action-button(modalID, onclick)
         i(class='material-icons') add
 
 
+// Creates a button (clickable with url) and description below
+mixin create-nav-column(name, description, url)
+    div(class='col l4 m4 s12')
+        br
+        br
+        a(class='btn btn-fit-div waves-effect waves-light blue lighten-2' href='#{url}')= name
+        p= description
+
+
 // Creates survey item graph to represent it's results. All params are necessary.
 mixin create-graph-result(questionsAndAnswers, answers, usersCount)
     // margins

@@ -5,10 +5,13 @@ block includes
     link(rel='stylesheet' href='css/forms.css')
 
 block content
+    // Adding auth block for admin and errors in session checker
     include ../../blocks/admin-auth
     include ../../blocks/errors-toaster
+    include ../../components/mixins
 
-    div(class='container')
+    // Setting main container and context for jQuery
+    div(class='container maintaining-index-context')
 
         // If admin has authorized, showing him navigation menu
         if controller.authModule.isAdminAuthorized()
@@ -18,32 +21,18 @@ block content
                     br
                     br
                 br
+
+                // Title hint
                 h5 Выберите необходимый раздел
+
                 // Navigation buttons
-                div(class='col l4 m4 s12')
-                    br
-                    br
-                    a(class='btn btn-fit-div waves-effect waves-light blue lighten-2' href='/maintaining/create') Формы
-                    p Здесь вы можете создавать формы для дальнейших опросов
-                div(class='col l4 m4 s12')
-                    br
-                    br
-                    a(class='btn btn-fit-div waves-effect waves-light blue lighten-2' href='/maintaining/schedule') Опросы
-                    p Запуск опросов и управление активными голосованиями
-                div(class='col l4 m4 s12')
-                    br
-                    br
-                    a(class='btn btn-fit-div waves-effect waves-light blue lighten-2' href='/maintaining/results') Результаты
-                    p Просмотр результатов проведенных для студентов опросов
+                +create-nav-column('Формы',      'Здесь вы можете создавать формы для дальнейших опросов', '/maintaining/create')
+                +create-nav-column('Опросы',     'Запуск опросов и управление активными голосованиями',    '/maintaining/schedule')
+                +create-nav-column('Результаты', 'Просмотр результатов проведенных для студентов опросов', '/maintaining/results')
 
         else
             // In other case showing prompt about authorization
             br
             br
             br
-            div.row
-                div(class='col s12 center')
-                    h5.
-                        Чтобы получить доступ к управлению формами опросов,
-                        а также запускать анкетирования
-                        и отслеживать результаты голосований, необходимо авторизоваться
+            +section-title('Чтобы получить доступ к управлению формами опросов, а также запускать анкетирования и отслеживать результаты голосований, необходимо авторизоваться', true)
