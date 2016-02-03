@@ -10,7 +10,7 @@ var maintainingController = require('../controllers/maintaining');
 var checklist = [
     /* Checks if user authorized as student or not authorized as admin */
     function(req, res, next) {
-        if (authController.getStudentsAuthorization()) {   // if student - go to main page, you can't maintain
+        if (authController.getStudentsAuthorization()) { // if student - go to main page, you can't maintain
             res.redirect('/');
         } else {                                      // in other case - you can access maintaining
             if (authController.isAdminAuthorized()) { // admin is authorized, everything is ok
@@ -36,8 +36,10 @@ var checklist = [
 
 /* Root administrator's screen */
 router.get('/', checklist, function(req, res, next) {
+    /* Saved in session errors. */
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
+    /* Rendering index page for maintaining. */
     res.render('pages/maintaining', {
         title: 'Администрирование системы анкетирования',
         controller: maintainingController,                // controller to check authorizations and else
@@ -47,6 +49,7 @@ router.get('/', checklist, function(req, res, next) {
 
 /* Here admin can add new surveys */
 router.get('/create', checklist, function(req, res, next) {
+    /* Session errors. */
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
     // Preparing data about forms for page.
@@ -62,24 +65,50 @@ router.get('/create', checklist, function(req, res, next) {
 
 /* Here admin can schedule surveys */
 router.get('/schedule', checklist, function(req, res, next) {
+    /* To get errors from session. */
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
+
+    /* To make multiple functions work in different threads together and wait when all of them will be finished together. */
+    var async = require('async');
+
+    /* Here will be results of get functions. */
+    var preparedStages, preparedForms, preparedDisciplines;
+
+    /* Array of the functions to be executed together. Callbacks are necessary for parallel! */
+    var functionsToExecute = [];
     // Preparing data about stages for page.
-    maintainingController.getAllStagesData(res, function(stages) {
-        // Getting all existing forms which can be used with stages
-        maintainingController.getExistingFormsData(function(forms) {
-            // Then getting all disciplines from BRS.
-            maintainingController.getAllBrsDisciplines(res, function(disciplines) {
-                res.render('pages/maintaining/schedule', {
-                    title: 'Опросы',
-                    controller: maintainingController,
-                    stages: stages,
-                    forms: forms,
-                    disciplines: disciplines,
-                    errors: possibleErrors
-                })
-            })
-        });
+    functionsToExecute.push(function(callback) {maintainingController.getAllStagesData(res, function(stages) {
+        preparedStages = stages;
+        callback(null, stages);
+    })});
+    // Getting all existing forms which can be used with stages
+    functionsToExecute.push(function(callback) {maintainingController.getExistingFormsData(function(forms) {
+        preparedForms = forms;
+        callback(null, forms);
+    })});
+    // Then getting all disciplines from BRS.
+    functionsToExecute.push(function(callback) {maintainingController.getAllBrsDisciplines(res, function(disciplines) {
+        preparedDisciplines = disciplines;
+        callback(null, disciplines);
+    })});
+
+    /* Running an array of functions. */
+    async.parallel(functionsToExecute, function(err, result) {
+        /* Error is impossible here */
+        if (err)
+            res.send('Произошла ошибка асинхронного получения данных.');
+
+
+        /* And finally rendering page. */
+        res.render('pages/maintaining/schedule', {
+            title: 'Опросы',
+            controller: maintainingController,
+            stages: preparedStages,
+            forms: preparedForms,
+            disciplines: preparedDisciplines,
+            errors: possibleErrors
+        })
     });
 });
 
