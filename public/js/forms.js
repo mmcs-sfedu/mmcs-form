@@ -1,29 +1,41 @@
 /* Called when page was loaded. */
 $(document).ready(function() {
-    /* Setting onclick listeners for forms list. */
-    forms.updateDeleteButtonsListeners();
-
-    /* Setting onclick listener for add question button. */
-    $('a#addQuestion').on('click', forms.addQuestion);
-
-    /* Setting submit questions button onclick listener. */
-    $('a#submitQuestions').on('click', forms.submitQuestions);
+    forms.init();
 });
 
 /* Namespace for forms scripts. */
 var forms = {
+    context : null, // to make a namespace for jQuery (DOM)
+
+    /**
+     * Runs when the page was first time loaded.
+     * */
+    init: function() {
+        // Setting context.
+        forms.context = $('.maintaining-create-context');
+
+        /* Setting onclick listeners for forms list. */
+        forms.updateDeleteButtonsListeners();
+
+        /* Setting onclick listener for add question button. */
+        forms.context.find('a#addQuestion').on('click', forms.addQuestion);
+
+        /* Setting submit questions button onclick listener. */
+        forms.context.find('a#submitQuestions').on('click', forms.submitQuestions);
+    },
+
     /**
      * Sets onclick listeners for all appropriate delete buttons on the screen.
      * */
     updateDeleteButtonsListeners: function() {
-        $("li.collection-item a.secondary-content i").on('click', forms.deleteForm);
+        forms.context.find(".collection#forms li.collection-item a.secondary-content i").on('click', forms.deleteForm);
     },
 
     /**
      * Creates html code for forms list item depending on it's type.
-     * @param {Number} id Form's ID.
+     * @param {String} id Form's ID.
      * @param {String} name Form's title.
-     * @param {Number} stages Number of form's stages.
+     * @param {String} stages Number of form's stages.
      * @returns {String} An HTML code of created list element.
      * */
     generateFormsListItem: function(id, name, stages) {
@@ -36,10 +48,8 @@ var forms = {
         if (stages != 0) {
             formHtml = formHtml +
                 '<br>(используется в опросах: ' + stages + ')';                  // showing stages count
-        }
-
-        /* If form doesn't have stages, adding delete button for it. */
-        if (stages == 0) {
+        } else {
+            /* If form doesn't have any stages, adding delete button for it. */
             formHtml = formHtml +
                 '<a href="#!"' +
                 ' class="secondary-content">' +
@@ -81,7 +91,11 @@ var forms = {
         });
     },
 
-    /* Some counters to avoid intersections. */
+
+
+    /* FORM CREATION BLOCK */
+
+    /* Some counters (as IDs) to avoid intersections. */
     questionsCounter: 0,
     answersCounter:   0,
 
@@ -90,7 +104,7 @@ var forms = {
      * */
     addQuestion: function() {
         /* A div where to add question fields. */
-        var questionsBlock = $(".questions");
+        var questionsBlock = forms.context.find(".questions");
 
         /* Increasing count (id) of questions. */
         forms.questionsCounter++;
@@ -101,8 +115,9 @@ var forms = {
             '<div class="w-90 margin-to-right"><br><br>' +
             // Enter question name field.
             '<div class="input-field">' +
-            // Delete question button.
+            // Delete question button. You can see a hierarchy above.
             '<i onclick="parentNode.parentNode.remove();" class="material-icons red-text text-lighten-3 pointer prefix">delete</i>' +
+            // Input to type question's text
             '<input id="question_'  + forms.questionsCounter + '" type="text" class="validate question" autocomplete="off">' +
             '<label for="question_' + forms.questionsCounter + '">Текст вопроса</label>' +
             '</div>' +
@@ -130,6 +145,7 @@ var forms = {
                 '<div class="input-field">' +
                 // Delete answer button.
                 '<i onclick="parentNode.remove();" class="material-icons red-text text-lighten-3 pointer prefix">delete</i>' +
+                // Input to write an answer. Ids are better to be unique.
                 '<input id="possible_answer_'  + forms.questionsCounter + '_' + forms.answersCounter + '"' +
                 ' type="text" class="validate" autocomplete="off">' +
                 '<label for="possible_answer_' + forms.questionsCounter + '_' + forms.answersCounter + '">Возможный ответ</label>' +
@@ -152,7 +168,7 @@ var forms = {
         requestBody["questions"] = {}; // init questions field
 
         /* Checking if form name is not empty. */
-        var formName = $('div.input-field input#name').val();
+        var formName = forms.context.find('input#name').val();
         if (formName.length == 0) {
             Materialize.toast('Укажите название формы!', 5000);
             return;
@@ -162,7 +178,7 @@ var forms = {
         }
 
         /* A div containing all questions. */
-        var questionsBlock = $('div.questions');
+        var questionsBlock = forms.context.find('div.questions');
 
         /* Checking if forms has no answers. */
         if (questionsBlock.children().length == 0) {
@@ -225,8 +241,7 @@ var forms = {
 
 
         /* Binding UI elements. */
-        var buttonsFooter = $('#addForm .modal-footer');
-        var btnSubmit = buttonsFooter.find('#submitQuestions');
+        var buttonsFooter = forms.context.find('#addForm .modal-footer');
         var btnCancel = buttonsFooter.find('#cancelForm');
 
         /* Describing add form request. */
@@ -241,7 +256,7 @@ var forms = {
         request.done(function(response) {
             // Adding new form to list.
             try {
-                $(".collection").append(forms.generateFormsListItem(response.id, response.name, response.stages));
+                forms.context.find('.collection#forms').append(forms.generateFormsListItem(response.id, response.name, response.stages));
                 forms.updateDeleteButtonsListeners(); // adding onclick listener for new form item
                 btnCancel.click(); // closing dialog
                 Materialize.toast('Форма успешно добавлена', 5000);
