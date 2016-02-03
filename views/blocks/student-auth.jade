@@ -3,7 +3,7 @@ div(class='student-auth-context')
         if controller.authModule.getStudentsAuthorization()
             // if student is authorized
             div(class='col l11 m11 s10 right-align')
-                p.white-text #{controller.authModule.getUserName()}
+                p.white-text #{controller.authModule.getStudentsName()}
             div(class='col l1 m1 s2')
                 h6
                 // a link to logout for user
