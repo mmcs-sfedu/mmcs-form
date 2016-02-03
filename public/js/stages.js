@@ -1,26 +1,36 @@
 /* Called when page was loaded. */
 $(document).ready(function() {
-    // $.getScript("/js/utils.js"); // async import script
-
-    /* Setting on text change listener for search request input. */
-    $('#disciplineSearch').on('input', stages.onSearchRequestChanged);
-
-    /* Setting submit stage button onclick listener. */
-    $('#submitStage').on('click', stages.submitStage);
-
-    /* Firing material selects transformation. */
-    $('select').material_select();
+    stages.init();
 });
 
 /* Namespace for stages scripts. */
 var stages = {
+    // Namespace for DOM to avoid intersections.
+    context : null,
+
+    /**
+     * Fires when page was loaded.
+     * */
+    init: function() {
+        /* Setting context. */
+        stages.context = $('.maintaining-schedule-context');
+
+        /* Setting on text changed listener for search request input. */
+        stages.context.find('#disciplineSearch').on('input', stages.onSearchRequestChanged);
+
+        /* Setting submit stage button onclick listener. */
+        stages.context.find('#submitStage').on('click', stages.submitStage);
+
+        /* Firing material selects transformation. */
+        stages.context.find('select').material_select();
+    },
 
     /**
      * Appends stage item with description to collection list.
      * @param {Object} node A collection object where to add item.
-     * @param {Number} id Stage's ID (needed for further delete).
-     * @param {Date} dateFrom The date of stage's beginning.
-     * @param {Date} dateTo The date of stage's ending.
+     * @param {String} id Stage's ID (needed for further delete).
+     * @param {String} dateFrom The date of stage's beginning.
+     * @param {String} dateTo The date of stage's ending.
      * @param {String} formName Used form in that stage.
      * @param {Array} stageDescriptions An array of discipline used for that stage.
      * */
@@ -32,15 +42,15 @@ var stages = {
             '<div>Дата проведения: <b>с ' + utils.formatDateForStage(dateFrom) + ' по ' + utils.formatDateForStage(dateTo) + '</b>';
 
         /* Used form row. */
-        stageItemHtml = stageItemHtml + '<br>Используется форма <i>' + formName + '</i>';
+        stageItemHtml += '<br>Используется форма <i>' + formName + '</i>';
 
 
         /* Disciplines start block. */
-        stageItemHtml = stageItemHtml + '<br>Для дисциплин: <i>';
+        stageItemHtml += '<br>Для дисциплин: <i>';
 
         /* Adding disciplines descriptions. */
-        for (var stageDescriptionIndex in stageDescriptions) {
-            var stageDescription = stageDescriptions[stageDescriptionIndex];
+        for (var i = 0; i < stageDescriptions.length; i++) {
+            var stageDescription = stageDescriptions[i];
             var discipline = stageDescription['discipline'];
             stageItemHtml += '<br>&nbsp&nbsp&nbsp&nbsp&nbsp' + discipline['subject']
                 + ' (' + discipline['teacher'] + ') '
@@ -48,14 +58,14 @@ var stages = {
         }
 
         /* Discipline end block. */
-        stageItemHtml = stageItemHtml + '</i>';
+        stageItemHtml += '</i>';
 
 
         /* Adding delete button. */
         stageItemHtml += '' +
             // This button will show deletion prompt first in modal dialog.
             '<a href="#deleteStage" class="secondary-content modal-trigger">' +
-            '<i id="' + id + '" class="material-icons red-text text-lighten-3">delete</i>' +
+            '<i id="' + id + '" class="delete-stage-icon material-icons red-text text-lighten-3">delete</i>' +
             '</a>';
 
 
@@ -69,7 +79,7 @@ var stages = {
         stageItemHtml = $($.parseHTML(stageItemHtml));
 
         // Adding onclick listener.
-        stageItemHtml.find('i#'+id).on('click', stages.prepareDeletionModal);
+        stageItemHtml.find('i#' + id).on('click', stages.prepareDeletionModal);
 
 
         /* And finally adding row to list. */
@@ -84,7 +94,7 @@ var stages = {
         var stageIdToDelete = $(this).attr('id');
 
         /* Getting UI button to set onclick listener. */
-        var btnSubmit = $('.modal #submitDeletion');
+        var btnSubmit = stages.context.find('.modal #submitDeletion');
 
         /* Onclick deletion listener. */
         btnSubmit.off('click'); // removing old listeners first
@@ -104,8 +114,8 @@ var stages = {
         });
         /* Deleting stage from list, if everything is ok. */
         request.done(function(response) {
-            $('.modal #cancelDeletion').click(); // closing dialog
-            $('i#' + stageID).parents('.collection-item').first().remove();
+            stages.context.find('.modal#deleteStage').closeModal(); // closing dialog
+            stages.context.find('i.delete-stage-icon#' + stageID).parents('.collection-item').first().remove(); // deleting stage from DOM
         });
         /* Showing an error in another case. */
         request.fail(function(jqXHR, textStatus) {
@@ -124,7 +134,7 @@ var stages = {
         var divider = ';';
 
         /* Block with all disciplines. */
-        var items = $('.collection.disciplines .collection-item');
+        var items = stages.context.find('.collection.disciplines .collection-item');
 
         /* If some dividers found. */
         if (searchQuery.indexOf(divider) != -1) {
@@ -161,8 +171,8 @@ var stages = {
      * */
     submitStage: function() {
         /* Getting and checking dates. */
-        var dateFrom = $('#dateFrom').val();
-        var dateTo   = $('#dateTo').val();
+        var dateFrom = stages.context.find('#dateFrom').val();
+        var dateTo   = stages.context.find('#dateTo').val();
         // Dates must be filled.
         if (dateFrom.length == 0) {
             Materialize.toast('Укажите правильную дату начала опроса', 5000);
@@ -184,11 +194,12 @@ var stages = {
             return;
         }
 
+
         /* Getting chosen form ID. */
-        var feedbackFormId = $('select.forms').val();
+        var feedbackFormId = stages.context.find('select.forms').val();
 
         /* Getting chosen disciplines data. */
-        var disciplinesList = $('ul.collection.disciplines');
+        var disciplinesList = stages.context.find('.collection.disciplines');
         /* Getting all chosen disciplines. */
         var disciplinesItems = disciplinesList.children().not('.hide');
         if (disciplinesItems.length == 0) { // checking if user chose something
@@ -208,9 +219,9 @@ var stages = {
         /* ALL DATA VALIDATED AND PREPARED */
 
 
+
         /* Binding UI elements. */
-        var buttonsFooter = $('#addStage .modal-footer');
-        var btnSubmit = buttonsFooter.find('#submitStage');
+        var buttonsFooter = stages.context.find('#addStage .modal-footer');
         var btnCancel = buttonsFooter.find('#cancelStage');
 
         /* SENDING DATA ASYNC */
@@ -233,13 +244,13 @@ var stages = {
             // Adding new stage to list.
             try {
                 stages.appendStageToStagesList(
-                    $(".collection.stages"),
+                    stages.context.find(".collection.stages"),
                     response.id,
                     response.dateFrom,
                     response.dateTo,
                     response.formName,
                     response.stageDescriptions);
-                btnCancel.click(); // closing dialog
+                stages.context.find('.modal#addStage').closeModal(); // closing dialog
                 Materialize.toast('Опрос успешно добавлен', 5000);
             } catch (exc) {
                 proceedFail();
