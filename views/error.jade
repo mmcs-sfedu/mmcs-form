@@ -1,6 +1,8 @@
 extends base/layout
 
+// this is an error page content
 block content
+  // all data below must be provided
   h1= message
   h2= error.status
   pre #{error.stack}

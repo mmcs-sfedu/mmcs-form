@@ -11,6 +11,7 @@ var utils = {
     formatDateForStage: function(dateString) {
         var date = new Date(dateString);
 
+        /* Date will look like: 8.12.2016-22:35 */
         return ''
             + date.getDate() + '.'
             + (date.getMonth() + 1) + '.'
@@ -31,6 +32,28 @@ var utils = {
         source = JSON.parse(source);
 
         return source;
+    },
+
+    /**
+     * Adds or deletes loader in container depending on boolean flag.
+     * @param {Object} container A container where to show or hide loader.
+     * @param {Boolean} show Flag to add or delete loader.
+     * */
+    showLoader : function(container, show) {
+        if (show) {
+            // Appending a loader for stated container.
+            container.prepend('<div class="loader center"><div class="preloader-wrapper big active">' + // big size
+                '<div class="spinner-layer spinner-blue-only">' + // color specification
+                '<div class="circle-clipper left">' +
+                '<div class="circle"></div>' +
+                '</div><div class="gap-patch">' +
+                '<div class="circle"></div>' +
+                '</div><div class="circle-clipper right">' +
+                '<div class="circle"></div>' +
+                '</div></div></div></div>');
+        } else
+            // Removing all loaders in a stated container.
+            container.find('.loader').remove();
     }
 
 };

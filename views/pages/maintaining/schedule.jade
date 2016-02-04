@@ -15,9 +15,11 @@ block content
     include ../../components/mixins
 
     // All page content will be here
-    div(class='container')
+    div(class='container maintaining-schedule-context')
 
         +section-title('Управление опросами')
+
+
 
         // A list of existing stages
         ul(class='collection stages')
@@ -25,24 +27,27 @@ block content
         // Adding existing stages to list
         - each val in stages
             script.
-                /* Getting values here, because Jade has bad convert rules (destroys objects). */
-                var id          = '#{val.id}';
-                var dateFrom    = '#{val.date_from}';
-                var dateTo      = '#{val.date_to}';
-                var formName    = '#{val.feedback_form.name}';
-                // Converting stage descriptions to string first.
-                var stageDescriptions = '#{JSON.stringify(val.stage_descriptions)}';
-                // Replacing quote symbol on normal everywhere using regexp.
-                stageDescriptions = stageDescriptions.replace(/&quot;/g, '"');
-                // Parsing to object.
-                stageDescriptions = JSON.parse(stageDescriptions);
+                /* Using lambda to avoid namespaces intersections. */
+                (function() {
+                    /* Getting values here, because Jade has bad convert rules (destroys objects). */
+                    var id          = '#{val.id}';
+                    var dateFrom    = '#{val.date_from}';
+                    var dateTo      = '#{val.date_to}';
+                    var formName    = '#{val.feedback_form.name}';
+                    // Converting stage descriptions to string first.
+                    var stageDescriptions = '#{JSON.stringify(val.stage_descriptions)}';
+                    // Replacing quote symbols on normal everywhere using regexp. Then parsing object.
+                    stageDescriptions = utils.parseObjectFromJadeStringified(stageDescriptions)
 
-                /* Adding stages in list. */
-                stages.appendStageToStagesList($(".collection.stages"), id, dateFrom, dateTo, formName, stageDescriptions);
+                    /* Adding stages in list. */
+                    stages.appendStageToStagesList($('.maintaining-schedule-context .collection.stages'), id, dateFrom, dateTo, formName, stageDescriptions);
+                }())
+
 
 
         // A button to create new stage
         +create-action-button('addStage', null)
+
 
 
         // Add stage dialog
@@ -56,12 +61,12 @@ block content
                 span Выберите дату начала и завершения опроса
                 - var minDate = new Date();
                 - var maxDate = new Date(minDate);
-                - maxDate.setYear(minDate.getFullYear() + 5);
+                - maxDate.setYear(minDate.getFullYear() + 5); // to provide some borders for date chooser
                 div.row
                     div(class='col l6 m6 s6')
                         input(id='dateFrom' type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
                     div(class='col l6 m6 s6')
-                        input(id='dateTo' type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
+                        input(id='dateTo'   type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
                 br
 
                 // Block for search query and form chooser
@@ -111,6 +116,9 @@ block content
                 a(id='cancelStage' href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
                 - if (forms.length != 0) // adding run button only if we have forms at all
                     a(id='submitStage' class='waves-effect waves-teal btn-flat') Запустить
+
+        // End of add stage dialog
+
 
 
         // Delete stage prompt

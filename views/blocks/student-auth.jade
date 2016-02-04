@@ -1,30 +1,35 @@
-div(class='row w-100 blue lighten-2 z-depth-1')
-    if controller.authModule.isStudentAuthorized()
-        // if student is authorized
-        div(class='col l11 m11 s10 right-align')
-            p.white-text #{controller.authModule.getUserName()}
-        div(class='col l1 m1 s2')
-            h6
-            a(href='/student/logout')
-                i(class='small white-text material-icons') input
-    else
-        // if student is unauthorized
-        form(method='post', action='/student/login')
-            // to make enter key available
-            input(type='submit' class='hidden')
-            div(class='col l2 m3')
-                div(class='input-field white-mod')
-                    input(id='login' type='text' class='validate' name='login' autocomplete='off')
-                    label(for='login') Логин или E-Mail
-            div(class='col l2 m3')
-                div(class='input-field white-mod')
-                    input(id='password' type='password' class='validate' name='password')
-                    label(for='password') Пароль
-            div(class='col l1 m1')
-                br
-                a(href='javascript:;' onclick='parentNode.parentNode.submit();')
+div(class='student-auth-context')
+    div(class='row w-100 blue lighten-2 z-depth-1')
+        if controller.authModule.getStudentsAuthorization(session)
+            // if student is authorized
+            div(class='col l11 m11 s10 right-align')
+                p.white-text #{controller.authModule.getStudentsName(session)}
+            div(class='col l1 m1 s2')
+                h6
+                // a link to logout for user
+                a(href='/student/logout')
                     i(class='small white-text material-icons') input
-            div(class='col l7 m12')
-                div.hide-on-med-and-down
+        else
+            // if student is unauthorized
+            form(method='post', action='/student/login')
+                // to make enter key available
+                input(type='submit' class='hidden')
+                // fields for login and password
+                div(class='col l2 m3')
+                    div(class='input-field white-mod')
+                        input(id='login' type='text' class='validate' name='login' autocomplete='off')
+                        label(for='login') Логин или E-Mail
+                div(class='col l2 m3')
+                    div(class='input-field white-mod')
+                        input(id='password' type='password' class='validate' name='password')
+                        label(for='password') Пароль
+                div(class='col l1 m1')
                     br
-                p.white-text Для авторизации используются данные <a class="blue-text text-darken-2" href="http://rating.mmcs.sfedu.ru" target="_blank">сервиса БРС</a>
+                    // a button to submit login data
+                    a(href='javascript:;' onclick='$(".student-auth-context form").submit();')
+                        i(class='small white-text material-icons') input
+                // a label for big screens
+                div(class='col l7 m12')
+                    div.hide-on-med-and-down
+                        br
+                    p.white-text Для авторизации используются данные <a class="blue-text text-darken-2" href="http://rating.mmcs.sfedu.ru" target="_blank">сервиса БРС</a>
