@@ -98,7 +98,7 @@ function getStudentsAuthorization(session) {
 /**
  * Checks session and returns student's name.
  * @param {Object} session To get student's data.
- * @returns {Object} authorized student's name.
+ * @returns {Object} Authorized student's name.
  * */
 function getStudentsName (session) {
     if (session != null && session.student != null && session.student.name != null)
@@ -109,7 +109,7 @@ function getStudentsName (session) {
 /**
  * Checks session and returns student's group ID.
  * @param {Object} session To get student's data.
- * @returns {Object} authorized student's group ID.
+ * @returns {Object} Authorized student's group ID.
  * */
 function getStudentsGroupId(session) {
     if (session != null && session.student != null && session.student.group != null)
@@ -144,19 +144,16 @@ function getStudentAuthChecker() {
 
 /* ADMIN AUTHORIZATION BLOCK */
 
-/* Data about signed admin */
-var adminIdOrHash, // also stores administrator's auth status
-    adminName;
-
 /**
  * Makes an attempt to authorize user as admin.
+ * @param {Object} req To access session.
  * @param {String} login Administrator's login.
  * @param {String} password Administrator's password.
  * @param {Function} callback Login finished callback:
  - pass null to it if login was successful;
  - pass error string (with fail reason) to it if login was failed.
  * */
-function adminAttemptLogin(login, password, callback) {
+function adminAttemptLogin(req, login, password, callback) {
     /* Getting stored config to validate user auth data */
     var adminsConfig = require('../config/admins.json');
 
@@ -169,29 +166,40 @@ function adminAttemptLogin(login, password, callback) {
         callback("Неправильный логин или пароль!");
     } else {
         /* Saving admin data and refreshing page */
-        adminIdOrHash = adminsConfig[login];
-        adminName = adminsConfig[login]['name'];
+        req.session.admin = {
+            id   : adminsConfig[login],
+            name : adminsConfig[login]['name']
+        };
         callback(null)
     }
 }
 
 /**
  * Checks if admin has already authorized.
- * @returns {String} Admin ID or null (if not authorized).
+ * @returns {Object} True (if authorized) or null (if not authorized).
  * */
-function isAdminAuthorized () {
-    return adminIdOrHash;
-}
-
-/* Returns authorized admin name */
-function getAdminName() {
-    return adminName;
+function isAdminAuthorized (session) {
+    if (session != null && session.admin != null && session.admin.id != null)
+        return true;
+    return null;
 }
 
 /**
- * Implements logout for admin.
+ * Checks session and returns admin's name.
+ * @param {Object} session To get admin's data.
+ * @returns {Object} Authorized admin's name.
  * */
-function adminLogout() {
-    adminIdOrHash = null;
-    adminName     = null;
+function getAdminName(session) {
+    if (session != null && session.admin != null && session.admin.name != null)
+        return session.admin.name;
+    return null;
+}
+
+/**
+ * Unauthorizes admin.
+ * @param {Object} req To access session.
+ * */
+function adminLogout(req) {
+    if (req.session.admin != null)
+        req.session.admin = null;
 }

@@ -10,10 +10,10 @@ var maintainingController = require('../controllers/maintaining');
 var checklist = [
     /* Checks if user authorized as student or not authorized as admin */
     function(req, res, next) {
-        if (authController.getStudentsAuthorization()) { // if student - go to main page, you can't maintain
+        if (authController.getStudentsAuthorization(req.session)) { // if student - go to main page, you can't maintain
             res.redirect('/');
         } else {                                      // in other case - you can access maintaining
-            if (authController.isAdminAuthorized()) { // admin is authorized, everything is ok
+            if (authController.isAdminAuthorized(req.session)) { // admin is authorized, everything is ok
                 next();
             } else {                                  // in other case redirecting him on maintaining
 
@@ -143,6 +143,7 @@ router.post('/login', checklist, function(req, res, next) {
 
     /* If all fields are provided - trying to login */
     authController.adminAttemptLogin(
+        req,
         req.body['login'],
         req.body['password'],
         function(error) { // callback with auth result
@@ -154,7 +155,7 @@ router.post('/login', checklist, function(req, res, next) {
 
 /* To finish admin session */
 router.all('/logout', function(req, res, next) {
-    authController.adminLogout();
+    authController.adminLogout(req);
     res.redirect('/maintaining');
 });
 

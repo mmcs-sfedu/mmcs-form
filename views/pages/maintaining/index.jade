@@ -14,7 +14,7 @@ block content
     div(class='container maintaining-index-context')
 
         // If admin has authorized, showing him navigation menu
-        if controller.authModule.isAdminAuthorized()
+        if controller.authModule.isAdminAuthorized(session)
             div(class='row center')
                 // Hiding spacing on small screens
                 div.hide-on-small-only
