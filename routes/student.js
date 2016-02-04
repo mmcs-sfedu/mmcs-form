@@ -11,7 +11,7 @@ var errorsController = require('../controllers/errors');
 
 /* Log out for user and redirect on surveys. */
 router.all('/logout', function(req, res, next) {
-    authController.studentLogout();
+    authController.studentLogout(req);
     res.redirect('/survey');
 });
 
@@ -30,6 +30,7 @@ router.post('/login', function(req, res, next) {
 
     // Trying to authorize user with a callback
     authController.studentAttemptLogin(
+        req,
         req.body['login'],
         req.body['password'],
         function(error) {

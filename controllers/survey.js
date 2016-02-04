@@ -24,11 +24,12 @@ module.exports =
 
 /**
  * Returns all actual surveys for user in a callback.
+ * @param {Object} req To provide a session for some functions.
  * @param {Function} callback A callback to return surveys.
  * */
-function getStageDescriptions(callback) {
+function getStageDescriptions(req, callback) {
     /* Getting user's authorization (user's ID). */
-    var authorizedUserId  = authController.getStudentsAuthorization();
+    var authorizedUserId  = authController.getStudentsAuthorization(req.session);
 
     /* There is no need to load stages, if we are not going to show chooser for unauthorized user. */
     if (!authorizedUserId) {
@@ -37,7 +38,7 @@ function getStageDescriptions(callback) {
     }
 
     /* Getting group ID for authorized user. */
-    var studentsGroupId = authController.getStudentsGroupId();
+    var studentsGroupId = authController.getStudentsGroupId(req.session);
 
     /* Date border to choose only actual surveys. */
     var dateNow = new Date();
@@ -155,11 +156,12 @@ function getFormsQuestionsForStage(stageDescriptionId, callback) {
 
 /**
  * Saves user's answer for survey.
+ * @param {Object} req To provide a session for some functions.
  * @param {Integer} stageDescriptionId Survey ID.
  * @param {Array} usersAnswers User's answers for that survey.
  * @param {Object} res To draw response page.
  */
-function saveUsersAnswer(stageDescriptionId, usersAnswers, res) {
+function saveUsersAnswer(req, stageDescriptionId, usersAnswers, res) {
     /* Using same format to get possible answers (user's answers) IDs. */
     usersAnswers = JSON.parse('[' + usersAnswers + ']');
 
@@ -181,7 +183,7 @@ function saveUsersAnswer(stageDescriptionId, usersAnswers, res) {
             return models.voted_user
                 .create({           // creating voted user record
                     stage_description_id: stageDescriptionId,
-                    account_id: authController.getStudentsAuthorization(),
+                    account_id: authController.getStudentsAuthorization(req.session),
                     createdAt: new Date(),
                     updatedAt: new Date()
                 }, { transaction: t })

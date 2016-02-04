@@ -7,6 +7,29 @@
  * */
 module.exports =
 {
+
+    attemptForStudentsAuth : function(login, password, callback) {
+        /**
+         * TODO здесь осуществляется авторизация в сервисе БРС,
+         * TODO которая в случае успеха возвращает в колбэке пустую ошибку, ID пользователя, ID его группы, имя пользователя.
+         * */
+
+        /** TODO заглушка. */
+
+        var models = require('../models');
+
+        models.discipline
+            .find({ order: "random()" })
+            .then(function(discipline) {
+                if (discipline == null) {
+                    callback("Ошибка базы данных - нет дисциплин!");
+                    return;
+                }
+
+                callback(null, 11, discipline.group_id, 'Вася Пупкин');
+            });
+    },
+
     getBrsSubjects : function(groupId) {
         var subjects = [];
         for (var i = 5; i >= 0; i--) {

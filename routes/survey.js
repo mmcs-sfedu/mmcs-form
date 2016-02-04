@@ -18,7 +18,7 @@ router.get('/', function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
     /* Getting stage descriptions first - don't worry, it won't touch db, if user wasn't authorized. */
-    surveyController.getStageDescriptions(function(stageDescriptions) {
+    surveyController.getStageDescriptions(req, function(stageDescriptions) {
         res.render('pages/survey', {
             title: 'Страница опроса',
             controller: surveyController, // now controller is available using this var
@@ -44,6 +44,7 @@ router.post('/finish', checklist, function(req, res, next) {
 
     /* Saving user's answer */
     surveyController.saveUsersAnswer(
+        req,
         req.body['stage_description_id'], // answered stage
         req.body['possible_answers'],     // user's answers
         res                               // res to draw response page
