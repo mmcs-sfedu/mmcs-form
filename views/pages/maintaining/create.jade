@@ -11,27 +11,33 @@ block content
     include ../../blocks/errors-toaster
     include ../../components/mixins
 
-    div(class='container')
+    // Context for jQuery
+    div(class='container maintaining-create-context')
 
         +section-title('Управление формами')
 
         // Here will be our forms
-        ul(class='collection')
+        ul(class='collection' id='forms')
 
         // Adding existing forms to list
-        - each val in forms
+        - each form in forms
             script.
-                /* Getting values here, because Jade has bad convert rules (destroys objects). */
-                var id = '#{val.id}';
-                var name = '#{val.name}';
-                var stages = '#{val.feedback_stages.length}';
+                /* Using lambda to avoid names intersections. */
+                (function() {
+                    /* Getting values here, because Jade has bad convert rules (destroys objects). */
+                    var id     = '#{form.id}';
+                    var name   = '#{form.name}';
+                    var stages = '#{form.feedback_stages.length}';
 
-                /* Adding forms in list. */
-                $(".collection").append(forms.generateFormsListItem(id, name, stages))
+                    /* Adding forms in list. */
+                    $(".maintaining-create-context .collection#forms").append(forms.generateFormsListItem(id, name, stages))
+                }())
+
 
         // Button to add new form
         // Also clears last form fields
-        +create-action-button('addForm', '$(".questions").empty();$("input#name").val("");')
+        +create-action-button('addForm', '$(".maintaining-create-context .questions").empty(); $(".maintaining-create-context input#name").val("");')
+        // Clearing all questions and form name on click
 
         // Add form dialog
         div(id='addForm' class='modal modal-large')
@@ -44,7 +50,7 @@ block content
                     input(id='name' type='text' class='validate' autocomplete='off')
                     label(for='name') Название формы
 
-                // Here will be question with answers for form
+                // Here will be questions with answers for form
                 div(class='questions')
 
                 br

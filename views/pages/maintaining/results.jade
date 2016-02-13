@@ -16,7 +16,7 @@ block content
 
 
     // All page content will be here
-    div(class='container')
+    div(class='container maintaining-results-context')
 
         +section-title('Просмотр результатов опросов')
 
@@ -33,24 +33,30 @@ block content
                             i.material-icons trending_up
                             // Form name
                             | #{feedbackStage.feedback_form.name}
+
+                            // Filling header data for accordion elements
                             script.
-                                // Getting current item object in DOM
-                                var stageDescriptionId = '#{stageDescription.id}';
-                                var currentItemRow = $('.collapsible-header#' + stageDescriptionId);
+                                /* Lambda to avoid names intersections. */
+                                (function () {
+                                    // Getting current item object in DOM
+                                    var stageDescriptionId = '#{stageDescription.id}';
+                                    var currentItemRow = $('.maintaining-results-context .collapsible-header#' + stageDescriptionId);
 
-                                // Formatting and appending date
-                                var dateFrom = '#{feedbackStage.date_from}';
-                                var dateTo   = '#{feedbackStage.date_to}';
-                                currentItemRow.append(' (' + utils.formatDateForStage(dateFrom));
-                                currentItemRow.append(' -- ' + utils.formatDateForStage(dateFrom) + ')');
+                                    // Formatting and appending date
+                                    var dateFrom = '#{feedbackStage.date_from}';
+                                    var dateTo   = '#{feedbackStage.date_to}';
+                                    currentItemRow.append(' (' + utils.formatDateForStage(dateFrom));
+                                    currentItemRow.append(' -- ' + utils.formatDateForStage(dateTo) + ')');
 
-                                // Appending discipline
-                                var discipline = '#{JSON.stringify(stageDescription.discipline)}';
-                                discipline = utils.parseObjectFromJadeStringified(discipline);
-                                currentItemRow.append('' +
-                                 ' по ' + discipline.subject + '' +
-                                  ' (' + discipline.teacher + ') ' +
-                                   'у ' + discipline.group);
+                                    // Appending discipline
+                                    var discipline = '#{JSON.stringify(stageDescription.discipline)}';
+                                    discipline = utils.parseObjectFromJadeStringified(discipline);
+                                    currentItemRow.append('' +
+                                     ' по ' + discipline.subject + '' +
+                                      ' ('  + discipline.teacher + ') ' +
+                                       'у ' + discipline.group);
+                                }())
+
 
                         // Inner block (hidden)
                         div.collapsible-body

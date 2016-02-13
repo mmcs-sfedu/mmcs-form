@@ -34,6 +34,11 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+app.use(function(req, res, next) { // to make session variable available in jade
+    res.locals.session = req.session;
+    next();
+});
+// here are some modules which available globally in our app
 
 // and here we are stating our paths to routes in url access
 app.use('/', routes);

@@ -1,142 +1,201 @@
-var authController = require('../controllers/auth');
+/* Importing controllers. */
+var authController    = require('../controllers/auth');
 var brsDataController = require('../controllers/brs');
+var utilsController   = require('../controllers/utils');
 
+/* To access DB. */
 var models = require('../models');
 
+/* Public methods. */
 module.exports =
 {
+    // To provide an access to authorization for user.
     authModule : authController,
 
+    getStageDescriptions : getStageDescriptions,
+
+    getFormsQuestionsForStage : getFormsQuestionsForStage,
+
+    saveUsersAnswer : saveUsersAnswer
+};
 
 
-    getTestData : function() {
-        var json = '{"feedbackForm": [{"title": "Насколько полезен с вашей точки зрения данный предмет?","type": "radio","options": ["5","4","3","2","1"]}]}';
-        return JSON.parse(json)['feedbackForm'];
-    },
+/* Functions descriptions. */
 
+/**
+ * Returns all actual surveys for user in a callback.
+ * @param {Object} req To provide a session for some functions.
+ * @param {Function} callback A callback to return surveys.
+ * */
+function getStageDescriptions(req, callback) {
+    /* Getting user's authorization (user's ID). */
+    var authorizedUserId  = authController.getStudentsAuthorization(req.session);
 
+    /* There is no need to load stages, if we are not going to show chooser for unauthorized user. */
+    if (!authorizedUserId) {
+        callback([]);
+        return;
+    }
 
-//    getSavedSurveysQuery : function() {
-//        return surveyControllerNamespace.savedSurveysQuery;
-//    },
+    /* Getting group ID for authorized user. */
+    var studentsGroupId = authController.getStudentsGroupId(req.session);
 
+    /* Date border to choose only actual surveys. */
+    var dateNow = new Date();
 
-
-    getStageDescriptions : function(callback) {
-        var groupId = authController.getGroupId(); // TODO возможно, запрос к БРС
-        var userId  = authController.isStudentAuthorized();
-
-        var dateNow = new Date();
-
-        /* Выбираем все возможные тестирования. */
-        models.stage_description.findAll({
-            attributes: { exclude: ['createdAt', 'updatedAt'] },
-            include: [
-                {
-                    attributes: { exclude: ['createdAt', 'updatedAt'] }, // добавляем записи о пользователях
-                    model: models.voted_user
-//                    where: { $not : { account_id: [userId] } },
-//                    required: false
-                },
-                {
-                    attributes: { exclude: ['createdAt', 'updatedAt'] },
-                    model: models.discipline,
-                    where: { group_id: [groupId] } // для группы зарегистрировавшегося студента
-                },
-                {
-                    attributes: { exclude: ['createdAt', 'updatedAt'] },
-                    model: models.feedback_stage,
-                    where: {
-                        date_to:   { $gt: dateNow.toISOString() }, // актуальные по времени проведения
-                        date_from: { $lt: dateNow.toISOString() }
-                    }
+    /* Getting all possible stage descriptions. */
+    models.stage_description.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] }, // trash attributes
+        include: [
+            {
+                // Including data about voted users.
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.voted_user
+            },
+            {
+                // Getting stage descriptions only for student's group.
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.discipline,
+                where: { group_id: [ studentsGroupId ] }
+            },
+            {
+                // Getting only actual by date stage descriptions.
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.feedback_stage,
+                where: {
+                    date_to:   { $gt: dateNow.toISOString() }, // actual for current date
+                    date_from: { $lt: dateNow.toISOString() }
                 }
-            ]
-        }).then(function(result) {
-            var brsTeachers = brsDataController.getBrsTeachers(groupId); // берём от БРС списки учителей и предметов
-            var brsSubjects = brsDataController.getBrsSubjects(groupId);
+            }
+        ]
+    }).then(function(result) {
+        /* Parsing to normal JS object from Sequelize format. */
+        var normalJsResult = utilsController.toNormalArray(result);
 
-            var desiredStageDescriptions = [];
-            result.forEach(function(sd) { // постобработка - выкидываем записи, для которых пользователь уже проходил опрос
-                var shouldAdd = true;
-                sd['voted_users'].forEach(function(vUser) {
-                    if (vUser['account_id'] == userId) {
-                        shouldAdd = false;
+
+        /* TODO КОСТЫЛЬНАЯ ИНТЕГРАЦИЯ (ЗАГЛУШКА) ДЛЯ БРС! */
+        var brsTeachers = brsDataController.getBrsTeachers(studentsGroupId);
+        var brsSubjects = brsDataController.getBrsSubjects(studentsGroupId);
+
+
+        /* Here will be response data with populated labels from BRS. */
+        var desiredStageDescriptions = [];
+
+
+        /* Iterating throw all stage descriptions to find ones, where current user didn't vote yet. */
+        normalJsResult.forEach(function(sd) {
+            // Boolean var to check if current user has already voted.
+            var userVoted = sd['voted_users'].some(function(votedUser) {
+                return votedUser['account_id'] === authorizedUserId;
+            });
+            // Only if user hasn't voted in that stage yet.
+            if (!userVoted) {
+                /* TODO ИСПРАВИТЬ ИНТЕГРАЦИЮ С ДАННЫМИ БРС! */
+                brsTeachers.forEach(function(teacher) {
+                    if (teacher['id'] == sd['discipline']['teacher_id']) {
+                        sd['discipline']['teacher'] = teacher['name'];
                     }
                 });
-                if (shouldAdd) {
-                    brsTeachers.forEach(function(teacher) { // добавляем имя преподавателя по id из БРС
-                        if (teacher['id'] == sd['discipline']['teacher_id']) {
-                            sd['discipline']['dataValues']['teacher'] = teacher['name']; // внимание, dataValues - хак структуры объекта в Sequelize
-                        }
-                    });
-                    brsSubjects.forEach(function(subject) { // добавляем название дисциплины по id из БРС
-                        if (subject['id'] == sd['discipline']['subject_id']) {
-                            sd['discipline']['dataValues']['subject'] = subject['name']; // внимание, dataValues - хак структуры объекта в Sequelize
-                        }
-                    });
+                brsSubjects.forEach(function(subject) {
+                    if (subject['id'] == sd['discipline']['subject_id']) {
+                        sd['discipline']['subject'] = subject['name'];
+                    }
+                });
+                /* TODO КОНЕЦ ИНТЕГРАЦИИ */
 
-                    desiredStageDescriptions.push(sd);
-                }
-            });
-
-            /* Сохраняем полученные данные возможных опросов для получения идентификаторов в дальнейшем. */
-            // surveyControllerNamespace.savedSurveysQuery = desiredStageDescriptions; // возможно, при отправке формы его нужно будет обнулить
-
-            callback(desiredStageDescriptions);
+                // Pushing checked and populated with BRS data object to response array.
+                desiredStageDescriptions.push(sd);
+            }
         });
-    },
 
+        /* Returning prepared data about surveys. */
+        callback(desiredStageDescriptions);
+    });
+}
 
+/**
+ * Returns found form in a callback. Form can be null, if something went wrong.
+ * @param {Integer} stageDescriptionId ID of the stage to choose right form.
+ * @param {Function} callback A callback which returns null or found form.
+ * */
+function getFormsQuestionsForStage(stageDescriptionId, callback) {
+    /* Getting feedback form. */
+    models.feedback_form.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] }, // useless trash
+        include: [
+            {
+                // Where stage description equals stated in source param.
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.feedback_stage,
+                include: [
+                    {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.stage_description,
+                        where: { id: stageDescriptionId }
+                    }
+                ]
+            },
+            {
+                // Getting also question for that form.
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.question,
+                include: [
+                    {
+                        // And answers for question.
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.possible_answer
+                    }
+                ]
+            }
+        ]
+    }).then(function(forms) {
+        /* Returning found form to student. */
+        callback(utilsController.toNormalArray(forms)[0]);
+    });
+}
 
-    /**
-     * Saves user's answer for survey.
-     * @param {Integer} stageDescriptionId Survey ID.
-     * @param {Array} possibleAnswers User's answers for that survey.
-     * @param {Object} res To draw response page.
-     * @return {Null} Returns nothing.
-     */
-    saveUsersAnswer : function(stageDescriptionId, possibleAnswers, res) {
-        /* Using same format to get possible answers (user's answers) IDs */
-        possibleAnswers = possibleAnswers.split(',');
+/**
+ * Saves user's answer for survey.
+ * @param {Object} req To provide a session for some functions.
+ * @param {Integer} stageDescriptionId Survey ID.
+ * @param {Array} usersAnswers User's answers for that survey.
+ * @param {Object} res To draw response page.
+ */
+function saveUsersAnswer(req, stageDescriptionId, usersAnswers, res) {
+    /* Using same format to get possible answers (user's answers) IDs. */
+    usersAnswers = JSON.parse('[' + usersAnswers + ']');
 
-        /* Preparing array for bulk insert */
-        var answers = [];
-        for (var i = 0; i < possibleAnswers.length; i++) {
-            answers.push({
-                possible_answer_id: possibleAnswers[i],
-                stage_description_id: stageDescriptionId,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            });
-        }
+    /* Preparing array for bulk insert. */
+    var answers = [];
+    for (var i = 0; i < usersAnswers.length; i++) {
+        answers.push({
+            possible_answer_id: usersAnswers[i],
+            stage_description_id: stageDescriptionId,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
+    }
 
-        /* Transaction to insert both voted user and his answers data */
-        return models.sequelize.transaction(
-            { autocommit: false },   // without false param returns an error
-            function (t) {
+    /* Transaction to insert both voted user and his answers data. */
+    return models.sequelize.transaction(
+        { autocommit: false },   // without false param returns an error
+        function (t) {
             return models.voted_user
-                .create({            // creating voted user record
-                stage_description_id: stageDescriptionId,
-                account_id: authController.isStudentAuthorized(),
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }, { transaction: t })
+                .create({           // creating voted user record
+                    stage_description_id: stageDescriptionId,
+                    account_id: authController.getStudentsAuthorization(req.session),
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }, { transaction: t })
                 .then(function () { // when voted user data inserted, adding his answers
-                return models.answer.bulkCreate(answers, { transaction: t });
-            });
-        }).then(function (result) { // when transaction successfully completed
+                    return models.answer.bulkCreate(answers, { transaction: t });
+                });
+        }).then(function (result) { // when transaction successfully completed - rendering ok page
             res.render('pages/survey/finish');
-        }).catch(function (err) {   // when an error occurred with transaction
+        }).catch(function (err) {   // when an error occurred with transaction - rendering error page
             res.render('error', {
                 message: "Произошла ошибка в транзакции записи результата голосования!",
                 error: {}
             });
         });
-    }
-
-};
-
-//var surveyControllerNamespace = {
-//    savedSurveysQuery : null
-//};
+}

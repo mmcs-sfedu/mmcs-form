@@ -1,26 +1,23 @@
-/*
-div div.col img { // now images in columns has proper size
-  width: 75%;
-}
-*/
-
+/* In the center with small margins */
 .t-spacing-col {
   width: 90%;
   margin: 0 auto;
 }
 
+/* To make padding in any div as in Materialize <p> */
 .as-p-padding {
   padding: 2rem;
 }
 
+/* Different widths */
 .w-100 {
   width: 100%;
 }
-
 .w-90 {
   width: 90%;
 }
 
+/* Stick to right */
 .margin-to-right {
   margin-right: 0;
   margin-left: auto;
@@ -28,6 +25,7 @@ div div.col img { // now images in columns has proper size
 
 
 
+/* To fit button in a grid's width */
 .btn-fit-div {
   display: block;
   width: 88%;     // small horizontal margin
@@ -36,6 +34,7 @@ div div.col img { // now images in columns has proper size
 
 
 
+/* To make modal dialog window large */
 .modal-large {
   width: 95% !important;
   max-height: 90% !important;
@@ -43,35 +42,14 @@ div div.col img { // now images in columns has proper size
 
 
 
+/* Mouse pointer for links */
 .pointer {
   cursor: pointer;
 }
 
 
 
+/* Maybe unused, because Materialize has hide */
 .hidden {
   display: none;
-}
-
-
-
-body {
-  display: flex; // something like LinearLayout in Android
-  min-height: 100vh; // vh is a 1/100 of viewport's height; 100vh equals viewport's height
-  flex-direction: column; // where to grow
-
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-}
-
-main {
-  flex: 1 0 auto; // growing politics of flex blocks sizes
-  -webkit-box-flex: 1;
-  -webkit-flex: 1 0 auto;
-  -ms-flex: 1 0 auto;
 }
