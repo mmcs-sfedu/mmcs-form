@@ -67,3 +67,16 @@ block content
                 a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
                 a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat'
                 onclick='survey.submitAnswersRequest(#{form.feedback_stages[0].stage_descriptions[0].id});') Да
+
+
+        // Dialog with prompt about leaving the survey.
+        div(id='back-prompt-dialog' class='modal')
+            div.modal-content
+                // Dialog header.
+                h4 Вы действительно хотите прекратить опрос?
+                // Dialog text.
+                p Отмеченные ответы не будут сохранены
+            // Dialogs action buttons.
+            div.modal-footer
+                a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
+                a(href='/survey' class='modal-action modal-close waves-effect waves-teal btn-flat') Да

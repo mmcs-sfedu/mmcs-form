@@ -31,11 +31,39 @@ var survey = {
         authHeader.addClass('fixed-header');
 
         // Adding back button for header
-        authHeader.find('.left-nav').html('<a class="white-text" href="/survey">← К выбору опроса</a>');
+        authHeader.find('.left-nav').html('<a href="#!" class="white-text" onclick="survey.goBack();">← К выбору опроса</a>');
 
 
         // Adding true spacing for container (to fit auth header)
         $('.container.survey-index-context').css('margin-top', authHeader.height());
+    },
+
+    /**
+     * Checks forms' filling: if some of them filled - showing a prompt about that.
+     * If there is no checked forms - redirecting back.
+     * */
+    goBack : function() {
+        // Looking for all survey forms.
+        var surveyForms = survey.context.find('.survey-form');
+
+        // Flag to check if some forms are filled.
+        var someFormsChecked = false;
+        surveyForms.each(function() {
+            // Checking if some forms has checked answers.
+            var checkedAnswers = $(this).find(':checked');
+            if (checkedAnswers.size() != 0) {
+                someFormsChecked = true; // found at least one checked answer
+                return false; // returning from foreach
+            }
+        });
+
+        // If some answers are checked - showing a prompt about it.
+        if (someFormsChecked) {
+            survey.context.find('.modal#back-prompt-dialog').openModal();
+        // Redirecting back vice versa.
+        } else {
+            window.location.href = '/survey';
+        }
     },
 
 
