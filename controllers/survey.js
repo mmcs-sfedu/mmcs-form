@@ -144,7 +144,11 @@ function getFormsQuestionsForStage(stageDescriptionId, callback) {
                     {
                         attributes: { exclude: ['createdAt', 'updatedAt'] },
                         model: models.stage_description,
-                        where: { id: stageDescriptionId }
+                        where: { id: stageDescriptionId },
+                        include: {
+                            attributes: ['teacher_id', 'subject_id'],
+                            model: models.discipline
+                        }
                     }
                 ]
             },
@@ -162,8 +166,29 @@ function getFormsQuestionsForStage(stageDescriptionId, callback) {
             }
         ]
     }).then(function(forms) {
+        // Converting result to usual js object.
+        var formJsObject = utilsController.toNormalArray(forms)[0];
+
+
+        /* TODO КОСТЫЛЬНАЯ ИНТЕГРАЦИЯ (ЗАГЛУШКА) ДЛЯ БРС! */
+        var brsTeachers = brsDataController.getBrsTeachers();
+        var brsSubjects = brsDataController.getBrsSubjects();
+        brsTeachers.forEach(function(teacher) {
+            if (teacher['id'] == formJsObject.feedback_stages[0].stage_descriptions[0].discipline.teacher_id) {
+                formJsObject['teacher'] = teacher['name'];
+                return false;
+            }
+        });
+        brsSubjects.forEach(function(subject) {
+            if (subject['id'] == formJsObject.feedback_stages[0].stage_descriptions[0].discipline.subject_id) {
+                formJsObject['subject'] = subject['name'];
+                return false;
+            }
+        });
+
+
         /* Returning found form to student. */
-        callback(utilsController.toNormalArray(forms)[0]);
+        callback(formJsObject);
     });
 }
 
