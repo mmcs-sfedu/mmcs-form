@@ -28,6 +28,17 @@ router.get('/', function(req, res, next) {
     });
 });
 
+/* Show questions for chosen survey */
+router.get('/:id', checklist, function(req, res, next) {
+
+    res.send(req.params['id']);
+
+    // TODO ПРОВЕРЯТЬ ДОСТУПНОСТЬ ФОРМЫ ДЛЯ ЮЗЕРА И СЛАТЬ ЕМУ ДАННЫЕ ВОПРОСОВ ДЛЯ РЕНДЕРА
+
+    // TODO ДОБАВИТЬ ПРОВЕРКУ ДОСТУПНОСТИ ФОРМЫ В САБМИТЕ
+
+});
+
 /* Screen after finishing student's survey */
 router.post('/finish', checklist, function(req, res, next) {
     /* Checking if data at least provided. */

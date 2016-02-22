@@ -65,6 +65,12 @@ function getStageDescriptions(req, callback) {
                 where: {
                     date_to:   { $gt: dateNow.toISOString() }, // actual for current date
                     date_from: { $lt: dateNow.toISOString() }
+                },
+                // We also want to get form's name
+                include:
+                {
+                    attributes: ['name'],
+                    model: models.feedback_form
                 }
             }
         ]
@@ -103,10 +109,15 @@ function getStageDescriptions(req, callback) {
                 });
                 /* TODO КОНЕЦ ИНТЕГРАЦИИ */
 
+                // We don't want to send voted users data to client.
+                delete sd['voted_users'];
+
                 // Pushing checked and populated with BRS data object to response array.
                 desiredStageDescriptions.push(sd);
             }
         });
+
+        console.log(desiredStageDescriptions);
 
         /* Returning prepared data about surveys. */
         callback(desiredStageDescriptions);

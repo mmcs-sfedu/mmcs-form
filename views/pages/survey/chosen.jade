@@ -1,0 +1,18 @@
+extends ../../base/layout
+
+// Additional js and css includes for surveys page
+block includes
+    link(rel='stylesheet' href='/css/forms.css')
+    link(rel='stylesheet' href='/css/survey.css')
+    script(src='/js/survey.js')
+
+// Adding auth block for student and errors toaster
+block content
+    include ../../blocks/student-auth
+    include ../../blocks/errors-toaster
+    include ../../components/mixins
+
+        // Context for jQuery
+        div(class='container survey-index-context')
+
+// TODO ДОБАВИТЬ ВЫВОД ВОПРОСОВ ФОРМЫ, КАК В JS, НО НА СЕРВЕРЕ
