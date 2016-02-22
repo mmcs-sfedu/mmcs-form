@@ -30,13 +30,27 @@ router.get('/', function(req, res, next) {
 
 /* Show questions for chosen survey */
 router.get('/:id', checklist, function(req, res, next) {
+    /* Getting errors saved in session, if we have some. */
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
 
-    res.send(req.params['id']);
+    surveyController.checkStageAvailabilityForUser(req.params['id'], req.session, function(checkResult) {
+        if (checkResult) {
+            res.render('pages/survey/chosen', {
 
-    // TODO ПРОВЕРЯТЬ ДОСТУПНОСТЬ ФОРМЫ ДЛЯ ЮЗЕРА И СЛАТЬ ЕМУ ДАННЫЕ ВОПРОСОВ ДЛЯ РЕНДЕРА
 
-    // TODO ДОБАВИТЬ ПРОВЕРКУ ДОСТУПНОСТИ ФОРМЫ В САБМИТЕ
+                // TODO ЗАПРАШИВАТЬ И ОТСЫЛАТЬ ДАННЫЕ О ФОРМАХ ЗДЕСЬ!!!
 
+
+                title: 'Страница опроса',
+                controller: surveyController, // now controller is available using this var
+                // surveys: stageDescriptions,   // passing surveys to view
+                errors: possibleErrors        // passing errors to make view render them
+            });
+        } else {
+            // This survey is unavailable for authorized user - so redirecting him back.
+            res.redirect('back');
+        }
+    });
 });
 
 /* Screen after finishing student's survey */
@@ -53,13 +67,22 @@ router.post('/finish', checklist, function(req, res, next) {
         return;
     }
 
-    /* Saving user's answer */
-    surveyController.saveUsersAnswer(
-        req,
-        req.body['stage_description_id'], // answered stage
-        req.body['possible_answers'],     // user's answers
-        res                               // res to draw response page
-    );
+    // Checking if student can vote for this stage at all.
+    surveyController.checkStageAvailabilityForUser(req.params['id'], req.session, function(checkResult) {
+        // Yes, he can vote for this stage.
+        if (checkResult) {
+            /* Saving student's answer */
+            surveyController.saveUsersAnswer(
+                req,
+                req.body['stage_description_id'], // answered stage
+                req.body['possible_answers'],     // user's answers
+                res                               // res to draw response page
+            );
+        } else {
+            // Looks like we've got a cheater - returning him back.
+            res.redirect('back');
+        }
+    });
 });
 
 /* To return questions with answers for chosen stage. For async ajax request. */

@@ -16,6 +16,8 @@ module.exports =
 
     getFormsQuestionsForStage : getFormsQuestionsForStage,
 
+    checkStageAvailabilityForUser : checkStageAvailabilityForUser,
+
     saveUsersAnswer : saveUsersAnswer
 };
 
@@ -126,7 +128,7 @@ function getStageDescriptions(req, callback) {
 
 /**
  * Returns found form in a callback. Form can be null, if something went wrong.
- * @param {Integer} stageDescriptionId ID of the stage to choose right form.
+ * @param {Number} stageDescriptionId ID of the stage to choose right form.
  * @param {Function} callback A callback which returns null or found form.
  * */
 function getFormsQuestionsForStage(stageDescriptionId, callback) {
@@ -163,6 +165,77 @@ function getFormsQuestionsForStage(stageDescriptionId, callback) {
         /* Returning found form to student. */
         callback(utilsController.toNormalArray(forms)[0]);
     });
+}
+
+/**
+ * Checks if current student has already voted for provided stage or this stage is not available for him.
+ * @param {Number} stageDescriptionId ID of the stage to check for authorized user.
+ * @param {Object} session A session to get student's auth data.
+ * @param {Function} callback To return a result of the check:
+ *                            true - if user can vote for this stage description, false - in another case.
+ * */
+function checkStageAvailabilityForUser(stageDescriptionId, session, callback) {
+    // Getting and checking student's group and ID first of all.
+    var studentsGroupID = authController.getStudentsGroupId(session);
+    var studentID       = authController.getStudentsAuthorization(session);
+    if (studentsGroupID && studentID) {
+        // Looking for stage description with provided ID.
+        models.stage_description.findOne({
+            where: { id: stageDescriptionId },
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            include: [
+                {
+                    attributes: ['group_id'],
+                    model: models.discipline
+                },
+                {
+                    attributes: ['date_from', 'date_to'],
+                    model: models.feedback_stage
+                },
+                {
+                    attributes: ['account_id'],
+                    model: models.voted_user
+                }
+            ]
+        }).then(function(stage_description) {
+            // It's impossible to vote for non-existing stage.
+            if (stage_description == null) {
+                callback(false);
+                return;
+            }
+
+            // Checking if chosen stage is available for student's group.
+            if (stage_description.discipline.group_id != studentsGroupID) {
+                // This stage is not available for user.
+                callback(false);
+                return;
+            }
+
+            // Checking if current stage is available by date criteria.
+            var dateNow = new Date();
+            if (!(stage_description.feedback_stage.date_from < dateNow
+                && stage_description.feedback_stage.date_to > dateNow)) {
+                // This stage is outdated or too far in the future.
+                callback(false);
+                return;
+            }
+
+            // Checking if user has already voted for this survey.
+            var votedUsers = utilsController.toNormalArray(stage_description.voted_users);
+            if (votedUsers.some(function(votedUser) {
+                return votedUser.account_id == studentID;
+            })) {
+                callback(false);
+            }
+
+            // All checks are passed - student can vote for chosen stage.
+            callback(true);
+        });
+
+    // User is not authorized - impossible to vote for him.
+    } else {
+        callback(false);
+    }
 }
 
 /**
