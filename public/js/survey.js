@@ -15,6 +15,27 @@ var survey = {
     init : function() {
         // Setting context
         survey.context = $('.survey-index-context');
+
+        // Preparing header for survey.
+        survey.makeHeaderFixedAndAddNav();
+    },
+
+    /**
+     * Prepares auth header for chosen survey section.
+     * */
+    makeHeaderFixedAndAddNav : function() {
+        // Getting link to header
+        var authHeader = $('.student-auth-context');
+
+        // Making header fixed
+        authHeader.addClass('fixed-header');
+
+        // Adding back button for header
+        authHeader.find('.left-nav').html('<a class="white-text" href="/survey">← К выбору опроса</a>');
+
+
+        // Adding true spacing for container (to fit auth header)
+        $('.container.survey-index-context').css('margin-top', authHeader.height());
     },
 
 

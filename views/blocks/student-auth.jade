@@ -1,8 +1,11 @@
 div(class='student-auth-context')
     div(class='row w-100 blue lighten-2 z-depth-1')
         if controller.authModule.getStudentsAuthorization(session)
+            // this is a block for some navigation items
+            div(class='col l4 m4 s5')
+                p.left-nav
             // if student is authorized
-            div(class='col l11 m11 s10 right-align')
+            div(class='col l7 m7 s5 right-align')
                 p.white-text #{controller.authModule.getStudentsName(session)}
             div(class='col l1 m1 s2')
                 h6
