@@ -20,6 +20,11 @@ block content
 
         +section-title('Просмотр результатов опросов')
 
+        // To print corresponding message if we have no any results yet
+        - if (results.length == 0) {
+            p На текущий момент нет ни одного проведённого опроса
+        - }
+
         // Accordion with all results
         ul(class='collapsible popout' data-collapsible='accordion')
             - each feedbackStage in results
