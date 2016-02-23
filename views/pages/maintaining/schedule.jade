@@ -67,10 +67,18 @@ block content
                         input(id='dateFrom' type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
                     div(class='col l6 m6 s6')
                         input(id='dateTo'   type='date' max='#{controller.formatDateForHtml(maxDate)}' min='#{controller.formatDateForHtml(minDate)}')
-                br
+
 
                 // Block for search query and form chooser
                 div.row
+
+                    // Search input column
+                    div(class='col l6 m6 s12')
+                        div(class='input-field')
+                            i(class='material-icons prefix') search
+                            input(id='disciplineSearch' type='text' class='validate' autocomplete='off')
+                            label(for='disciplineSearch') Запрос для применения фильтрации
+
                     // Form chooser column
                     div(class='col l6 m6 s12')
                         // If we don't have any forms yet
@@ -89,27 +97,40 @@ block content
                                         - } }
                                 label Выберите форму для опроса
                         - }
-                    // Some spaces for proper dividing on small screens
-                    div.hide-on-med-and-up
-                        br
-                        br
-                        br
-                    // Search input column
-                    div(class='col l6 m6 s12')
-                        span.
-                            Укажите через точку с запятой критерии для выбора дисциплин<br>
-                            Дисциплины в списке ниже будут использоваться для опроса
-                        div(class='input-field')
-                            i(class='material-icons prefix') search
-                            input(id='disciplineSearch' type='text' class='validate' autocomplete='off')
-                            label(for='disciplineSearch') Поисковой запрос
+
 
                 // Disciplines chosen list
-                div.overflow-list
-                    ul(class='collection disciplines')
-                        - each discipline in disciplines
-                            li(class='collection-item' subjectID='#{discipline.subject.id}' teacherID='#{discipline.teacher.id}' groupID='#{discipline.group.id}').
-                                #{discipline.subject.name} (#{discipline.teacher.name}) #{discipline.group.name}
+                div.row
+                    // Source disciplines list
+                    div(class='col l5 m5 s12')
+                        div.overflow-list
+                            ul(class='collection disciplines')
+                                - each discipline in disciplines
+                                    // To make items selectable
+                                    a(class='collection-item black-text' href='#!' onclick='$(this).toggleClass("active");'
+                                    subjectID='#{discipline.subject.id}' teacherID='#{discipline.teacher.id}' groupID='#{discipline.group.id}').
+                                        #{discipline.subject.name} (#{discipline.teacher.name}) #{discipline.group.name}
+
+                    // Action buttons to add or remove discipline for stage
+                    div(class='col l2 m2 s12 center')
+                        div.small-inline
+                            a(class='btn-floating btn-small waves-effect waves-light green lighten-1'
+                            onclick='stages.activeToSelected();') →
+                        div.small-inline
+                            a(class='btn-floating btn-small waves-effect waves-light green lighten-1'
+                            onclick='stages.filteredToSelected();') ⇒
+                        div.small-inline
+                            a(class='btn-floating btn-small waves-effect waves-light green lighten-1'
+                            onclick='stages.dropSelected();') ←
+                        div.small-inline
+                            a(class='btn-floating btn-small waves-effect waves-light green lighten-1'
+                            onclick='stages.dropAll();') ⇐
+
+                    // Chosen disciplines list
+                    div(class='col l5 m5 s12')
+                        div.overflow-list
+                            ul(class='collection chosen')
+
 
             // Action buttons for dialog
             div.modal-footer
