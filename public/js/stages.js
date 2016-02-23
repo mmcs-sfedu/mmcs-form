@@ -64,7 +64,7 @@ var stages = {
         /* Adding delete button. */
         stageItemHtml += '' +
             // This button will show deletion prompt first in modal dialog.
-            '<a href="#deleteStage" class="secondary-content modal-trigger">' +
+            '<a href="#deleteStage" class="modal-trigger secondary-content">' +
             '<i id="' + id + '" class="delete-stage-icon material-icons red-text text-lighten-3">delete</i>' +
             '</a>';
 
@@ -158,12 +158,86 @@ var stages = {
                         $(this).removeClass('hide');
                         break;
                     } else {
-                        // Hiding item, if it doesn't have any match
+                        // Hiding item, if it doesn't have any match.
                         $(this).addClass('hide');
+
+                        // To dismiss selection when item is hiding.
+                        $(this).removeClass('active');
                     }
                 }
             })
         }
+    },
+
+    /**
+     * To place activated disciplines into the selected column (without duplication).
+     * */
+    activeToSelected: function() {
+        // Getting references to source and destination columns.
+        var sourceColumn = stages.context.find('.collection.disciplines');
+        var destinationColumn = stages.context.find('.collection.chosen');
+
+        // Moving only activated items to chosen column.
+        sourceColumn.children().each(function() {
+            // If item is selected.
+            if ($(this).hasClass('active')) {
+                // Moving item to chosen column and removing selection.
+                destinationColumn.append($(this));
+                $(this).removeClass('active');
+            }
+        })
+    },
+
+    /**
+     * To all disciplines (which currently in the source column) into the selected column (without duplication).
+     * */
+    filteredToSelected: function() {
+        // Getting references to source and destination columns.
+        var sourceColumn = stages.context.find('.collection.disciplines');
+        var destinationColumn = stages.context.find('.collection.chosen');
+
+        // Moving all filtered items to chosen column.
+        sourceColumn.children().each(function() {
+            // If item is visible in the filter.
+            if (!$(this).hasClass('hide')) {
+                // Moving item to chosen column and removing selection.
+                destinationColumn.append($(this));
+                $(this).removeClass('active');
+            }
+        })
+    },
+
+    /**
+     * Clears selected column (only activated), adds cleared items to source column.
+     * */
+    dropSelected: function() {
+        // Getting references to source and destination columns.
+        var sourceColumn = stages.context.find('.collection.disciplines');
+        var destinationColumn = stages.context.find('.collection.chosen');
+
+        // Moving only activated chosen items to the source column.
+        destinationColumn.children().each(function() {
+            // Moving only activated items.
+            if ($(this).hasClass('active')) {
+                sourceColumn.append($(this));
+                $(this).removeClass('active'); // and removing selection
+            }
+        })
+    },
+
+    /**
+     * Clears selected column (absolutely all), adds cleared items to source column.
+     * */
+    dropAll: function() {
+        // Getting references to source and destination columns.
+        var sourceColumn = stages.context.find('.collection.disciplines');
+        var destinationColumn = stages.context.find('.collection.chosen');
+
+        // Moving all chosen items to the source column.
+        destinationColumn.children().each(function() {
+            sourceColumn.append($(this));
+            $(this).removeClass('active'); // and removing selection
+        })
     },
 
     /**
@@ -199,9 +273,9 @@ var stages = {
         var feedbackFormId = stages.context.find('select.forms').val();
 
         /* Getting chosen disciplines data. */
-        var disciplinesList = stages.context.find('.collection.disciplines');
-        /* Getting all chosen disciplines. */
-        var disciplinesItems = disciplinesList.children().not('.hide');
+        var disciplinesList = stages.context.find('.collection.chosen');
+        /* Getting all chosen disciplines items. */
+        var disciplinesItems = disciplinesList.children(); //.not('.hide');
         if (disciplinesItems.length == 0) { // checking if user chose something
             Materialize.toast('Выберите по меньшей мере одну дисциплину', 5000);
             return;

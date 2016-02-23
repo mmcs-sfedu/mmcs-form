@@ -9,14 +9,14 @@
 /* Desktop */
 @media all and (min-width: 993px) {
   .overflow-list {
-    max-height: 180px;
+    max-height: 195px;
   }
 }
 
 /* Tablets */
 @media all and (max-width: 992px) and (min-width: 601px) {
   .overflow-list {
-    max-height: 125px;
+    max-height: 195px;
   }
 }
 
@@ -25,4 +25,30 @@
   .overflow-list {
     max-height: 100px;
   }
+
+  /* Restricting maximum height to make form's select work as it needed in mobile layouts */
+  .modal#addStage .dropdown-content {
+    max-height: 200px;
+  }
+}
+
+
+/* Restricting maximum height to make form's select work as it needed */
+.modal#addStage .dropdown-content {
+  max-height: 295px;
+}
+
+
+/* To make small buttons extra small and add margins for them */
+.btn-small {
+  max-height: 33px;
+  max-width:  33px;
+  margin:      8px;
+}
+
+/* To colorize selected items in lists */
+@import "colors";
+.overflow-list .collection-item.active {
+  background-color: @materialize-light-green!important;
+  color: @main-white!important;
 }

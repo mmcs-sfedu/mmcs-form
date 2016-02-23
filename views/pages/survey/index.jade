@@ -1,37 +1,44 @@
 extends ../../base/layout
 
-// Additional js and css includes for surveys page
+// Additional css includes for surveys page
 block includes
     link(rel='stylesheet' href='/css/forms.css')
-    link(rel='stylesheet' href='/css/survey.css')
-    script(src='/js/survey.js')
-    script(src='/js/utils.js')
+    link(rel='stylesheet' href='/css/surveys.css')
 
 // Adding auth block for student and errors toaster
 block content
     include ../../blocks/student-auth
     include ../../blocks/errors-toaster
+    include ../../components/mixins
 
     // Showing disciplines chooser only if user has authorized
     if controller.authModule.getStudentsAuthorization(session)
         // Context for jQuery
-        div(class='container survey-index-context')
+        div(class='container surveys-index-context')
 
-            // Discipline chooser
-            div.discipline-chooser
+            // If there is no available surveys showing prompt about it
+            - if (surveys.length === 0) {
                 br
                 br
-                div(class='input-field col s12')
-                    select(id='disciplines')
-                        // Default value
-                        option(disabled selected) Выберите дисциплину для опроса
-                        each survey in surveys
-                            option(value='#{survey.id}') #{survey.discipline.subject} (#{survey.discipline.teacher})
-                    // Chooser title
-                    label Выбранная дисциплина
+                br
+                +section-title('На текущий момент больше нет доступных для вас опросов', true)
 
-                br
-                br
+            // Showing a list of surveys to make student choose one of them
+            - } else {
 
-            // Here will be added forms for chosen survey
-            div.forms-list
+                // Choose survey prompt
+                +section-title('Выберите интересующий вас опрос')
+
+                // Rendering list of all available surveys
+                div(class='collection' id='surveys')
+                    each survey in surveys
+                        a(href='/survey/#{survey.id}' class='collection-item black-text').
+                            #{survey.feedback_stage.feedback_form.name} (#{survey.discipline.subject}, #{survey.discipline.teacher})
+            - }
+
+    else
+        // A prompt for unauthorized users to log in
+        br
+        br
+        br
+        +section-title('Чтобы принять участие в анкетировании, необходимо авторизоваться', true)

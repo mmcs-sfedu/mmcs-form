@@ -135,7 +135,7 @@ function getStudentAuthChecker() {
         if (getStudentsAuthorization(req.session)) {
             next();
         } else {
-            res.redirect("/");
+            res.redirect('/survey');
         }
     }
 }
