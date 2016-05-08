@@ -24,7 +24,7 @@ mixin section-title(title, isCentered)
 
 
 // Pass null as args if you don't need this button as modal trigger and it doesn't need onclick function.
-mixin create-action-button(modalID, onclick)
+mixin create-action-button(modalID, onclick, hint)
     - var classDefinition = 'btn-floating btn-large waves-effect waves-light green lighten-1';
     - var hrefDefinition = '#!';
     - if (modalID != null) {
@@ -39,6 +39,10 @@ mixin create-action-button(modalID, onclick)
     // onclick action for button
     a(class='#{classDefinition}' href='#{hrefDefinition}' onclick='#{onclick}')
         i(class='material-icons') add
+            // on mouse over hint popup
+            - if (hint != null) {
+            span(class='hide' id='hint') #{hint}
+            - }
 
 
 // Creates a button (clickable with url) and description below

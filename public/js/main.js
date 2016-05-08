@@ -8,6 +8,9 @@ var main = {
     init : function() {
         /* Turning on dialog triggers for modal windows. */
         $('.modal-trigger').leanModal();
+
+        /* Adding on mouse hints for buttons. */
+        main.registerBtnsForHintsPopups();
     },
 
     /**
@@ -32,6 +35,39 @@ var main = {
 
         // Adding true spacing for container (to fit auth header)
         $(containerBelow).css('margin-top', authHeader.height());
+    },
+
+    /**
+     *  Looks for every buttons with hints and adds popup logic for them.
+     *  */
+    registerBtnsForHintsPopups : function() {
+        // Iterating throw all potential buttons.
+        $('a.btn-floating:has(i)').each(function() {
+
+            // Checking if current button has a hint.
+            var currentButton = $(this);
+            var hintSpans = currentButton.find('span#hint');
+            if (hintSpans.length != 0) {
+
+                // Creating a hint block with hint's text.
+                var hintBlock = $('<div class="hint-popup card-panel green-text">' + hintSpans.first().html() + '</div>');
+
+                // Setting position for hint popup.
+                hintBlock.css('top', (currentButton.offset().top + currentButton.height()));
+                hintBlock.css('left', (currentButton.offset().left + currentButton.width() / 2));
+                console.log(hintBlock.width());
+
+                // Describing functions which will show or hide hint popup.
+                function showHint() { $('body').append(hintBlock); }
+                function hideHint() { hintBlock.remove(); }
+
+                // Resetting and adding hint popup logic for button.
+                currentButton.off('mouseover');
+                currentButton.off('mouseout');
+                currentButton.on('mouseover', showHint);
+                currentButton.on('mouseout', hideHint);
+            }
+        })
     }
 };
 
