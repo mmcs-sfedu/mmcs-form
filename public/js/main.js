@@ -52,18 +52,22 @@ var main = {
                 // Creating a hint block with hint's text.
                 var hintBlock = $('<div class="hint-popup card-panel green-text">' + hintSpans.first().html() + '</div>');
 
-                // Setting position for hint popup.
-                hintBlock.css('top', (currentButton.offset().top + currentButton.height()));
-                hintBlock.css('left', (currentButton.offset().left + currentButton.width() / 2));
-                console.log(hintBlock.width());
-
                 // Describing functions which will show or hide hint popup.
-                function showHint() { $('body').append(hintBlock); }
+                function showHint() {
+                    // Setting position for hint popup.
+                    hintBlock.css('top', (currentButton.offset().top + currentButton.height()));
+                    hintBlock.css('left', (currentButton.offset().left + currentButton.width() / 2));
+
+                    // Appending hint popup to the body of the page.
+                    $('body').append(hintBlock);
+                }
                 function hideHint() { hintBlock.remove(); }
 
                 // Resetting and adding hint popup logic for button.
-                currentButton.off('mouseover');
-                currentButton.off('mouseout');
+                currentButton.off('click', hideHint);
+                currentButton.off('mouseover', showHint);
+                currentButton.off('mouseout', hideHint);
+                currentButton.on('click', hideHint);
                 currentButton.on('mouseover', showHint);
                 currentButton.on('mouseout', hideHint);
             }
