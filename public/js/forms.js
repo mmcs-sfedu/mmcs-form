@@ -17,6 +17,10 @@ var forms = {
         /* Setting onclick listeners for forms list. */
         forms.updateDeleteButtonsListeners();
 
+        /* Adding back button. */
+        main.makeHeaderFixedAndAddNav('.admin-auth-context', '← К разделам',
+            function () { window.location.href = '/maintaining'; }, '.container.maintaining-create-context');
+
         /* Setting onclick listener for add question button. */
         forms.context.find('a#addQuestion').on('click', forms.addQuestion);
 

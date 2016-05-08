@@ -15,6 +15,10 @@ var stages = {
         /* Setting context. */
         stages.context = $('.maintaining-schedule-context');
 
+        /* Adding back button. */
+        main.makeHeaderFixedAndAddNav('.admin-auth-context', '← К разделам',
+            function () { window.location.href = '/maintaining'; }, '.container.maintaining-schedule-context');
+
         /* Setting on text changed listener for search request input. */
         stages.context.find('#disciplineSearch').on('input', stages.onSearchRequestChanged);
 

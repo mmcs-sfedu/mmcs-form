@@ -17,25 +17,8 @@ var survey = {
         survey.context = $('.survey-index-context');
 
         // Preparing header for survey.
-        survey.makeHeaderFixedAndAddNav();
-    },
-
-    /**
-     * Prepares auth header for chosen survey section.
-     * */
-    makeHeaderFixedAndAddNav : function() {
-        // Getting link to header
-        var authHeader = $('.student-auth-context');
-
-        // Making header fixed
-        authHeader.addClass('fixed-header');
-
-        // Adding back button for header
-        authHeader.find('.left-nav').html('<a href="#!" class="white-text" onclick="survey.goBack();">← К выбору опроса</a>');
-
-
-        // Adding true spacing for container (to fit auth header)
-        $('.container.survey-index-context').css('margin-top', authHeader.height());
+        main.makeHeaderFixedAndAddNav('.student-auth-context', '← К выбору опроса',
+                                      survey.goBack, '.container.survey-index-context');
     },
 
     /**
