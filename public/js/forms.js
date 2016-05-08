@@ -21,6 +21,9 @@ var forms = {
         main.makeHeaderFixedAndAddNav('.admin-auth-context', '← К разделам',
             function () { window.location.href = '/maintaining'; }, '.container.maintaining-create-context');
 
+        // Allowing user to switch between inputs with arrows on the keyboard.
+        main.addInputsArrowsSwitch();
+
         /* Setting onclick listener for add question button. */
         forms.context.find('a#addQuestion').on('click', forms.addQuestion);
 
@@ -157,10 +160,16 @@ var forms = {
 
             /* Adding possible answer field. */
             answersBlock.append(possibleAnswer);
+
+            // Adding arrows switch support for new input.
+            main.addInputsArrowsSwitch();
         });
 
         /* Adding question field. */
         questionsBlock.append(questionRow);
+
+        // Adding arrows switch support for new input.
+        main.addInputsArrowsSwitch();
     },
 
     /**

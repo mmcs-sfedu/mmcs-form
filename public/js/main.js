@@ -13,6 +13,7 @@ var main = {
         main.registerBtnsForHintsPopups();
     },
 
+
     /**
      * Adds go back button with some action to the header bar.
      * @param {String} headerClass Root class of the navigation bar view.
@@ -36,6 +37,7 @@ var main = {
         // Adding true spacing for container (to fit auth header)
         $(containerBelow).css('margin-top', authHeader.height());
     },
+
 
     /**
      *  Looks for every buttons with hints and adds popup logic for them.
@@ -72,6 +74,53 @@ var main = {
                 currentButton.on('mouseout', hideHint);
             }
         })
+    },
+
+
+    /**
+     * Looks for all inputs and applies arrows switch focus between them.
+     * */
+    addInputsArrowsSwitch : function() {
+        // Looking for all inputs to set key up handler.
+        var allInputs = $('input');
+
+        // Resetting old handler and applying new.
+        allInputs.unbind('keyup', main.arrowsSwitchHandler);
+        allInputs.on ('keyup', main.arrowsSwitchHandler);
+    },
+
+    /**
+     * Changes focus on another input depending on the pressed key.
+     * */
+    arrowsSwitchHandler : function(key) {
+        // Getting all inputs to iterate throw.
+        var allInputs = $('input');
+
+        // Storing currently focused and previously iterated inputs.
+        var currentInput = $(this);
+        var prevInput;
+
+        // Iterating throw all inputs.
+        allInputs.each(function() {
+
+            // We must have at least one iteration.
+            if (prevInput != null) {
+                if (key.which === 40                                       // arrow down was pressed
+                    && prevInput.attr('id') === currentInput.attr('id')) { // previous input was the focused one
+                    $(this).focus();                                       // so setting current input as focused
+                    return false;
+                }
+
+                if (key.which == 38                                      // arrow up was pressed
+                    && $(this).attr('id') === currentInput.attr('id')) { // current input is the focused one
+                    prevInput.focus();                                   // so setting previous input as focused
+                    return false;
+                }
+            }
+
+            // Updating previous input.
+            prevInput = $(this);
+        });
     }
 };
 
