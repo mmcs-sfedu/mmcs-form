@@ -24,6 +24,15 @@ block content
         - if (results.length == 0) {
             p На текущий момент нет ни одного проведённого опроса
         - }
+        - else
+            // Export all links.
+            span Экспортировать все результаты в&nbsp
+            a(href='/maintaining/results/pdf' target='_blank') PDF
+            span &nbsp/&nbsp
+            a(href='/maintaining/results/csv' target='_blank') CSV
+            br
+            br
+        -
 
         // Accordion with all results
         ul(class='collapsible popout' data-collapsible='accordion')
