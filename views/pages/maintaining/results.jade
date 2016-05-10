@@ -62,6 +62,13 @@ block content
                                        'у ' + discipline.group);
                                 }())
 
+                            // Adding download results buttons
+                            span  (
+                            a(class='download-csv' id='#{stageDescription.id}' href='#!') csv
+                            span ,&nbsp
+                            a(class='download-pdf' id='#{stageDescription.id}' href='#!') pdf
+                            span )
+
 
                         // Inner block (hidden)
                         div.collapsible-body

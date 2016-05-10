@@ -118,13 +118,26 @@ router.get('/results', checklist, function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
     // Preparing data about results of surveys.
-    maintainingController.getSurveysResults(res, function(results) {
+    maintainingController.getSurveysResults(null, res, function(results) {
         res.render('pages/maintaining/results', {
             title: 'Результаты',
             controller: maintainingController,
             results: results,
             errors: possibleErrors
         })
+    });
+});
+
+/* To get a survey's result in PDF */
+router.get('/results/pdf/:id?', checklist, function(req, res, next) {
+    // Getting generated PDF file's stream.
+    maintainingController.getResultStreamPDF(req.params.id, res, function(err, stream) {
+        // If something went wrong while PDF generation.
+        if (err != null)
+            res.redirect('/maintaining/results');
+        // Everything is ok - sending back generated PDF.
+        else
+            stream.pipe(res);
     });
 });
 
