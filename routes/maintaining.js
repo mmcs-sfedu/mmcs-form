@@ -118,13 +118,47 @@ router.get('/results', checklist, function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
     // Preparing data about results of surveys.
-    maintainingController.getSurveysResults(res, function(results) {
+    maintainingController.getSurveysResults(null, res, function(results) {
         res.render('pages/maintaining/results', {
             title: 'Результаты',
             controller: maintainingController,
             results: results,
             errors: possibleErrors
         })
+    });
+});
+
+/* To get a survey's result in PDF */
+router.get('/results/pdf/:id?', checklist, function(req, res, next) {
+    // If we have no provided id - generating for all surveys.
+    var whereClause = (typeof req.params.id == "undefined") ? null : {id : req.params.id};
+
+    // Getting generated PDF file's stream.
+    maintainingController.getResultStreamPDF(whereClause, res, function(err, stream) {
+        // If something went wrong while PDF generation.
+        if (err != null)
+            res.redirect('/maintaining/results');
+        // Everything is ok - sending back generated PDF.
+        else
+            stream.pipe(res);
+    });
+});
+
+/* To get a survey's result in CSV */
+router.get('/results/csv/:id?', checklist, function(req, res, next) {
+    // If we have no provided id - generating for all surveys.
+    var whereClause = (typeof req.params.id == "undefined") ? null : {id : req.params.id};
+
+    // Getting generated CSV string.
+    maintainingController.getResultStringCSV(whereClause, res, function(err, csv) {
+        // If something went wrong while CSV generation.
+        if (err != null)
+            res.redirect('/maintaining/results');
+        // Everything is ok - sending back generated CSV.
+        else {
+            res.set('Content-Type', 'text/csv; charset=utf-8');
+            res.send(csv);
+        }
     });
 });
 

@@ -19,6 +19,10 @@ module.exports =
 
     getSurveysResults: getSurveysResults,
 
+    getResultStreamPDF: getResultStreamPDF,
+
+    getResultStringCSV: getResultStringCSV,
+
     deleteForm: deleteForm,
 
     addForm: addForm,
@@ -167,10 +171,11 @@ function getAllBrsDisciplines(res, callback) {
 
 /**
  * Provides a data about all surveys' results.
+ * @param whereClause Some additional selection rules (filter only specific ids for example).
  * @param {Function} callback Used to asynchronously return data.
  * @param {Object} res To redirect on error page in a bad case.
  * */
-function getSurveysResults(res, callback) {
+function getSurveysResults(whereClause, res, callback) {
     /* It's very difficult to describe: we need all of our full data, excepting voted users IDs to build graphs. */
     models.feedback_stage.findAll({
         attributes: { exclude: ['createdAt', 'updatedAt'] }, // we don't like data with dates
@@ -179,6 +184,7 @@ function getSurveysResults(res, callback) {
             {
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
                 model: models.stage_description,
+                where: whereClause,
                 required: true,
                 include: [
                     {
@@ -246,6 +252,167 @@ function getSurveysResults(res, callback) {
             callback(results);
         }
     );
+}
+
+/**
+ * Generates PDF stream for survey if possible.
+ * @param whereClause Desired data for PDF generation.
+ * @param {Object} res Response object.
+ * @param {Function} callback Contains error and PDF stream.
+ * */
+function getResultStreamPDF(whereClause, res, callback) {
+    // Getting data from db for selected survey first.
+    getSurveysResults(whereClause, res, function(response) {
+
+        // Checking if provided id was incorrect - returning error.
+        if (response.length == 0)
+            return callback("No survey for ID was found.", null);
+
+        // Turning on PDF generation module.
+        var pdf = require('phantomjs-pdf');
+
+        // To store result content of PDF.
+        var pdfContent = "";
+
+        // Generating content of the PDF.
+        for (var respIndex = 0; respIndex < response.length; ++respIndex) {
+            // For fast access.
+            var discipline = response[respIndex].stage_descriptions[0].discipline;
+            var questions = response[respIndex].feedback_form.questions;
+            var answers = response[respIndex].stage_descriptions[0].answers;
+            // var totalVoted = response[respIndex].stage_descriptions[0].voted_users.length;
+
+
+            // Template.
+            pdfContent += 'Результаты анкетирования по форме <b>' + response[respIndex].feedback_form.name + '</b>;<br>' +
+                'даты проведения опроса: <b>' + formatDateForHtml(response[respIndex].date_from) + ' - ' + formatDateForHtml(response[respIndex].date_to) + '</b>;<br>' +
+                'группа: <b>' + discipline.group + '</b>;<br>' +
+                'дисциплина: <b>' + discipline.subject + ' (' + discipline.teacher + ')</b><br><br>';
+
+
+            // Answers content template.
+            for (var i = 0; i < questions.length; ++i) {
+                // To print total amount of voters for question.
+                var totalVotesInQuestion = 0;
+
+                // Printing question's text.
+                pdfContent += '<b>' + questions[i].text + '</b><br>';
+
+                // Counting total amount of voters for question.
+                for (var j = 0; j < questions[i].possible_answers.length; j++) {
+                    for (var k = 0; k < answers.length; k++) {
+                        if (answers[k].possible_answer_id == questions[i].possible_answers[j].id) {
+                            totalVotesInQuestion++;
+                        }
+                    }
+                }
+
+                // Counting answers for specific question
+                for (j = 0; j < questions[i].possible_answers.length; j++) {
+                    var count = 0;
+                    for (k = 0; k < answers.length; k++) {
+                        if (answers[k].possible_answer_id == questions[i].possible_answers[j].id) {
+                            count++;
+                        }
+                    }
+
+                    // Getting part of votes for that answer from total votes count.
+                    // var proportion = count / totalVotesInQuestion * 100;
+                    // Rendering answer text
+                    pdfContent += questions[i].possible_answers[j].text;
+                    pdfContent += ' - ';
+                    pdfContent += '<b>' + count + '</b><br>'; // number of answers of that type
+                }
+
+                // Total voted string.
+                pdfContent += 'Всего проголосовавших: <b>' + totalVotesInQuestion + '</b>';
+                if (i != questions.length - 1)
+                    pdfContent += '<br><br>';
+            }
+
+            // Adding new page space.
+            pdfContent += '<br><br><br><br><br>';
+        }
+
+
+        // Generating PDF.
+        pdf.convert({
+            "html" : pdfContent},
+            function(result) {
+                // Returning generated PDF stream.
+                return callback(null, result.toStream());
+            });
+    });
+}
+
+/**
+ * Generates CSV string for survey if possible.
+ * @param whereClause Desired data for CSV generation.
+ * @param {Object} res Response object.
+ * @param {Function} callback Contains error and CSV string.
+ * */
+function getResultStringCSV(whereClause, res, callback) {
+    // Getting data from db for selected survey first.
+    getSurveysResults(whereClause, res, function(response) {
+
+        // Checking if provided id was incorrect - returning error.
+        if (response.length == 0)
+            return callback("No survey for ID was found.", null);
+
+        // Generating header for CSV.
+        var csvContent = "form,form_id,date_from,date_to," +
+                         "subject,subject_id,teacher,teacher_id,group,group_id," +
+                         "question,question_id,answer,answer_id,answered_count\n";
+
+
+        // Generating content of the CSV.
+        for (var respIndex = 0; respIndex < response.length; ++respIndex) {
+            // For fast access.
+            var discipline = response[respIndex].stage_descriptions[0].discipline;
+            var questions = response[respIndex].feedback_form.questions;
+            var answers = response[respIndex].stage_descriptions[0].answers;
+
+
+            // Answers evaluations.
+            for (var i = 0; i < questions.length; ++i) {
+                // Counting answers for specific question
+                for (var j = 0; j < questions[i].possible_answers.length; j++) {
+                    var count = 0;
+                    for (var k = 0; k < answers.length; k++) {
+                        if (answers[k].possible_answer_id == questions[i].possible_answers[j].id) {
+                            count++;
+                        }
+                    }
+
+                    // Form's data.
+                    csvContent += response[respIndex].feedback_form.name + ',' + response[respIndex].feedback_form.id + ',';
+
+                    // Data about dates.
+                    csvContent += parseInt(response[respIndex].date_from.getTime() / 1000) + ',' + parseInt(response[respIndex].date_to.getTime() / 1000) + ',';
+
+                    // Data about discipline.
+                    csvContent += discipline.subject + ',' + discipline.subject_id + ',';
+                    csvContent += discipline.teacher + ',' + discipline.teacher_id + ',';
+                    csvContent += discipline.group + ',' + discipline.group_id + ',';
+
+                    // Question's data.
+                    csvContent += questions[i].text + ',' + questions[i].id + ',';
+
+                    // Answer data.
+                    csvContent += questions[i].possible_answers[j].text + ',' + questions[i].possible_answers[j].id + ',';
+
+                    // Total answers data.
+                    csvContent += count;
+
+                    // End of the CSV line.
+                    csvContent += '\n';
+                }
+            }
+        }
+
+
+        return callback(null, csvContent);
+    });
 }
 
 /* DELETE OR ADD FUNCTIONS */

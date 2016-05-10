@@ -36,7 +36,9 @@ block content
 
         // Button to add new form
         // Also clears last form fields
-        +create-action-button('addForm', '$(".maintaining-create-context .questions").empty(); $(".maintaining-create-context input#name").val("");')
+        +create-action-button('addForm',
+        '$(".maintaining-create-context .questions").empty(); $(".maintaining-create-context input#name").val("");',
+        'Создать новую форму')
         // Clearing all questions and form name on click
 
         // Add form dialog
@@ -57,7 +59,8 @@ block content
 
                 // Button to add question
                 a(id='addQuestion' class='btn-floating btn-medium waves-effect waves-light green lighten-1')
-                    i(class='material-icons') add
+                    i.material-icons add
+                        span(class='hide' id='hint') Добавить вопрос
 
             // Action buttons for dialog
             div.modal-footer
