@@ -61,9 +61,11 @@ router.get('/login2', function(req, res, next) {
         },
         // Callback to provide an identifier to user.
         function(identifier, profile, done) {
-            var url = require('url');
+            var url = require('url');       // to parse http request string
+            var crypto = require('crypto'); // to gen md5
             var parts = url.parse(identifier, true);
-            return done(null, { id : parts.query.user, name : profile['displayName'] });
+            return done(null, { id : crypto.createHash('md5').update(parts.query.user).digest('hex'),
+                              name : profile['displayName'] });
         }
     ));
 
