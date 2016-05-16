@@ -5,7 +5,7 @@ module.exports = function(sequelize, DataTypes) {
                 primaryKey: true
             },
             account_id: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.STRING,
                 primaryKey: true,
                 notNull: true
             }

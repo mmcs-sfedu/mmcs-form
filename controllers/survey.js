@@ -39,8 +39,8 @@ function getStageDescriptions(req, callback) {
         return;
     }
 
-    /* Getting group ID for authorized user. */
-    var studentsGroupId = authController.getStudentsGroupId(req.session);
+    /* Getting group ID for authorized user. Now we're not binding user to his group! */
+    // var studentsGroupId = authController.getStudentsGroupId(req.session);
 
     /* Date border to choose only actual surveys. */
     var dateNow = new Date();
@@ -57,8 +57,8 @@ function getStageDescriptions(req, callback) {
             {
                 // Getting stage descriptions only for student's group.
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
-                model: models.discipline,
-                where: { group_id: [ studentsGroupId ] }
+                model: models.discipline //,
+                //where: { group_id: [ studentsGroupId ] }
             },
             {
                 // Getting only actual by date stage descriptions.
@@ -82,8 +82,8 @@ function getStageDescriptions(req, callback) {
 
 
         /* TODO КОСТЫЛЬНАЯ ИНТЕГРАЦИЯ (ЗАГЛУШКА) ДЛЯ БРС! */
-        var brsTeachers = brsDataController.getBrsTeachers(studentsGroupId);
-        var brsSubjects = brsDataController.getBrsSubjects(studentsGroupId);
+        var brsTeachers = brsDataController.getBrsTeachers();
+        var brsSubjects = brsDataController.getBrsSubjects();
 
 
         /* Here will be response data with populated labels from BRS. */
@@ -94,7 +94,7 @@ function getStageDescriptions(req, callback) {
         normalJsResult.forEach(function(sd) {
             // Boolean var to check if current user has already voted.
             var userVoted = sd['voted_users'].some(function(votedUser) {
-                return votedUser['account_id'] === authorizedUserId;
+                return votedUser['account_id'].valueOf() == authorizedUserId.valueOf();
             });
             // Only if user hasn't voted in that stage yet.
             if (!userVoted) {
@@ -119,7 +119,7 @@ function getStageDescriptions(req, callback) {
             }
         });
 
-        console.log(desiredStageDescriptions);
+        // console.log(desiredStageDescriptions);
 
         /* Returning prepared data about surveys. */
         callback(desiredStageDescriptions);
@@ -200,10 +200,10 @@ function getFormsQuestionsForStage(stageDescriptionId, callback) {
  *                            true - if user can vote for this stage description, false - in another case.
  * */
 function checkStageAvailabilityForUser(stageDescriptionId, session, callback) {
-    // Getting and checking student's group and ID first of all.
-    var studentsGroupID = authController.getStudentsGroupId(session);
+    // Getting and checking student's group (deprecated) and ID first of all.
+    // var studentsGroupID = authController.getStudentsGroupId(session);
     var studentID       = authController.getStudentsAuthorization(session);
-    if (studentsGroupID && studentID) {
+    if (studentID) {
         // Looking for stage description with provided ID.
         models.stage_description.findOne({
             where: { id: stageDescriptionId },
@@ -229,12 +229,12 @@ function checkStageAvailabilityForUser(stageDescriptionId, session, callback) {
                 return;
             }
 
-            // Checking if chosen stage is available for student's group.
-            if (stage_description.discipline.group_id != studentsGroupID) {
-                // This stage is not available for user.
-                callback(false);
-                return;
-            }
+            // Checking if chosen stage is available for student's group. Deprecated.
+            //if (stage_description.discipline.group_id != studentsGroupID) {
+            //    // This stage is not available for user.
+            //    callback(false);
+            //    return;
+            //}
 
             // Checking if current stage is available by date criteria.
             var dateNow = new Date();

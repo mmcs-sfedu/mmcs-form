@@ -134,7 +134,7 @@
     <column id="COL33" populated="true" UUID="0565efff-72e9-4ffd-88ba-20636cc7cd5f" autoIncrement="false" autoIncrementSequenceName="voted_users_stage_description_id_seq" defaultValue="" name="stage_description_id" nullable="0" physicalName="stage_description_id" precision="0" primaryKeySeq="0" referenceCount="1" scale="0" sourceDataTypeName="UserDefinedSQLType" type="4" userDefinedTypeUUID="63b011c7-c81f-4c75-8271-632b3c87f727" >
      <remarks></remarks>
     </column>
-    <column id="COL34" populated="true" UUID="bf71963f-8018-47b9-a215-0f862ba43679" autoIncrement="false" autoIncrementSequenceName="voted_users_account_id_seq" defaultValue="" name="account_id" nullable="0" physicalName="account_id" precision="0" primaryKeySeq="1" referenceCount="1" scale="0" sourceDataTypeName="UserDefinedSQLType" type="4" userDefinedTypeUUID="63b011c7-c81f-4c75-8271-632b3c87f727" >
+    <column id="COL34" populated="true" UUID="bf71963f-8018-47b9-a215-0f862ba43679" autoIncrement="false" autoIncrementSequenceName="voted_users_account_id_seq" defaultValue="" name="account_id" nullable="0" physicalName="account_id" precision="0" primaryKeySeq="1" referenceCount="1" scale="0" sourceDataTypeName="UserDefinedSQLType" type="12" userDefinedTypeUUID="831ac2d4-0e65-47ec-a0b7-62b7f6b8760a" >
      <remarks></remarks>
     </column>
     </folder>

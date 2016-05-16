@@ -61,7 +61,9 @@ router.get('/login2', function(req, res, next) {
         },
         // Callback to provide an identifier to user.
         function(identifier, profile, done) {
-            return done(null, { id : identifier, name : profile['displayName'] });
+            var url = require('url');
+            var parts = url.parse(identifier, true);
+            return done(null, { id : parts.query.user, name : profile['displayName'] });
         }
     ));
 

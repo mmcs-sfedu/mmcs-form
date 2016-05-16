@@ -13,7 +13,7 @@ module.exports = {
           for (var j = 0; j < stage_descriptions.length; j++) {
               for (var i = 1; i <= 3; i++) {
                   voted_users.push({
-                      account_id: i,
+                      account_id: '' + i,
                       stage_description_id: stage_descriptions[j].id,
                       createdAt: new Date().toISOString(),
                       updatedAt: new Date().toISOString()
