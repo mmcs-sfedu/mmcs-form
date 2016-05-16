@@ -42,3 +42,13 @@ block content
         br
         br
         +section-title('Чтобы принять участие в анкетировании, необходимо авторизоваться', true)
+
+
+
+    // TODO УБРАТЬ В НОРМАЛЬНОЕ ОКНО АВТОРИЗАЦИИ, ПРИПИСЫВАТЬ URL К ID.
+    form(action='/student/login2' method='post')
+        div
+            label OpenID:
+            input(type='text' name='openid_identifier' value='https://openid.sfedu.ru/server.php/idpage?user=koshmansky@sfedu.ru')
+            br
+            input(type='submit' value='Sign In')

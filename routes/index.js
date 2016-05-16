@@ -8,9 +8,4 @@ router.get('/', function(req, res, next) {
 
 
 
-/* To test database. */
-//router.get('/db-test', function(req, res, next) {
-//    res.send('It Works!');
-//});
-
 module.exports = router;
