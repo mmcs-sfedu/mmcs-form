@@ -12,10 +12,10 @@ var errorsController = require('../controllers/errors');
 /* Log out for user and redirect on surveys. */
 router.all('/logout', function(req, res, next) {
     authController.studentLogout(req);
-    res.redirect('/survey');
+    res.redirect('/');
 });
 
-/* Authorization route for student. */
+/* Authorization route for student. Deprecated. */
 router.post('/login', function(req, res, next) {
     /* Checking user's input first */
     req.checkBody('login').notEmpty();
@@ -50,17 +50,18 @@ var passport = require('passport'),
     OpenIDStrategy = require('passport-openid').Strategy;
 
 // Preliminary route for oid configs.
-router.post('/login2', function(req, res, next) {
+router.get('/login2', function(req, res, next) {
 
     // Configuring passport and strategy.
     passport.use(new OpenIDStrategy({
             // Where to return after OpenID auth.
             returnURL: req.protocol + '://' + req.get('host') + '/student/postoid',
-            realm: req.protocol + '://' + req.get('host')
+            realm: req.protocol + '://' + req.get('host'),
+            profile: true
         },
         // Callback to provide an identifier to user.
-        function(identifier, done) {
-            return done(null, identifier);
+        function(identifier, profile, done) {
+            return done(null, { id : identifier, name : profile['displayName'] });
         }
     ));
 
@@ -69,7 +70,7 @@ router.post('/login2', function(req, res, next) {
     passport.deserializeUser(function(user, done) { done(null, user); });
 
     // Starting auth via OpenID.
-    res.redirect('/student/oid?openid_identifier=' + req.body['openid_identifier']);
+    res.redirect('/student/oid?openid_identifier=https://openid.sfedu.ru/server.php/idpage?');
 });
 
 // OpenID auth.
@@ -78,8 +79,8 @@ router.get('/oid', passport.authenticate('openid'));
 // Return URL for OpenID.
 router.get('/postoid',
     passport.authenticate('openid', {
-        successRedirect: '/survey',
-        failureRedirect: '/survey228' })); // TODO BAD RESULT URL, AUTH AND UNAUTH LOGIC IN SESSION, HTML LAYOUT
+        successRedirect: '/survey', // success - loading surveys again
+        failureRedirect: '/' }));   // failure - going on the main page
 
 
 
