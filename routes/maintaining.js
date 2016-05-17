@@ -280,6 +280,96 @@ router.post('/stage', checklist, function(req, res, next) {
 });
 
 
+
+/* Delete discipline by ID */
+router.delete('/discipline', checklist, function(req, res, next) {
+    /* Checking request. */
+    req.checkBody('id').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) { // if there is no provided form ID, ajax will show error
+        res.send(null);
+        return;
+    }
+
+    // Looking for desired entity in db.
+    models.discipline.findOne({
+            where: { id: req.body.id }})
+        .then(function(entity) {
+            var entCopy = entity.get({ plain: true });
+            // Destroying entity.
+            entity.destroy();
+            return res.send(entCopy);
+        }).catch(function() {
+        return res.send(null);
+    });
+});
+
+/* Add discipline */
+router.post('/discipline', checklist, function(req, res, next) {
+    models.subject.find({order: [models.Sequelize.fn( 'RANDOM' )]})
+        .then(function(subject) {
+        if (subject == null)
+            return res.send(null);
+
+            models.teacher.find({order: [models.Sequelize.fn( 'RANDOM' )]
+            }).then(function(teacher) {
+                if (teacher == null)
+                    return res.send(null);
+
+                models.group.find({order: [models.Sequelize.fn( 'RANDOM' )]
+                }).then(function(group) {
+                    if (group == null)
+                        return res.send(null);
+
+                    // Creating instance for chosen entity.
+                    models.discipline.create({
+                        teacher_id: teacher.id,
+                        subject_id: subject.id,
+                        group_id:   group.id,
+                        updatedAt:  new Date().toISOString(),
+                        createdAt:  new Date().toISOString()
+                    }).then(function(entity) {
+                        return res.send(entity.get({ plain: true }));
+                    });
+                });
+
+            });
+
+    });
+});
+
+/* Edit discipline */
+router.put('/discipline', checklist, function(req, res, next) {
+    /* Checking request. */
+    req.checkBody('id').notEmpty();
+    req.checkBody('subject_id').notEmpty();
+    req.checkBody('teacher_id').notEmpty();
+    req.checkBody('group_id').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) { // if there is no provided form ID or other data, ajax will show error
+        res.send(null);
+        return;
+    }
+
+    // Updating instance for chosen entity.
+    models.discipline.update(
+        {
+            subject_id: req.body.subject_id,
+            teacher_id: req.body.teacher_id,
+            group_id: req.body.group_id
+        },
+        {
+            where: { id : req.body.id }
+        })
+        .then(function(entity) {
+            return res.send({id:req.body.id});
+        }, function(rejectedPromiseError){
+            return res.send(null);
+        });
+});
+
+
+
 /* Delete entity by ID */
 router.delete('/entity', checklist, function(req, res, next) {
     /* Checking request. */

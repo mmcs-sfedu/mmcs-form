@@ -22,17 +22,26 @@ block content
 
 
         +section-title('Управление дисциплинами')
-            for discipline in disciplines
-                div.row
-                    select(class='browser-default col l4 m4 s12')
-                        for subject in subjects
-                            option(value='#{subject.id}') #{subject.name}
-                    select(class='browser-default col l4 m4 s12')
-                        for teacher in teachers
-                            option(value='#{teacher.id}') #{teacher.name}
-                    select(class='browser-default col l4 m4 s12')
-                        for group in groups
-                            option(value='#{group.id}') #{group.name}
+
+        // Here will be disciplines list.
+        div.disciplines
+        i(class='material-icons medium green-text text-lighten-1 pointer'
+          onclick='disciplines.addDiscipline();') add
+
+        // Passing all server's vars to client.
+        script.
+            disciplines['disciplines'] = !{JSON.stringify(disciplines)};
+            disciplines['subjects'] = !{JSON.stringify(subjects)};
+            disciplines['teachers'] = !{JSON.stringify(teachers)};
+            disciplines['groups'] = !{JSON.stringify(groups)};
+
+
+
+
+
+        br
+        br
+        br
 
 
 
