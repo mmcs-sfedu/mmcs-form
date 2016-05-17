@@ -16,6 +16,8 @@ module.exports =
 
     getAllDisciplines: getAllDisciplines,
 
+    getAllDisciplinesWithData: getAllDisciplinesWithData,
+
     getSurveysResults: getSurveysResults,
 
     getResultStreamPDF: getResultStreamPDF,
@@ -153,6 +155,31 @@ function getAllDisciplines(res, callback) {
 
         callback(result);
     })
+}
+
+/**
+ * Gets all disciplines from database with subjects data.
+ * @param callback Contains disciplines, subjects, teachers and groups.
+ * */
+function getAllDisciplinesWithData(callback) {
+    getAllDisciplines(null, function(disciplines) {
+        models.subject.findAll({
+            attributes: { exclude: ['createdAt', 'updatedAt'] }
+        }).then(function(subjects) {
+            models.teacher.findAll({
+                attributes: { exclude: ['createdAt', 'updatedAt'] }
+            }).then(function(teachers) {
+                models.group.findAll({
+                    attributes: { exclude: ['createdAt', 'updatedAt'] }
+                }).then(function(groups) {
+                    callback(disciplines,
+                        utilsController.toNormalArray(subjects),
+                        utilsController.toNormalArray(teachers),
+                        utilsController.toNormalArray(groups))
+                })
+            });
+        })
+    });
 }
 
 /**

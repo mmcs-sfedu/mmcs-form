@@ -1,0 +1,1 @@
+.entities{overflow:scroll;border:2px solid #64b5f6;max-height:400px}@media all and (max-width:992px) and (min-width:601px){.entities{max-height:350px}}@media all and (max-width:600px){.entities{max-height:250px}}.input-field input[type=text]:focus{border-bottom:1px solid #64b5f6;box-shadow:0 1px 0 0 #64b5f6}.input-field input[type=text]{width:84%}

@@ -1,0 +1,31 @@
+@import "colors";
+
+.entities {
+  overflow: scroll;
+  border: 2px solid @materialize-light-blue;
+  max-height: 400px;
+}
+
+/* Tablets */
+@media all and (max-width: 992px) and (min-width: 601px) {
+  .entities {
+    max-height: 350px;
+  }
+}
+
+/* Mobile devices */
+@media all and (max-width: 600px) {
+  .entities {
+    max-height: 250px;
+  }
+}
+
+/* Label underline focus color */
+.input-field input[type=text]:focus {
+  border-bottom: 1px solid @materialize-light-blue;
+  box-shadow: 0 1px 0 0 @materialize-light-blue;
+}
+/* Default input width to fit block */
+.input-field input[type=text] {
+  width: 84%;
+}
