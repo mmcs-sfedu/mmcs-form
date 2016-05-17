@@ -100,26 +100,6 @@ function getAllStagesData(res, callback) {
         /* To convert this value to usual object and make it client-side-readable. */
         result = result.map(function(stage){ return stage.toJSON() });
 
-
-        /**
-         *  TODO в этом блоке достаточно нерациональное решение (как заглушка) слияния данных с БРС.
-         *  TODO в перспективе лучше для каждого stage description (дисциплины внутри) запрашивать имя по ID от БРС. */
-        /* Getting data about discipline from BRS. */
-        var brsGroups   = brsDataController.getBrsGroups();
-        var brsTeachers = brsDataController.getBrsTeachers(null);
-        var brsSubjects = brsDataController.getBrsSubjects(null);
-        /* Checking BRS data. */
-        if (brsGroups == null)   { renderError(res, 'Не удалось загрузить список групп от БРС'); return; }
-        if (brsTeachers == null) { renderError(res, 'Не удалось загрузить список преподавателей от БРС'); return; }
-        if (brsSubjects == null) { renderError(res, 'Не удалось загрузить список предметов от БРС'); return; }
-        /* Scary merge with BRS data. Don't forget to change BRS data structure when it'll work with true BRS! */
-        for (var i = 0; i < result.length; i++) {     // looking throw all feedback stages
-            mergeStageDescriptionsWithBRS(
-                result[i]['stage_descriptions'],      // stage descriptions from database
-                brsGroups, brsTeachers, brsSubjects); // BRS data arrays
-        }
-
-
         callback(result);
     })
 }

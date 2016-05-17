@@ -142,7 +142,21 @@ function getFormsQuestionsForStage(stageDescriptionId, callback) {
                         where: { id: stageDescriptionId },
                         include: {
                             attributes: ['teacher_id', 'subject_id'],
-                            model: models.discipline
+                            model: models.discipline,
+                            include: [
+                                {
+                                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                    model: models.subject
+                                },
+                                {
+                                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                    model: models.teacher
+                                },
+                                {
+                                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                    model: models.group
+                                }
+                            ]
                         }
                     }
                 ]
@@ -164,23 +178,12 @@ function getFormsQuestionsForStage(stageDescriptionId, callback) {
         // Converting result to usual js object.
         var formJsObject = utilsController.toNormalArray(forms)[0];
 
+        // For fast access.
+        var discipline = formJsObject.feedback_stages[0].stage_descriptions[0].discipline;
 
-        /* TODO КОСТЫЛЬНАЯ ИНТЕГРАЦИЯ (ЗАГЛУШКА) ДЛЯ БРС! */
-        var brsTeachers = brsDataController.getBrsTeachers();
-        var brsSubjects = brsDataController.getBrsSubjects();
-        brsTeachers.forEach(function(teacher) {
-            if (teacher['id'] == formJsObject.feedback_stages[0].stage_descriptions[0].discipline.teacher_id) {
-                formJsObject['teacher'] = teacher['name'];
-                return false;
-            }
-        });
-        brsSubjects.forEach(function(subject) {
-            if (subject['id'] == formJsObject.feedback_stages[0].stage_descriptions[0].discipline.subject_id) {
-                formJsObject['subject'] = subject['name'];
-                return false;
-            }
-        });
-
+        // Populating data about the discipline.
+        formJsObject['subject'] = discipline.subject.name;
+        formJsObject['teacher'] = discipline.teacher.name;
 
         /* Returning found form to student. */
         callback(formJsObject);
