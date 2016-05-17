@@ -1,6 +1,5 @@
 /* Importing controllers. */
 var authController    = require('../controllers/auth');
-var brsDataController = require('../controllers/brs');
 var utilsController   = require('../controllers/utils');
 
 /* To access DB. */
@@ -57,7 +56,21 @@ function getStageDescriptions(req, callback) {
             {
                 // Getting stage descriptions only for student's group.
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
-                model: models.discipline //,
+                model: models.discipline,
+                include: [
+                    {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.subject
+                    },
+                    {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.teacher
+                    },
+                    {
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        model: models.group
+                    }
+                ]
                 //where: { group_id: [ studentsGroupId ] }
             },
             {
@@ -81,11 +94,6 @@ function getStageDescriptions(req, callback) {
         var normalJsResult = utilsController.toNormalArray(result);
 
 
-        /* TODO КОСТЫЛЬНАЯ ИНТЕГРАЦИЯ (ЗАГЛУШКА) ДЛЯ БРС! */
-        var brsTeachers = brsDataController.getBrsTeachers();
-        var brsSubjects = brsDataController.getBrsSubjects();
-
-
         /* Here will be response data with populated labels from BRS. */
         var desiredStageDescriptions = [];
 
@@ -98,19 +106,6 @@ function getStageDescriptions(req, callback) {
             });
             // Only if user hasn't voted in that stage yet.
             if (!userVoted) {
-                /* TODO ИСПРАВИТЬ ИНТЕГРАЦИЮ С ДАННЫМИ БРС! */
-                brsTeachers.forEach(function(teacher) {
-                    if (teacher['id'] == sd['discipline']['teacher_id']) {
-                        sd['discipline']['teacher'] = teacher['name'];
-                    }
-                });
-                brsSubjects.forEach(function(subject) {
-                    if (subject['id'] == sd['discipline']['subject_id']) {
-                        sd['discipline']['subject'] = subject['name'];
-                    }
-                });
-                /* TODO КОНЕЦ ИНТЕГРАЦИИ */
-
                 // We don't want to send voted users data to client.
                 delete sd['voted_users'];
 

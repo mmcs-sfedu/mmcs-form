@@ -1,6 +1,5 @@
 /* Importing controllers */
 var authController = require('../controllers/auth');
-var brsDataController = require('../controllers/brs');
 var utilsController = require('../controllers/utils');
 
 /* Importing db models helper */
