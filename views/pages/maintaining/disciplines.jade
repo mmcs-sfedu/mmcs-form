@@ -1,0 +1,54 @@
+extends ../../base/layout
+
+// Some additional includes of styles and scripts
+block includes
+    link(rel='stylesheet' href='/css/forms.css')
+    // link(rel='stylesheet' href='/css/stages.css')
+    script(src='/js/disciplines.js')
+    // To format dates
+    // script(src='/js/utils.js')
+
+// Login block and module to show errors, mixins usage
+block content
+    include ../../blocks/admin-auth
+    include ../../blocks/errors-toaster
+    include ../../components/mixins
+
+    // All page content will be here
+    div(class='container maintaining-disciplines-context')
+
+
+        +section-title('Редактирование данных для дисциплин')
+        div.row
+            div(class='col l4 m4 s12')
+                ul
+                for subject in subjects
+                    li #{subject.name}
+                        i(class='material-icons blue-text text-lighten-4 pointer'
+                          onclick='disciplines.delEntity("subject", #{subject.id});') trending_up
+            div(class='col l4 m4 s12')
+                ul
+                for teacher in teachers
+                    li #{teacher.name}
+                        i(class='material-icons blue-text text-lighten-4 pointer'
+                          onclick='disciplines.delEntity("teacher", #{teacher.id});') trending_up
+            div(class='col l4 m4 s12')
+                ul
+                for group in groups
+                    li #{group.name}
+                        i(class='material-icons blue-text text-lighten-4 pointer'
+                          onclick='disciplines.delEntity("group", #{group.id});') trending_up
+
+
+        +section-title('Управление дисциплинами')
+        for discipline in disciplines
+            div.row
+                select(class='browser-default col l4 m4 s12')
+                    for subject in subjects
+                        option(value='#{subject.id}') #{subject.name}
+                select(class='browser-default col l4 m4 s12')
+                    for teacher in teachers
+                        option(value='#{teacher.id}') #{teacher.name}
+                select(class='browser-default col l4 m4 s12')
+                    for group in groups
+                        option(value='#{group.id}') #{group.name}

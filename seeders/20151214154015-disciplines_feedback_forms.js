@@ -5,8 +5,10 @@ var models = require('../models');
 module.exports = {
   up: function (queryInterface, Sequelize) {
 
+      var count = 15;
+
       var subjects = [];
-      for (var i = 1; i <= 3; ++i) {
+      for (var i = 1; i <= count; ++i) {
           subjects.push({
               name: "Предмет " + i,
               createdAt: new Date().toISOString(),
@@ -14,7 +16,7 @@ module.exports = {
           })
       }
       var teachers = [];
-      for (i = 1; i <= 3; ++i) {
+      for (i = 1; i <= count; ++i) {
           teachers.push({
               name: "Преподаватель " + i,
               createdAt: new Date().toISOString(),
@@ -22,7 +24,7 @@ module.exports = {
           })
       }
       var groups = [];
-      for (i = 1; i <= 3; ++i) {
+      for (i = 1; i <= count; ++i) {
           groups.push({
               name: "Группа " + i,
               createdAt: new Date().toISOString(),
@@ -34,7 +36,7 @@ module.exports = {
       queryInterface.bulkInsert('groups', groups, {});
 
       var disciplines = [];
-      for (i = 1; i <= 3; i++) {
+      for (i = 1; i <= count; i++) {
           disciplines.push({
               teacher_id: i,
               subject_id: i,

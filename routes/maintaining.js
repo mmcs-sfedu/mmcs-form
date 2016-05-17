@@ -6,6 +6,10 @@ var errorsController      = require('../controllers/errors');
 var authController        = require('../controllers/auth');
 var maintainingController = require('../controllers/maintaining');
 
+// To access DB.
+var models = require('../models');
+
+
 /* Pre-routing check functions */
 var checklist = [
     /* Checks if user authorized as student or not authorized as admin */
@@ -162,6 +166,25 @@ router.get('/results/csv/:id?', checklist, function(req, res, next) {
     });
 });
 
+/* Disciplines for CRUD */
+router.get('/disciplines', checklist, function(req, res, next) {
+    // Checking possible stored in session errors.
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
+
+    // Preparing data about disciplines.
+    maintainingController.getAllDisciplinesWithData(function(disciplines, subjects, teachers, groups) {
+        res.render('pages/maintaining/disciplines', {
+            title: 'Дисциплины',
+            controller: maintainingController,
+            disciplines: disciplines,
+            subjects: subjects,
+            teachers: teachers,
+            groups: groups,
+            errors: possibleErrors
+        })
+    });
+});
+
 
 /* To authorize admin */
 router.post('/login', checklist, function(req, res, next) {
@@ -255,5 +278,64 @@ router.post('/stage', checklist, function(req, res, next) {
         res.send(result);
     });
 });
+
+
+/* Delete entity by ID */
+router.delete('/entity', checklist, function(req, res, next) {
+    /* Checking request. */
+    req.checkBody('id').notEmpty();
+    req.checkBody('type').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) { // if there is no provided form ID, ajax will show error
+        res.send(null);
+        return;
+    }
+
+    // Getting desired type for deletion.
+    var targetModel;
+    switch (req.body.type) {
+        case "subject":
+            targetModel = models.subject;
+            break;
+        case "teacher":
+            targetModel = models.teacher;
+            break;
+        case "group":
+            targetModel = models.group;
+            break;
+        default: return res.send(null);
+    }
+
+    // Looking for desired entity in db.
+    targetModel.findOne({
+        where: { id: req.body.id }})
+        .then(function(entity) {
+            // Destroying entity.
+            entity.destroy();
+            return res.send({id : req.body.id});
+        }).catch(function() {
+            return res.send(null);
+    });
+});
+
+/* Add entity */
+router.post('/entity', checklist, function(req, res, next) {
+    /* Adding entity and sending result. */
+    // TODO МЕНЯЕМ ФУНКЦИЮ, ПРОВЕРЯЕМ И ПЕРЕДАЕМ ТИП
+    //maintainingController.addForm(req.body, function(result) {
+    //    res.send(result);
+    //});
+});
+
+/* Edit entity */
+router.put('/entity', checklist, function(req, res, next) {
+    /* Editing entity and sending result. */
+    // TODO ФУНКЦИЯ ТА ЖЕ, ПРОВЕРЯЕМ ТИП И НОВОЕ ЗНАЧЕНИЕ
+    //maintainingController.addForm(req.body, function(result) {
+    //    res.send(result);
+    //});
+});
+
+
 
 module.exports = router;
