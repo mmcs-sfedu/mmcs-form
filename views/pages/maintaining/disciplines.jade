@@ -26,18 +26,24 @@ block content
                     li #{subject.name}
                         i(class='material-icons blue-text text-lighten-4 pointer'
                           onclick='disciplines.delEntity("subject", #{subject.id});') trending_up
+                i(class='material-icons blue-text text-lighten-4 pointer'
+                  onclick='disciplines.addEntity("subject");') trending_up
             div(class='col l4 m4 s12')
                 ul
                 for teacher in teachers
                     li #{teacher.name}
                         i(class='material-icons blue-text text-lighten-4 pointer'
                           onclick='disciplines.delEntity("teacher", #{teacher.id});') trending_up
+                i(class='material-icons blue-text text-lighten-4 pointer'
+                  onclick='disciplines.addEntity("teacher");') trending_up
             div(class='col l4 m4 s12')
                 ul
                 for group in groups
                     li #{group.name}
                         i(class='material-icons blue-text text-lighten-4 pointer'
                           onclick='disciplines.delEntity("group", #{group.id});') trending_up
+                i(class='material-icons blue-text text-lighten-4 pointer'
+                  onclick='disciplines.addEntity("group");') trending_up
 
 
         +section-title('Управление дисциплинами')

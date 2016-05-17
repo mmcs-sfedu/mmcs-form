@@ -292,19 +292,9 @@ router.delete('/entity', checklist, function(req, res, next) {
     }
 
     // Getting desired type for deletion.
-    var targetModel;
-    switch (req.body.type) {
-        case "subject":
-            targetModel = models.subject;
-            break;
-        case "teacher":
-            targetModel = models.teacher;
-            break;
-        case "group":
-            targetModel = models.group;
-            break;
-        default: return res.send(null);
-    }
+    var targetModel = getRequestEntityType(req.body.type);
+    if (!targetModel)
+        return res.send(null);
 
     // Looking for desired entity in db.
     targetModel.findOne({
@@ -320,21 +310,77 @@ router.delete('/entity', checklist, function(req, res, next) {
 
 /* Add entity */
 router.post('/entity', checklist, function(req, res, next) {
-    /* Adding entity and sending result. */
-    // TODO МЕНЯЕМ ФУНКЦИЮ, ПРОВЕРЯЕМ И ПЕРЕДАЕМ ТИП
-    //maintainingController.addForm(req.body, function(result) {
-    //    res.send(result);
-    //});
+    /* Checking request. */
+    req.checkBody('type').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) { // if there is no provided form ID, ajax will show error
+        res.send(null);
+        return;
+    }
+
+    // Getting desired type for creation.
+    var targetModel = getRequestEntityType(req.body.type);
+    if (!targetModel)
+        return res.send(null);
+
+    // Creating instance for chosen entity.
+    targetModel.create({
+        updatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+    }).then(function(entity) {
+        return res.send(entity.get({ plain: true }));
+    });
 });
 
 /* Edit entity */
 router.put('/entity', checklist, function(req, res, next) {
-    /* Editing entity and sending result. */
-    // TODO ФУНКЦИЯ ТА ЖЕ, ПРОВЕРЯЕМ ТИП И НОВОЕ ЗНАЧЕНИЕ
-    //maintainingController.addForm(req.body, function(result) {
-    //    res.send(result);
-    //});
+    /* Checking request. */
+    req.checkBody('id').notEmpty();
+    req.checkBody('type').notEmpty();
+    req.checkBody('val').notEmpty();  // new value
+    var errors = req.validationErrors();
+    if (errors) { // if there is no provided form ID or other data, ajax will show error
+        res.send(null);
+        return;
+    }
+
+    // Getting desired type for entity to edit.
+    var targetModel = getRequestEntityType(req.body.type);
+    if (!targetModel)
+        return res.send(null);
+
+    // Updating instance for chosen entity.
+    targetModel.update(
+        {
+            name: req.body.val
+        },
+        {
+            where: { id : req.body.id }
+        })
+        .then(function(entity) {
+            return res.send({id:req.body.id, type:req.body.type, val:req.body.val});
+        }, function(rejectedPromiseError){
+            return res.send(null);
+        });
 });
+
+
+/**
+ * Simplifies choice of the entity's type.
+ * @param type To choose required model.
+ * @return Model or null.
+ * */
+function getRequestEntityType(type) {
+    switch (type) {
+        case "subject":
+            return models.subject;
+        case "teacher":
+            return models.teacher;
+        case "group":
+            return models.group;
+        default: return null;
+    }
+}
 
 
 
