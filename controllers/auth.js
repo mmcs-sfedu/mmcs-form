@@ -40,6 +40,7 @@ module.exports =
 /* STUDENT AUTHORIZATION BLOCK */
 
 /**
+ * @Deprecated
  * Tries to authorize student - in a success case saves user's data in session.
  * @param {Object} req To get an access to user's session.
  * @param {String} login Provided student's login.
@@ -70,6 +71,7 @@ function studentAttemptLogin (req, login, password, callback) {
 }
 
 /**
+ * @Deprecated
  * Stores student's data in session after authorization.
  * @param {Object} req To access session.
  * @param {Integer} studentID Actual student ID.
@@ -90,8 +92,8 @@ function saveStudentsDataInSession(req, studentID, groupID, studentName) {
  * @returns {Object} Returns null if student wasn't authorized, his account id - in another case.
  * */
 function getStudentsAuthorization(session) {
-    if (session != null && session.student != null && session.student.id != null)
-        return session.student.id;
+    if (session != null && session['passport'] != null && session['passport']['user']['id'] != null)
+        return session['passport']['user']['id'];
     return null;
 }
 
@@ -101,8 +103,8 @@ function getStudentsAuthorization(session) {
  * @returns {Object} Authorized student's name.
  * */
 function getStudentsName (session) {
-    if (session != null && session.student != null && session.student.name != null)
-        return session.student.name;
+    if (session != null && session['passport'] != null && session['passport']['user']['name'] != null)
+        return session['passport']['user']['name'];
     return null;
 }
 
@@ -114,6 +116,9 @@ function getStudentsName (session) {
 function getStudentsGroupId(session) {
     if (session != null && session.student != null && session.student.group != null)
         return session.student.group;
+
+    // TODO ЧТО С ГРУППАМИ ТЕПЕРЬ?
+
     return null;
 }
 
@@ -122,12 +127,12 @@ function getStudentsGroupId(session) {
  * @param {Object} req To access session.
  * */
 function studentLogout (req) {
-    if (req.session.student != null)
-        req.session.student = null;
+    if (req.session['passport'] != null)
+        req.session['passport'] = null;
 }
 
 /**
- * Pre-routing check function generator. Redirects student on survey page, if he wasn't authorized.
+ * Pre-routing check function generator. Redirects student on home page, if he wasn't authorized.
  * @returns {Function} Checker function.
  * */
 function getStudentAuthChecker() {
@@ -135,7 +140,7 @@ function getStudentAuthChecker() {
         if (getStudentsAuthorization(req.session)) {
             next();
         } else {
-            res.redirect('/survey');
+            res.redirect('/');
         }
     }
 }

@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var uuid = require('uuid');
 var expressValidator = require('express-validator');
+var passport = require('passport'); // to use open id features
 
 // here we are adding some routes (path to them in project's directory), if we want to use them as separate files
 var routes = require('./routes/index');
@@ -23,6 +24,8 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(passport.initialize()); // initializing passport to use open id
+app.use(passport.session());    // passport also requires sessions
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
