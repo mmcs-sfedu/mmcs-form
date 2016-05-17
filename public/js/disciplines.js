@@ -22,6 +22,20 @@ var disciplines = {
     },
 
     /**
+     * Adds corresponding entity into the section.
+     * @param type Entity's type.
+     * @param entity Data to draw.
+     * */
+    renderEntity: function(type, entity) {
+        var whereToAdd = disciplines.context.find('.entities.' + type);
+        var name = (entity.name) ? entity.name : '';
+        whereToAdd.append('<div id="' + entity.id + '">' +
+                          '<div class="input-field">' +
+                          '<input type="text" value="' + name + '" onchange="disciplines.updEntity(\'' + type + '\', ' + entity.id + ', this.value);">' +
+                          '<i class="material-icons red-text text-lighten-2 pointer" onclick="disciplines.delEntity(\'' + type + '\', ' + entity.id + ');">delete</i></div></div>');
+    },
+
+    /**
      * Deletes entity by id.
      * @param type Entity's type.
      * @param id ID to delete in DB.
@@ -35,14 +49,12 @@ var disciplines = {
             dataType: 'json',                           // you must specify these type params to make NodeJS read query
             contentType: 'application/json'
         });
-        /* If everything is ok. TODO все поменять */
-        request.done(function(response) {
-            // Adding new form to list.
+        /* If everything is ok. */
+        request.done(function(deletedEntity) {
+            // Removing deleted entity from list.
             try {
-                //forms.context.find('.collection#forms').append(forms.generateFormsListItem(response.id, response.name, response.stages));
-                //forms.updateDeleteButtonsListeners(); // adding onclick listener for new form item
-                //btnCancel.click(); // closing dialog
-                Materialize.toast('Форма успешно добавлена', 5000);
+                disciplines.context.find('.entities.' + type).find('#' + id).remove();
+                Materialize.toast('Запись удалена', 3000);
             } catch (exc) {
                 proceedFail();
             }
@@ -53,12 +65,12 @@ var disciplines = {
         });
         /* A function to proceed fail. */
         function proceedFail() {
-            Materialize.toast('Не удалось создать форму', 5000);
+            Materialize.toast('Не удалось удалить запись', 3000);
         }
     },
 
     /**
-     * Adds new entity.
+     * Adds new entity with empty name.
      * @param type To create entity of the chosen type.
      * */
     addEntity: function(type) {
@@ -70,14 +82,12 @@ var disciplines = {
             dataType: 'json',                    // you must specify these type params to make NodeJS read query
             contentType: 'application/json'
         });
-        /* If everything is ok. TODO все поменять */
-        request.done(function(response) {
-            // Adding new form to list.
+        /* If everything is ok. */
+        request.done(function(addedEntity) {
+            // Adding new entity to the corresponding list.
             try {
-                //forms.context.find('.collection#forms').append(forms.generateFormsListItem(response.id, response.name, response.stages));
-                //forms.updateDeleteButtonsListeners(); // adding onclick listener for new form item
-                //btnCancel.click(); // closing dialog
-                Materialize.toast('Форма успешно добавлена', 5000);
+                disciplines.renderEntity(type, addedEntity);
+                Materialize.toast('Запись успешно добавлена', 3000);
             } catch (exc) {
                 proceedFail();
             }
@@ -88,10 +98,16 @@ var disciplines = {
         });
         /* A function to proceed fail. */
         function proceedFail() {
-            Materialize.toast('Не удалось создать форму', 5000);
+            Materialize.toast('Не удалось создать запись', 3000);
         }
     },
 
+    /**
+     * Updates entity's value in the database.
+     * @param type Which entity to update.
+     * @param id Entity's identifier.
+     * @param val New value.
+     * */
     updEntity: function(type, id, val) {
         /* Describing update entity request. */
         var request = $.ajax({
@@ -101,15 +117,11 @@ var disciplines = {
             dataType: 'json',                                    // you must specify these type params to make NodeJS read query
             contentType: 'application/json'
         });
-        /* If everything is ok. TODO все поменять */
+        /* If everything is ok. */
         request.done(function(response) {
             // Adding new form to list.
             try {
-                //forms.context.find('.collection#forms').append(forms.generateFormsListItem(response.id, response.name, response.stages));
-                //forms.updateDeleteButtonsListeners(); // adding onclick listener for new form item
-                //btnCancel.click(); // closing dialog
-                Materialize.toast('Форма успешно добавлена', 5000);
-                console.log(response);
+                Materialize.toast('Запись успешно обновлена', 3000);
             } catch (exc) {
                 proceedFail();
             }
@@ -120,7 +132,7 @@ var disciplines = {
         });
         /* A function to proceed fail. */
         function proceedFail() {
-            Materialize.toast('Не удалось создать форму', 5000);
+            Materialize.toast('Не удалось обновить запись', 3000);
         }
     }
 

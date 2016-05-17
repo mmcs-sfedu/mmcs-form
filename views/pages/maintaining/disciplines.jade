@@ -3,7 +3,7 @@ extends ../../base/layout
 // Some additional includes of styles and scripts
 block includes
     link(rel='stylesheet' href='/css/forms.css')
-    // link(rel='stylesheet' href='/css/stages.css')
+    link(rel='stylesheet' href='/css/disciplines.css')
     script(src='/js/disciplines.js')
     // To format dates
     // script(src='/js/utils.js')
@@ -18,43 +18,73 @@ block content
     div(class='container maintaining-disciplines-context')
 
 
-        +section-title('Редактирование данных для дисциплин')
-        div.row
-            div(class='col l4 m4 s12')
-                ul
-                for subject in subjects
-                    li #{subject.name}
-                        i(class='material-icons blue-text text-lighten-4 pointer'
-                          onclick='disciplines.delEntity("subject", #{subject.id});') trending_up
-                i(class='material-icons blue-text text-lighten-4 pointer'
-                  onclick='disciplines.addEntity("subject");') trending_up
-            div(class='col l4 m4 s12')
-                ul
-                for teacher in teachers
-                    li #{teacher.name}
-                        i(class='material-icons blue-text text-lighten-4 pointer'
-                          onclick='disciplines.delEntity("teacher", #{teacher.id});') trending_up
-                i(class='material-icons blue-text text-lighten-4 pointer'
-                  onclick='disciplines.addEntity("teacher");') trending_up
-            div(class='col l4 m4 s12')
-                ul
-                for group in groups
-                    li #{group.name}
-                        i(class='material-icons blue-text text-lighten-4 pointer'
-                          onclick='disciplines.delEntity("group", #{group.id});') trending_up
-                i(class='material-icons blue-text text-lighten-4 pointer'
-                  onclick='disciplines.addEntity("group");') trending_up
+
 
 
         +section-title('Управление дисциплинами')
-        for discipline in disciplines
-            div.row
-                select(class='browser-default col l4 m4 s12')
+            for discipline in disciplines
+                div.row
+                    select(class='browser-default col l4 m4 s12')
+                        for subject in subjects
+                            option(value='#{subject.id}') #{subject.name}
+                    select(class='browser-default col l4 m4 s12')
+                        for teacher in teachers
+                            option(value='#{teacher.id}') #{teacher.name}
+                    select(class='browser-default col l4 m4 s12')
+                        for group in groups
+                            option(value='#{group.id}') #{group.name}
+
+
+
+
+
+        // Subsection to edit disciplines' entities.
+        +section-title('Редактирование данных для дисциплин')
+        div(class='row')
+            // Subjects column.
+            div(class='col l4 m4 s12 center')
+                h5 Предметы
+                div(class='entities subject')
                     for subject in subjects
-                        option(value='#{subject.id}') #{subject.name}
-                select(class='browser-default col l4 m4 s12')
+                        - var subjectName = subject.name; if (subjectName == null) subjectName = '';
+                        div(id='#{subject.id}')
+                            div.input-field
+                                input(type='text' value='#{subjectName}' onchange='disciplines.updEntity("subject", #{subject.id}, this.value);')
+                                // Deletes corresponding subject.
+                                i(class='material-icons red-text text-lighten-2 pointer'
+                                  onclick='disciplines.delEntity("subject", #{subject.id});') delete
+                // Adds new subject.
+                i(class='material-icons medium green-text text-lighten-1 pointer'
+                  onclick='disciplines.addEntity("subject");') add
+
+            // Teachers column.
+            div(class='col l4 m4 s12 center')
+                h5 Преподаватели
+                div(class='entities teacher')
                     for teacher in teachers
-                        option(value='#{teacher.id}') #{teacher.name}
-                select(class='browser-default col l4 m4 s12')
+                        - var teacherName = teacher.name; if (teacherName == null) teacherName = '';
+                        div(id='#{teacher.id}')
+                            div.input-field
+                                input(type='text' value='#{teacherName}' onchange='disciplines.updEntity("teacher", #{teacher.id}, this.value);')
+                                // Deletes corresponding teacher.
+                                i(class='material-icons red-text text-lighten-2 pointer'
+                                onclick='disciplines.delEntity("teacher", #{teacher.id});') delete
+                // Add new teacher.
+                i(class='material-icons medium green-text text-lighten-1 pointer'
+                  onclick='disciplines.addEntity("teacher");') add
+
+            // Groups column.
+            div(class='col l4 m4 s12 center')
+                h5 Группы
+                div(class='entities group')
                     for group in groups
-                        option(value='#{group.id}') #{group.name}
+                        - var groupName = group.name; if (groupName == null) groupName = '';
+                            div(id='#{group.id}')
+                                div.input-field
+                                    input(type='text' value='#{groupName}' onchange='disciplines.updEntity("group", #{group.id}, this.value);')
+                                    // Deletes corresponding group.
+                                    i(class='material-icons red-text text-lighten-2 pointer'
+                                    onclick='disciplines.delEntity("group", #{group.id});') delete
+                // Add new group.
+                i(class='material-icons medium green-text text-lighten-1 pointer'
+                  onclick='disciplines.addEntity("group");') add
