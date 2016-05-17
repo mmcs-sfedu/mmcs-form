@@ -14,7 +14,7 @@ module.exports =
 
     getAllStagesData: getAllStagesData,
 
-    getAllBrsDisciplines: getAllBrsDisciplines,
+    getAllDisciplines: getAllDisciplines,
 
     getSurveysResults: getSurveysResults,
 
@@ -86,7 +86,21 @@ function getAllStagesData(res, callback) {
                 include: {
                     // To get an information about discipline, it's teacher and group from BRS.
                     attributes: { exclude: ['createdAt', 'updatedAt'] },
-                    model: models.discipline
+                    model: models.discipline,
+                    include: [
+                        {
+                            attributes: { exclude: ['createdAt', 'updatedAt'] },
+                            model: models.subject
+                        },
+                        {
+                            attributes: { exclude: ['createdAt', 'updatedAt'] },
+                            model: models.teacher
+                        },
+                        {
+                            attributes: { exclude: ['createdAt', 'updatedAt'] },
+                            model: models.group
+                        }
+                    ]
                 }
             }]
         // Fetching result here.
@@ -105,47 +119,40 @@ function getAllStagesData(res, callback) {
 }
 
 /**
- * Provides a data to draw a list of existing on BRS disciplines.
+ * Provides a data to draw a list of existing on disciplines.
  * @param {Object} res In a case of error res will be used to instantly render error page.
  * @param {Function} callback Used to asynchronously return data.
  * */
-function getAllBrsDisciplines(res, callback) {
-    /**
-     * TODO данный метод стоит определить в контроллере для получения данных от БРС.
-     * TODO текущее получение дисциплин от БРС (заглушка) оставляет желать лучшего.
-     * */
-
-    /* Getting data about discipline from BRS. */
-    var brsGroups   = brsDataController.getBrsGroups();
-    var brsTeachers = brsDataController.getBrsTeachers(null);
-    var brsSubjects = brsDataController.getBrsSubjects(null);
-
-    /* Checking BRS data. */
-    if (brsGroups == null)   { renderError(res, 'Не удалось загрузить список групп от БРС'); return; }
-    if (brsTeachers == null) { renderError(res, 'Не удалось загрузить список преподавателей от БРС'); return; }
-    if (brsSubjects == null) { renderError(res, 'Не удалось загрузить список предметов от БРС'); return; }
-
-    /* Generating disciplines array */
-    var minOfAll = Math.min(brsGroups.length, brsTeachers.length, brsSubjects.length);
-    var disciplines = [];
-    for (var i = 0; i < minOfAll; i++) {
-        disciplines.push({
-            group: {
-                id: brsGroups[i].id,
-                name: brsGroups[i].name
+function getAllDisciplines(res, callback) {
+    // Getting all disciplines.
+    models.discipline.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] }, // sour data
+        include: [
+            {
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.subject
             },
-            teacher: {
-                id: brsTeachers[i].id,
-                name: brsTeachers[i].name
+            {
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.teacher
             },
-            subject: {
-                id: brsSubjects[i].id,
-                name: brsSubjects[i].name
+            {
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.group
             }
-        });
-    }
+        ]
+    }).then(function (result) {
+        // If something went wrong - return an empty array.
+        if (result == null) {
+            callback([]);
+            return;
+        }
 
-    callback(disciplines);
+        /* To convert this value to usual object and make it client-side-readable. */
+        result = result.map(function(discipline){ return discipline.toJSON() });
+
+        callback(result);
+    })
 }
 
 /**
@@ -174,7 +181,21 @@ function getSurveysResults(whereClause, res, callback) {
                     {
                         attributes: { exclude: ['createdAt', 'updatedAt'] },
                         model: models.discipline,
-                        required: true
+                        required: true,
+                        include: [
+                            {
+                                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                model: models.subject
+                            },
+                            {
+                                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                model: models.teacher
+                            },
+                            {
+                                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                model: models.group
+                            }
+                        ]
                     },
                     {
                         attributes: ['stage_description_id'],
@@ -208,25 +229,6 @@ function getSurveysResults(whereClause, res, callback) {
 
             /* To convert this value to usual object and make it client-side-readable. */
             results = results.map(function(result){ return result.toJSON() });
-
-            /**
-             *  TODO и в третий раз всё то же нерациональное решение (см. предыдущие комментарии).
-             *  */
-            /* Getting data about discipline from BRS. */
-            var brsGroups   = brsDataController.getBrsGroups();
-            var brsTeachers = brsDataController.getBrsTeachers(null);
-            var brsSubjects = brsDataController.getBrsSubjects(null);
-            /* Checking BRS data. */
-            if (brsGroups == null)   { renderError(res, 'Не удалось загрузить список групп от БРС'); return; }
-            if (brsTeachers == null) { renderError(res, 'Не удалось загрузить список преподавателей от БРС'); return; }
-            if (brsSubjects == null) { renderError(res, 'Не удалось загрузить список предметов от БРС'); return; }
-            /* Scary merge with BRS data. Don't forget to change BRS data structure when it'll work with true BRS! */
-            for (var i = 0; i < results.length; i++) {     // looking throw all feedback stages
-                mergeStageDescriptionsWithBRS(
-                    results[i]['stage_descriptions'],      // stage descriptions from database
-                    brsGroups, brsTeachers, brsSubjects);  // BRS data arrays
-            }
-
 
             callback(results);
         }
@@ -265,8 +267,8 @@ function getResultStreamPDF(whereClause, res, callback) {
             // Template.
             pdfContent += 'Результаты анкетирования по форме <b>' + response[respIndex].feedback_form.name + '</b>;<br>' +
                 'даты проведения опроса: <b>' + formatDateForHtml(response[respIndex].date_from) + ' - ' + formatDateForHtml(response[respIndex].date_to) + '</b>;<br>' +
-                'группа: <b>' + discipline.group + '</b>;<br>' +
-                'дисциплина: <b>' + discipline.subject + ' (' + discipline.teacher + ')</b><br><br>';
+                'группа: <b>' + discipline.group.name + '</b>;<br>' +
+                'дисциплина: <b>' + discipline.subject.name + ' (' + discipline.teacher.name + ')</b><br><br>';
 
 
             // Answers content template.
@@ -370,9 +372,9 @@ function getResultStringCSV(whereClause, res, callback) {
                     csvContent += parseInt(response[respIndex].date_from.getTime() / 1000) + ',' + parseInt(response[respIndex].date_to.getTime() / 1000) + ',';
 
                     // Data about discipline.
-                    csvContent += discipline.subject + ',' + discipline.subject_id + ',';
-                    csvContent += discipline.teacher + ',' + discipline.teacher_id + ',';
-                    csvContent += discipline.group + ',' + discipline.group_id + ',';
+                    csvContent += discipline.subject.name + ',' + discipline.subject.id + ',';
+                    csvContent += discipline.teacher.name + ',' + discipline.teacher.id + ',';
+                    csvContent += discipline.group.name + ',' + discipline.group.id + ',';
 
                     // Question's data.
                     csvContent += questions[i].text + ',' + questions[i].id + ',';
@@ -635,7 +637,21 @@ function addStage(body, callback) {
                                             {
                                                 // Including disciplines.
                                                 attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                                model: models.discipline
+                                                model: models.discipline,
+                                                include: [
+                                                    {
+                                                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                                        model: models.subject
+                                                    },
+                                                    {
+                                                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                                        model: models.teacher
+                                                    },
+                                                    {
+                                                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                                        model: models.group
+                                                    }
+                                                ]
                                             }
                                         ], transaction: t})
 
@@ -648,23 +664,8 @@ function addStage(body, callback) {
                                             // Converting db response to usual JS array.
                                             stage_descriptions = utilsController.toNormalArray(stage_descriptions);
 
-
-                                            /* Getting data about discipline from BRS. */
-                                            var brsGroups   = brsDataController.getBrsGroups();
-                                            var brsTeachers = brsDataController.getBrsTeachers(null);
-                                            var brsSubjects = brsDataController.getBrsSubjects(null);
-                                            /* Checking BRS data. */
-                                            if (brsGroups == null || brsTeachers == null || brsSubjects == null) {
-                                                callback(null);
-                                                return;
-                                            }
                                             // To refer it from out the db interactions.
                                             createdStageDescriptions = stage_descriptions;
-                                            /**
-                                             * TODO опять-таки прежний изъян с работой с данными БРС. Избыточные данные - очень плохо!
-                                             * TODO для большей информации см. аналогичный комментарий выше. */
-                                            mergeStageDescriptionsWithBRS(createdStageDescriptions, brsGroups, brsTeachers, brsSubjects);
-
 
                                             // Looking for name for passed to this method form (by ID).
                                             return models.feedback_form.findOne({
@@ -705,79 +706,6 @@ function addStage(body, callback) {
 
 
 /* SUPPORT FUNCTIONS (PRIVATE) */
-
-/**
- * This is template function to merge stage descriptions from local database and BRS.
- * We are merging names of entities by IDs.
- * Doesn't return anything, 'cause can change data variables by links.
- * @param {Array} stageDescriptions Source stage descriptions from database.
- * @param {Array} brsGroups Groups with names from BRS.
- * @param {Array} brsTeachers Teachers from BRS.
- * @param {Array} brsSubjects Subjects from BRS.
- * */
-function mergeStageDescriptionsWithBRS(stageDescriptions, brsGroups, brsTeachers, brsSubjects) {
-    /* We'll use that value if data from BRS wouldn't be found. */
-    var noDataTemplate = 'Нет данных';
-
-    /* Walking throw all stage descriptions. */
-    for (var stageDescriptionIndex in stageDescriptions) {
-        // Current stage description and it's discipline from db
-        var stageDescription = stageDescriptions[stageDescriptionIndex];
-        var discipline = stageDescription['discipline'];
-
-        // To use template text if not found in BRS.
-        var brsItemFound = false;
-
-        // Looking for groups intersections.
-        for (var groupIndex in brsGroups) {
-            var group = brsGroups[groupIndex];
-            if (discipline['group_id'] == group['id']) {
-                // Setting name if found intersection
-                discipline['group'] = group['name'];
-                brsItemFound = true;
-                break; // no need to walk throw other items
-            }
-        }
-        // Setting template if not found in BRS.
-        if (!brsItemFound) {
-            discipline['group'] = noDataTemplate;
-        }
-
-        /* All other block are equal. */
-        brsItemFound = false;
-
-        // Looking for teachers intersections.
-        for (var teacherIndex in brsTeachers) {
-            var teacher = brsTeachers[teacherIndex];
-            if (discipline['teacher_id'] == teacher['id']) {
-                discipline['teacher'] = teacher['name'];
-                brsItemFound = true;
-                break;
-            }
-        }
-        // Setting template if not found in BRS.
-        if (!brsItemFound) {
-            discipline['teacher'] = noDataTemplate;
-        }
-
-        brsItemFound = false;
-
-        // Looking for subjects intersections.
-        for (var subjectIndex in brsSubjects) {
-            var subject = brsSubjects[subjectIndex];
-            if (discipline['subject_id'] == subject['id']) {
-                discipline['subject'] = subject['name'];
-                brsItemFound = true;
-                break;
-            }
-        }
-        // Setting template if not found in BRS.
-        if (!brsItemFound) {
-            discipline['subject'] = noDataTemplate;
-        }
-    }
-
-}
 
 /* Renders error with description. */
 function renderError(res, description) {

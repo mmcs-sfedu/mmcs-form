@@ -66,9 +66,9 @@ block content
                                     var discipline = '#{JSON.stringify(stageDescription.discipline)}';
                                     discipline = utils.parseObjectFromJadeStringified(discipline);
                                     currentItemRow.append('' +
-                                     ' по ' + discipline.subject + '' +
-                                      ' ('  + discipline.teacher + ') ' +
-                                       'у ' + discipline.group);
+                                     ' по ' + discipline.subject.name + '' +
+                                      ' ('  + discipline.teacher.name + ') ' +
+                                       'у ' + discipline.group.name);
                                 }())
 
                             // Adding download results buttons
