@@ -33,5 +33,5 @@ block content
                 div(class='collection' id='surveys')
                     each survey in surveys
                         a(href='/survey/#{survey.id}' class='collection-item black-text').
-                            #{survey.feedback_stage.feedback_form.name} (#{survey.discipline.subject}, #{survey.discipline.teacher})
+                            #{survey.feedback_stage.feedback_form.name} (#{survey.discipline.subject.name}, #{survey.discipline.teacher.name})
             - }

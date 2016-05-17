@@ -56,9 +56,9 @@ var stages = {
         for (var i = 0; i < stageDescriptions.length; i++) {
             var stageDescription = stageDescriptions[i];
             var discipline = stageDescription['discipline'];
-            stageItemHtml += '<br>&nbsp&nbsp&nbsp&nbsp&nbsp' + discipline['subject']
-                + ' (' + discipline['teacher'] + ') '
-                + 'в группе ' + discipline['group'];
+            stageItemHtml += '<br>&nbsp&nbsp&nbsp&nbsp&nbsp' + discipline['subject']['name']
+                + ' (' + discipline['teacher']['name'] + ') '
+                + 'в группе ' + discipline['group']['name'];
         }
 
         /* Discipline end block. */
@@ -88,6 +88,8 @@ var stages = {
 
         /* And finally adding row to list. */
         node.append(stageItemHtml);
+
+        return stageItemHtml;
     },
 
     /**
@@ -321,13 +323,14 @@ var stages = {
         request.done(function(response) {
             // Adding new stage to list.
             try {
-                stages.appendStageToStagesList(
+                var appended = stages.appendStageToStagesList(
                     stages.context.find(".collection.stages"),
                     response.id,
                     response.dateFrom,
                     response.dateTo,
                     response.formName,
                     response.stageDescriptions);
+                appended.find('.modal-trigger').leanModal(); // to add modal dialog support
                 stages.context.find('.modal#addStage').closeModal(); // closing dialog
                 Materialize.toast('Опрос успешно добавлен', 5000);
             } catch (exc) {

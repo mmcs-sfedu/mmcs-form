@@ -1,22 +1,19 @@
 /* To get an access to DB. */
 var models = require('../models');
 
-/* Controllers import. */
-var brsController = require('../controllers/brs');
-
 
 /* Public methods. */
 module.exports =
 {
     /* STUDENT AUTHORIZATION BLOCK */
 
-    studentAttemptLogin : studentAttemptLogin,
+    // studentAttemptLogin : studentAttemptLogin,
 
     getStudentsAuthorization : getStudentsAuthorization,
 
     getStudentsName : getStudentsName,
 
-    getStudentsGroupId : getStudentsGroupId,
+    // getStudentsGroupId : getStudentsGroupId,
 
     studentLogout : studentLogout,
 
@@ -49,23 +46,23 @@ module.exports =
  * */
 function studentAttemptLogin (req, login, password, callback) {
     /* Making async request with login and password to BRS. */
-    brsController.attemptForStudentsAuth(login, password, function(error, studentID, groupID, studentName) {
-        /* If there is no errors. */
-        if (error) {
-            callback(error);
-            return;
-        }
-
-        /* And all data was provided. */
-        if (studentID == null || groupID == null || studentName == null) {
-            callback('При получении данных от БРС произошла ошибка.');
-            return;
-        }
-
-        /* Than authorizing student (saving student's data in session). */
-        saveStudentsDataInSession(req, studentID, groupID, studentName);
-        callback();
-    });
+    //brsController.attemptForStudentsAuth(login, password, function(error, studentID, groupID, studentName) {
+    //    /* If there is no errors. */
+    //    if (error) {
+    //        callback(error);
+    //        return;
+    //    }
+    //
+    //    /* And all data was provided. */
+    //    if (studentID == null || groupID == null || studentName == null) {
+    //        callback('При получении данных от БРС произошла ошибка.');
+    //        return;
+    //    }
+    //
+    //    /* Than authorizing student (saving student's data in session). */
+    //    saveStudentsDataInSession(req, studentID, groupID, studentName);
+    //    callback();
+    //});
 
 
 }
@@ -109,6 +106,7 @@ function getStudentsName (session) {
 }
 
 /**
+ * @Deprecated
  * Checks session and returns student's group ID.
  * @param {Object} session To get student's data.
  * @returns {Object} Authorized student's group ID.
@@ -116,9 +114,6 @@ function getStudentsName (session) {
 function getStudentsGroupId(session) {
     if (session != null && session.student != null && session.student.group != null)
         return session.student.group;
-
-    // TODO ЧТО С ГРУППАМИ ТЕПЕРЬ?
-
     return null;
 }
 
