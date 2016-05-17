@@ -185,6 +185,25 @@ router.get('/disciplines', checklist, function(req, res, next) {
     });
 });
 
+/* Data of disciplines for CRUD */
+router.get('/subjects', checklist, function(req, res, next) {
+    // Checking possible stored in session errors.
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
+
+    // Preparing data about disciplines.
+    maintainingController.getAllDisciplinesWithData(function(disciplines, subjects, teachers, groups) {
+        res.render('pages/maintaining/subjects', {
+            title: 'Данные для дисциплин',
+            controller: maintainingController,
+            disciplines: disciplines,
+            subjects: subjects,
+            teachers: teachers,
+            groups: groups,
+            errors: possibleErrors
+        })
+    });
+});
+
 
 /* To authorize admin */
 router.post('/login', checklist, function(req, res, next) {

@@ -5,8 +5,6 @@ block includes
     link(rel='stylesheet' href='/css/forms.css')
     link(rel='stylesheet' href='/css/disciplines.css')
     script(src='/js/disciplines.js')
-    // To format dates
-    // script(src='/js/utils.js')
 
 // Login block and module to show errors, mixins usage
 block content
@@ -34,66 +32,3 @@ block content
             disciplines['subjects'] = !{JSON.stringify(subjects)};
             disciplines['teachers'] = !{JSON.stringify(teachers)};
             disciplines['groups'] = !{JSON.stringify(groups)};
-
-
-
-
-
-        br
-        br
-        br
-
-
-
-
-
-        // Subsection to edit disciplines' entities.
-        +section-title('Редактирование данных для дисциплин')
-        div(class='row')
-            // Subjects column.
-            div(class='col l4 m4 s12 center')
-                h5 Предметы
-                div(class='entities subject')
-                    for subject in subjects
-                        - var subjectName = subject.name; if (subjectName == null) subjectName = '';
-                        div(id='#{subject.id}')
-                            div.input-field
-                                input(type='text' value='#{subjectName}' onchange='disciplines.updEntity("subject", #{subject.id}, this.value);')
-                                // Deletes corresponding subject.
-                                i(class='material-icons red-text text-lighten-2 pointer'
-                                  onclick='disciplines.delEntity("subject", #{subject.id});') delete
-                // Adds new subject.
-                i(class='material-icons medium green-text text-lighten-1 pointer'
-                  onclick='disciplines.addEntity("subject");') add
-
-            // Teachers column.
-            div(class='col l4 m4 s12 center')
-                h5 Преподаватели
-                div(class='entities teacher')
-                    for teacher in teachers
-                        - var teacherName = teacher.name; if (teacherName == null) teacherName = '';
-                        div(id='#{teacher.id}')
-                            div.input-field
-                                input(type='text' value='#{teacherName}' onchange='disciplines.updEntity("teacher", #{teacher.id}, this.value);')
-                                // Deletes corresponding teacher.
-                                i(class='material-icons red-text text-lighten-2 pointer'
-                                onclick='disciplines.delEntity("teacher", #{teacher.id});') delete
-                // Add new teacher.
-                i(class='material-icons medium green-text text-lighten-1 pointer'
-                  onclick='disciplines.addEntity("teacher");') add
-
-            // Groups column.
-            div(class='col l4 m4 s12 center')
-                h5 Группы
-                div(class='entities group')
-                    for group in groups
-                        - var groupName = group.name; if (groupName == null) groupName = '';
-                            div(id='#{group.id}')
-                                div.input-field
-                                    input(type='text' value='#{groupName}' onchange='disciplines.updEntity("group", #{group.id}, this.value);')
-                                    // Deletes corresponding group.
-                                    i(class='material-icons red-text text-lighten-2 pointer'
-                                    onclick='disciplines.delEntity("group", #{group.id});') delete
-                // Add new group.
-                i(class='material-icons medium green-text text-lighten-1 pointer'
-                  onclick='disciplines.addEntity("group");') add
