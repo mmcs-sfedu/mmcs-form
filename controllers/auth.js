@@ -1,13 +1,15 @@
 /* To get an access to DB. */
 var models = require('../models');
 
+var brsController = require('../controllers/brs');
+
 
 /* Public methods. */
 module.exports =
 {
     /* STUDENT AUTHORIZATION BLOCK */
 
-    // studentAttemptLogin : studentAttemptLogin,
+    studentAttemptLogin : studentAttemptLogin,
 
     getStudentsAuthorization : getStudentsAuthorization,
 
@@ -46,23 +48,24 @@ module.exports =
  * */
 function studentAttemptLogin (req, login, password, callback) {
     /* Making async request with login and password to BRS. */
-    //brsController.attemptForStudentsAuth(login, password, function(error, studentID, groupID, studentName) {
-    //    /* If there is no errors. */
-    //    if (error) {
-    //        callback(error);
-    //        return;
-    //    }
-    //
-    //    /* And all data was provided. */
-    //    if (studentID == null || groupID == null || studentName == null) {
-    //        callback('При получении данных от БРС произошла ошибка.');
-    //        return;
-    //    }
-    //
-    //    /* Than authorizing student (saving student's data in session). */
-    //    saveStudentsDataInSession(req, studentID, groupID, studentName);
-    //    callback();
-    //});
+    brsController.attemptForStudentsAuth(login, password, function(error, studentID, groupID, studentName) {
+
+       /* If there is no errors. */
+       if (error) {
+           callback(error);
+           return;
+       }
+
+       /* And all data was provided. */
+       if (studentID == null || groupID == null || studentName == null) {
+           callback('При получении данных от БРС произошла ошибка.');
+           return;
+       }
+
+       /* Than authorizing student (saving student's data in session). */
+       saveStudentsDataInSession(req, studentID, groupID, studentName);
+       callback();
+    });
 
 
 }
@@ -89,8 +92,8 @@ function saveStudentsDataInSession(req, studentID, groupID, studentName) {
  * @returns {Object} Returns null if student wasn't authorized, his account id - in another case.
  * */
 function getStudentsAuthorization(session) {
-    if (session != null && session['passport'] != null && session['passport']['user']['id'] != null)
-        return session['passport']['user']['id'];
+    if (session != null && session.student != null && session.student.id != null)
+        return session.student.id;
     return null;
 }
 
@@ -100,8 +103,8 @@ function getStudentsAuthorization(session) {
  * @returns {Object} Authorized student's name.
  * */
 function getStudentsName (session) {
-    if (session != null && session['passport'] != null && session['passport']['user']['name'] != null)
-        return session['passport']['user']['name'];
+    if (session != null && session.student != null && session.student.name != null)
+        return session.student.name;
     return null;
 }
 
@@ -122,8 +125,8 @@ function getStudentsGroupId(session) {
  * @param {Object} req To access session.
  * */
 function studentLogout (req) {
-    if (req.session['passport'] != null)
-        req.session['passport'] = null;
+    if (req.session.student != null)
+        req.session.student = null;
 }
 
 /**
@@ -135,7 +138,7 @@ function getStudentAuthChecker() {
         if (getStudentsAuthorization(req.session)) {
             next();
         } else {
-            res.redirect('/');
+            res.redirect('/survey');
         }
     }
 }

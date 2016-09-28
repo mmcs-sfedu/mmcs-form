@@ -14,9 +14,9 @@ var checklist = [authController.getStudentAuthChecker()];
 
 /* Student's survey */
 router.get('/', function(req, res, next) {
-    // Checking if user needs authorization - redirecting him on the corresponding page.
-    if (!authController.getStudentsAuthorization(req.session))
-        return res.redirect('/student/login2');
+    // // Checking if user needs authorization - redirecting him on the corresponding page.
+    // if (!authController.getStudentsAuthorization(req.session))
+    //     return res.redirect('/student/login2');
 
     /* Getting errors saved in session, if we have some. */
     var possibleErrors = errorsController.fetchErrorFromSession(req);

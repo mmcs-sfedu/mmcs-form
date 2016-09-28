@@ -12,7 +12,7 @@ var errorsController = require('../controllers/errors');
 /* Log out for user and redirect on surveys. */
 router.all('/logout', function(req, res, next) {
     authController.studentLogout(req);
-    res.redirect('/');
+    res.redirect('/survey');
 });
 
 /* Authorization route for student. Deprecated. */

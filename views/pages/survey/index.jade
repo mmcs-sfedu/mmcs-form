@@ -35,3 +35,19 @@ block content
                         a(href='/survey/#{survey.id}' class='collection-item black-text').
                             #{survey.feedback_stage.feedback_form.name} (#{survey.discipline.subject.name}, #{survey.discipline.teacher.name})
             - }
+
+    else
+        // A prompt for unauthorized users to log in
+        br
+        br
+        br
+        +section-title('Чтобы принять участие в анкетировании, необходимо авторизоваться', true)
+
+
+
+    //form(action='/student/login2' method='post')
+    //    div
+    //        label OpenID:
+    //        input(type='text' name='openid_identifier' value='https://openid.sfedu.ru/server.php/idpage?user=koshmansky@sfedu.ru')
+    //        br
+    //        nput(type='submit' value='Sign In')
