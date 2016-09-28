@@ -1,34 +1,36 @@
-/**
- * TODO КОНТРОЛЛЕР ЦЕЛИКОМ И ПОЛНОСТЬЮ СОСТОИТ ИЗ ЗАГЛУШЕК,
- * TODO КОТОРЫЕ СЛЕДУЕТ ЗАМЕНИТЬ НА РЕАЛЬНЫЕ АСИНХРОННЫЕ МЕТОДЫ.
- *
- * TODO ОЧЕНЬ ЖЕЛАТЕЛЬНО СОХРАНИТЬ ФОРМАТ ОТВЕТОВ (id, name), ЧТОБЫ ВСЁ НЕ ПОПЛЫЛО.
- * TODO СКОРЕЙ ВСЕГО, НУЖНЫ МЕТОДЫ КАК ОДИНОЧНОГО ПОЛУЧЕНИЯ СУЩНОСТИ, ТАК И НЕСКОЛЬКИХ ЗА ОДИН ЗАПРОС СРАЗУ.
- * */
+var request = require('request');
+
 module.exports =
 {
 
     attemptForStudentsAuth : function(login, password, callback) {
-        /**
-         * TODO здесь осуществляется авторизация в сервисе БРС,
-         * TODO которая в случае успеха возвращает в колбэке пустую ошибку, ID пользователя, ID его группы, имя пользователя.
-         * */
 
-        /** TODO заглушка. */
+        request.get(
+            'http://users.mmcs.sfedu.ru/~test_rating/api/v0/auth/userinfo?' +
+            'token=fc0e5f16a22c3196e052d7fdf20a710f19419607' + '&' +
+            'login=' + login + '&' +
+            'password=' + password,
+            { form: {
+                // token: 'fc0e5f16a22c3196e052d7fdf20a710f19419607',
+                // login: login,
+                // password: password
+            } },
+            function (error, response, body) {
+                var parsed = JSON.parse(body);
+                if (!parsed)
+                    return callback("Не удалось провести авторизацию");
 
-        var models = require('../models');
-
-        models.discipline
-            .find({ order: "random()" })
-            .then(function(discipline) {
-                if (discipline == null) {
-                    callback("Ошибка базы данных - нет дисциплин!");
-                    return;
+                if (!error && response.statusCode == 200) {
+                    var resp = parsed['response'];
+                    return callback(null, resp['StudentID'], "", resp['FirstName'] + resp['SecondName'] + resp['LastName']);
                 }
 
-                callback(null, 11, discipline.group_id, 'Вася Пупкин');
-            });
+                return callback("Не удалось провести авторизацию: " + parsed['message']);
+            }
+        );
     },
+
+
 
     getBrsSubjects : function(groupId) {
         var subjects = [];
