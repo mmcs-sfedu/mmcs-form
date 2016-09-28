@@ -168,6 +168,11 @@ router.get('/results/csv/:id?', checklist, function(req, res, next) {
 
 /* Disciplines for CRUD */
 router.get('/disciplines', checklist, function(req, res, next) {
+
+
+    return res.redirect('/maintaining');
+
+
     // Checking possible stored in session errors.
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
@@ -187,6 +192,11 @@ router.get('/disciplines', checklist, function(req, res, next) {
 
 /* Data of disciplines for CRUD */
 router.get('/subjects', checklist, function(req, res, next) {
+
+
+    return res.redirect('/maintaining');
+
+
     // Checking possible stored in session errors.
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
