@@ -295,7 +295,7 @@ router.post('/stage', checklist, function(req, res, next) {
     req.checkBody('date_from').notEmpty();
     req.checkBody('date_to').notEmpty();
     req.checkBody('feedback_form_id').notEmpty();
-    req.checkBody('disciplines').notEmpty();
+    // req.checkBody('disciplines').notEmpty();
     var errors = req.validationErrors();
     if (errors) { // if there is some data which is not provided
         res.send(null);

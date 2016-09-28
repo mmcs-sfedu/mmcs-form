@@ -18,17 +18,17 @@ module.exports = function(sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
-                    models.feedback_stage.hasMany(stage_description, {
-                        onDelete: 'cascade',
-                        onUpdate: 'cascade',
-                        foreignKey: {
-                            name: 'feedback_stage_id',
-                            allowNull: false
-                        }
-                    });
+                    // models.feedback_stage.hasMany(stage_description, {
+                    //     onDelete: 'cascade',
+                    //     onUpdate: 'cascade',
+                    //     foreignKey: {
+                    //         name: 'feedback_stage_id',
+                    //         allowNull: false
+                    //     }
+                    // });
 
                     stage_description.belongsTo(models.discipline,     { foreignKey: 'discipline_id' });
-                    stage_description.belongsTo(models.feedback_stage, { foreignKey: 'feedback_stage_id' });
+                    // stage_description.belongsTo(models.feedback_stage, { foreignKey: 'feedback_stage_id' });
                 }
             }
         });

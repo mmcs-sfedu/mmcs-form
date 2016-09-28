@@ -81,30 +81,31 @@ function getAllStagesData(res, callback) {
             {   // Including form name for that stage.
                 attributes: ['name'],
                 model: models.feedback_form
-            },
-            {   // To get an information about disciplines next.
-                attributes: ['id', 'discipline_id'],
-                model: models.stage_description,
-                include: {
-                    // To get an information about discipline, it's teacher and group from BRS.
-                    attributes: { exclude: ['createdAt', 'updatedAt'] },
-                    model: models.discipline,
-                    include: [
-                        {
-                            attributes: { exclude: ['createdAt', 'updatedAt'] },
-                            model: models.subject
-                        },
-                        {
-                            attributes: { exclude: ['createdAt', 'updatedAt'] },
-                            model: models.teacher
-                        },
-                        {
-                            attributes: { exclude: ['createdAt', 'updatedAt'] },
-                            model: models.group
-                        }
-                    ]
-                }
-            }]
+            } //,
+            // {   // To get an information about disciplines next.
+            //     attributes: ['id', 'discipline_id'],
+            //     model: models.stage_description,
+            //     include: {
+            //         // To get an information about discipline, it's teacher and group from BRS.
+            //         attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //         model: models.discipline,
+            //         include: [
+            //             {
+            //                 attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //                 model: models.subject
+            //             },
+            //             {
+            //                 attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //                 model: models.teacher
+            //             },
+            //             {
+            //                 attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //                 model: models.group
+            //             }
+            //         ]
+            //     }
+            // }
+            ]
         // Fetching result here.
     }).then(function(result) {
         // If something went wrong return empty array.
@@ -596,12 +597,12 @@ function addStage(body, callback) {
         return;
     }
 
-    /* Checking that disciplines array is not empty. */
-    var disciplines = body['disciplines'];
-    if (!Array.isArray(disciplines) || disciplines.length == 0) {
-        callback(null);
-        return;
-    }
+    // /* Checking that disciplines array is not empty. */
+    // var disciplines = body['disciplines'];
+    // if (!Array.isArray(disciplines) || disciplines.length == 0) {
+    //     callback(null);
+    //     return;
+    // }
 
     /* Setting feedback form field to var. */
     var feedbackFormId = body['feedback_form_id'];
@@ -628,71 +629,86 @@ function addStage(body, callback) {
                 updatedAt:        new Date()
             }, { transaction: t })
 
-                /* When feedback stage was created, inserting disciplines for it. */
-                .then(function(feedback_stage) {
-                    createdStageId = feedback_stage.id;
-                    // We should populate raw disciplines with such dates for successful insertion.
-                    for (var i = 0; i < disciplines.length; i++) {
-                        disciplines[i]['createdAt'] = new Date();
-                        disciplines[i]['updatedAt'] = new Date();
-                    }
-                    // Inserting all disciplines for stage in database.
-                    return models.discipline.bulkCreate(disciplines,
-                        { transaction: t, returning: true }) // must provide returning param to create IDs
+                // /* When feedback stage was created, inserting disciplines for it. */
+                // .then(function(feedback_stage) {
+                //     createdStageId = feedback_stage.id;
+                //     // We should populate raw disciplines with such dates for successful insertion.
+                //     for (var i = 0; i < disciplines.length; i++) {
+                //         disciplines[i]['createdAt'] = new Date();
+                //         disciplines[i]['updatedAt'] = new Date();
+                //     }
+                //     // Inserting all disciplines for stage in database.
+                //     return models.discipline.bulkCreate(disciplines,
+                //         { transaction: t, returning: true }) // must provide returning param to create IDs
+                //
+                //         .then(function(disciplines) {
+                //             // Creating stage description for every created disciplines. Preparing array first.
+                //             var stageDescriptions = [];
+                //             for (var i = 0; i < disciplines.length; i++) {
+                //                 stageDescriptions.push({
+                //                     discipline_id:     disciplines[i].id,
+                //                     feedback_stage_id: feedback_stage.id,
+                //                     createdAt:         new Date(),
+                //                     updatedAt:         new Date()
+                //                 })
+                //             }
+                //             // Inserting stage descriptions in database
+                //             return models.stage_description.bulkCreate(stageDescriptions,
+                //                 { transaction: t, returning: true }) // to create IDs
+                //
+                //                 .then(function(stage_descriptions) {
 
-                        .then(function(disciplines) {
-                            // Creating stage description for every created disciplines. Preparing array first.
-                            var stageDescriptions = [];
-                            for (var i = 0; i < disciplines.length; i++) {
-                                stageDescriptions.push({
-                                    discipline_id:     disciplines[i].id,
-                                    feedback_stage_id: feedback_stage.id,
-                                    createdAt:         new Date(),
-                                    updatedAt:         new Date()
-                                })
-                            }
-                            // Inserting stage descriptions in database
-                            return models.stage_description.bulkCreate(stageDescriptions,
-                                { transaction: t, returning: true }) // to create IDs
 
-                                .then(function(stage_descriptions) {
-                                    // Not very perfect move, but we must return stage descriptions with disciplines to frontend.
-                                    return models.stage_description.findAll({
-                                        where: { feedback_stage_id: createdStageId },        // only for created feedback stage
-                                        attributes: ['discipline_id'],
-                                        include: [
-                                            {
-                                                // Including disciplines.
-                                                attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                                model: models.discipline,
-                                                include: [
-                                                    {
-                                                        attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                                        model: models.subject
-                                                    },
-                                                    {
-                                                        attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                                        model: models.teacher
-                                                    },
-                                                    {
-                                                        attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                                        model: models.group
-                                                    }
-                                                ]
-                                            }
-                                        ], transaction: t})
+                .then(function (fs) {
+                    createdStageId = fs.id;
 
-                                        .then(function(stage_descriptions) {
-                                            // Stopping if something wrong while getting stage descriptions.
-                                            if (stage_descriptions == null) {
-                                                callback(null);
-                                                return;
-                                            }
-                                            // Converting db response to usual JS array.
-                                            stage_descriptions = utilsController.toNormalArray(stage_descriptions);
 
-                                            // To refer it from out the db interactions.
-                                            createdStageDescriptions = stage_descriptions;
+                                    // // Not very perfect move, but we must return stage descriptions with disciplines to frontend.
+                                    // return models.stage_description.findAll({
+                                    //     where: { feedback_stage_id: createdStageId },        // only for created feedback stage
+                                    //     attributes: ['discipline_id'],
+                                    //     include: [
+                                    //         {
+                                    //             // Including disciplines.
+                                    //             attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                    //             model: models.discipline,
+                                    //             include: [
+                                    //                 {
+                                    //                     attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                    //                     model: models.subject
+                                    //                 },
+                                    //                 {
+                                    //                     attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                    //                     model: models.teacher
+                                    //                 },
+                                    //                 {
+                                    //                     attributes: { exclude: ['createdAt', 'updatedAt'] },
+                                    //                     model: models.group
+                                    //                 }
+                                    //             ]
+                                    //         }
+                                    //     ]
+                                    //
+                                    //     , transaction: t})
+                                    //
+                                    //     .then(function(stage_descriptions) {
+                                    //         // Stopping if something wrong while getting stage descriptions.
+                                    //         if (stage_descriptions == null) {
+                                    //             callback(null);
+                                    //             return;
+                                    //         }
+                                    //         // Converting db response to usual JS array.
+                                    //         stage_descriptions = utilsController.toNormalArray(stage_descriptions);
+                                    //
+                                    //         // To refer it from out the db interactions.
+                                    //         createdStageDescriptions = stage_descriptions;
+
+
+
+
+
+
+
 
                                             // Looking for name for passed to this method form (by ID).
                                             return models.feedback_form.findOne({
@@ -708,11 +724,13 @@ function addStage(body, callback) {
                                                     } else {
                                                         callback(null);
                                                     }
-                                                })
-                                        })
-                                })
-                        })
-                });
+                                                });
+                                        // })
+                                })  ;
+
+
+                //         })
+                // });
 
         /* If everything is ok in our big transaction. */
         }).then(function(result) {
@@ -721,8 +739,9 @@ function addStage(body, callback) {
                 id:                createdStageId,
                 dateFrom:          dateFrom,
                 dateTo:            dateTo,
-                formName:          usedFeedbackFormName,
-                stageDescriptions: createdStageDescriptions });
+                formName:          usedFeedbackFormName
+                // stageDescriptions: createdStageDescriptions
+            });
         }).catch(function(error) {
             // If something went wrong or source data was invalid.
             callback(null)

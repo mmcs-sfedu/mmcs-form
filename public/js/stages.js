@@ -38,7 +38,7 @@ var stages = {
      * @param {String} formName Used form in that stage.
      * @param {Array} stageDescriptions An array of discipline used for that stage.
      * */
-    appendStageToStagesList: function(node, id, dateFrom, dateTo, formName, stageDescriptions) {
+    appendStageToStagesList: function(node, id, dateFrom, dateTo, formName) {
         /* First part of stage element. */
         var stageItemHtml = '' +
             '<li class="collection-item">' +
@@ -49,20 +49,20 @@ var stages = {
         stageItemHtml += '<br>Используется форма <i>' + formName + '</i>';
 
 
-        /* Disciplines start block. */
-        stageItemHtml += '<br>Для дисциплин: <i>';
-
-        /* Adding disciplines descriptions. */
-        for (var i = 0; i < stageDescriptions.length; i++) {
-            var stageDescription = stageDescriptions[i];
-            var discipline = stageDescription['discipline'];
-            stageItemHtml += '<br>&nbsp&nbsp&nbsp&nbsp&nbsp' + discipline['subject']['name']
-                + ' (' + discipline['teacher']['name'] + ') '
-                + 'в группе ' + discipline['group']['name'];
-        }
-
-        /* Discipline end block. */
-        stageItemHtml += '</i>';
+        // /* Disciplines start block. */
+        // stageItemHtml += '<br>Для дисциплин: <i>';
+        //
+        // /* Adding disciplines descriptions. */
+        // for (var i = 0; i < stageDescriptions.length; i++) {
+        //     var stageDescription = stageDescriptions[i];
+        //     var discipline = stageDescription['discipline'];
+        //     stageItemHtml += '<br>&nbsp&nbsp&nbsp&nbsp&nbsp' + discipline['subject']['name']
+        //         + ' (' + discipline['teacher']['name'] + ') '
+        //         + 'в группе ' + discipline['group']['name'];
+        // }
+        //
+        // /* Discipline end block. */
+        // stageItemHtml += '</i>';
 
 
         /* Adding delete button. */
@@ -278,23 +278,23 @@ var stages = {
         /* Getting chosen form ID. */
         var feedbackFormId = stages.context.find('select.forms').val();
 
-        /* Getting chosen disciplines data. */
-        var disciplinesList = stages.context.find('.collection.chosen');
-        /* Getting all chosen disciplines items. */
-        var disciplinesItems = disciplinesList.children(); //.not('.hide');
-        if (disciplinesItems.length == 0) { // checking if user chose something
-            Materialize.toast('Выберите по меньшей мере одну дисциплину', 5000);
-            return;
-        }
-        /* Walking throw all chosen disciplines to prepare request array. */
-        var disciplines = [];
-        disciplinesItems.each(function() {
-            disciplines.push({
-                teacher_id: $(this).attr('teacherID'),
-                subject_id: $(this).attr('subjectID'),
-                group_id:   $(this).attr('groupID')
-            });
-        });
+        // /* Getting chosen disciplines data. */
+        // var disciplinesList = stages.context.find('.collection.chosen');
+        // /* Getting all chosen disciplines items. */
+        // var disciplinesItems = disciplinesList.children(); //.not('.hide');
+        // if (disciplinesItems.length == 0) { // checking if user chose something
+        //     Materialize.toast('Выберите по меньшей мере одну дисциплину', 5000);
+        //     return;
+        // }
+        // /* Walking throw all chosen disciplines to prepare request array. */
+        // var disciplines = [];
+        // disciplinesItems.each(function() {
+        //     disciplines.push({
+        //         teacher_id: $(this).attr('teacherID'),
+        //         subject_id: $(this).attr('subjectID'),
+        //         group_id:   $(this).attr('groupID')
+        //     });
+        // });
 
         /* ALL DATA VALIDATED AND PREPARED */
 
@@ -313,8 +313,8 @@ var stages = {
             data: JSON.stringify({             // string will be parsed into json
                 date_from        : dateFrom,
                 date_to          : dateTo,
-                feedback_form_id : feedbackFormId,
-                disciplines      : disciplines
+                feedback_form_id : feedbackFormId //,
+                // disciplines      : disciplines
             }),
             dataType: 'json',                  // you must specify these type params to make NodeJS read query
             contentType: 'application/json'
@@ -328,8 +328,9 @@ var stages = {
                     response.id,
                     response.dateFrom,
                     response.dateTo,
-                    response.formName,
-                    response.stageDescriptions);
+                    response.formName
+                    // response.stageDescriptions
+                );
                 appended.find('.modal-trigger').leanModal(); // to add modal dialog support
                 stages.context.find('.modal#addStage').closeModal(); // closing dialog
                 Materialize.toast('Опрос успешно добавлен', 5000);
