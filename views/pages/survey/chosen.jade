@@ -66,7 +66,7 @@ block content
             div.modal-footer
                 a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Нет
                 a(href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat'
-                onclick='survey.submitAnswersRequest(#{form.feedback_stages[0].stage_descriptions[0].id});') Да
+                onclick='survey.submitAnswersRequest(#{stageID}, #{disciplineID}, #{teacherID});') Да
 
 
         // Dialog with prompt about leaving the survey.

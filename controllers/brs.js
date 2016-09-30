@@ -22,7 +22,7 @@ module.exports =
 
                 if (!error && response.statusCode == 200) {
                     var resp = parsed['response'];
-                    return callback(null, resp['StudentID'], "", resp['FirstName'] + resp['SecondName'] + resp['LastName']);
+                    return callback(null, resp['StudentID'], "", resp['FirstName'] + ' ' + resp['SecondName'] + ' ' + resp['LastName']);
                 }
 
                 return callback("Не удалось провести авторизацию: " + parsed['message']);

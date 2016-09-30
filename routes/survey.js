@@ -22,14 +22,40 @@ router.get('/', function(req, res, next) {
     var possibleErrors = errorsController.fetchErrorFromSession(req);
 
     /* Getting stage descriptions first - don't worry, it won't touch db, if user wasn't authorized. */
-    surveyController.getStageDescriptions(req, function(stageDescriptions) {
+    surveyController.getStageDescriptions(req, function(stages) {
         res.render('pages/survey', {
             title: 'Страница опроса',
             controller: surveyController, // now controller is available using this var
-            surveys: stageDescriptions,   // passing surveys to view
+            surveys: stages,              // passing surveys to view
             errors: possibleErrors        // passing errors to make view render them
         });
     });
+});
+
+router.post('/chosen', checklist, function (req, res, next) {
+    var stageID = req.body['feedback_stage_id'];
+    var disciplineID = req.body['discipline_id'];
+    var teacherID = req.body['teacher_id'];
+
+    var possibleErrors = errorsController.fetchErrorFromSession(req);
+
+    surveyController.checkStageAvailabilityForUser(stageID, disciplineID, teacherID, req.session, function (checkResult) {
+        if (checkResult) {
+            surveyController.getFormsQuestionsForStage(stageID, checkResult, function(form) {
+                res.render('pages/survey/chosen', {
+                    title: 'Прохождение опроса',
+                    controller: surveyController, // now controller is available using this var
+                    form: form,                   // passing form's questions to the client
+                    stageID: stageID,
+                    disciplineID: disciplineID,
+                    teacherID: teacherID,
+                    errors: possibleErrors        // passing errors to make view render them
+                });
+            });
+        } else {
+            res.redirect('back');
+        }
+    })
 });
 
 /* Show questions for chosen survey */
@@ -64,7 +90,9 @@ router.get('/:id', checklist, function(req, res, next) {
 /* Screen after finishing student's survey */
 router.post('/finish', checklist, function(req, res, next) {
     /* Checking if data at least provided. */
-    req.checkBody('stage_description_id').notEmpty();
+    req.checkBody('feedback_stage_id').notEmpty();
+    req.checkBody('discipline_id').notEmpty();
+    req.checkBody('teacher_id').notEmpty();
     req.checkBody('possible_answers').notEmpty();
     var errors = req.validationErrors();
     if (errors) { // if some data wasn't provided - rendering an error
@@ -76,14 +104,16 @@ router.post('/finish', checklist, function(req, res, next) {
     }
 
     // Checking if student can vote for this stage at all.
-    surveyController.checkStageAvailabilityForUser(req.body['stage_description_id'], req.session, function(checkResult) {
+    surveyController.checkStageAvailabilityForUser(req.body['feedback_stage_id'], req.body['discipline_id'], req.body['teacher_id'], req.session, function(checkResult) {
         // Yes, he can vote for this stage.
         if (checkResult) {
             /* Saving student's answer */
             surveyController.saveUsersAnswer(
                 req,
-                req.body['stage_description_id'], // answered stage
                 req.body['possible_answers'],     // user's answers
+                req.body['feedback_stage_id'], // answered stage
+                req.body['discipline_id'],
+                req.body['teacher_id'],
                 res                               // res to draw response page
             );
         } else {

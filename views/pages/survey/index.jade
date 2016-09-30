@@ -4,6 +4,7 @@ extends ../../base/layout
 block includes
     link(rel='stylesheet' href='/css/forms.css')
     link(rel='stylesheet' href='/css/surveys.css')
+    script(src='/js/survey.js')
 
 // Adding auth block for student and errors toaster
 block content
@@ -32,12 +33,15 @@ block content
                 // Rendering list of all available surveys
                 div(class='collection' id='surveys')
                     each survey in surveys
-                        a(href='/survey/#{survey.id}' class='collection-item black-text').
-                            #{survey.feedback_stage.feedback_form.name} (#{survey.discipline.subject.name}, #{survey.discipline.teacher.name})
+                        each discipline in survey.disciplines
+                            each teacher in discipline.Teachers
+                                a(href='#' class='collection-item black-text' onclick='survey.openSurvey(#{survey.id}, #{discipline.ID}, #{teacher.ID});').
+                                    #{discipline.DisciplineName} (#{teacher.LastName} #{teacher.FirstName} #{teacher.SecondName}): c #{survey.date_from} по #{survey.date_to}
             - }
 
     else
         // A prompt for unauthorized users to log in
+        br
         br
         br
         br

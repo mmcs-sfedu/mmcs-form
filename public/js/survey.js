@@ -21,6 +21,14 @@ var survey = {
                                       survey.goBack, '.container.survey-index-context');
     },
 
+    openSurvey : function (stage_id, discipline_id, teacher_id) {
+        $.redirectPost("/survey/chosen", {
+            feedback_stage_id : stage_id,
+            discipline_id : discipline_id,
+            teacher_id : teacher_id
+        });
+    },
+
     /**
      * Checks forms' filling: if some of them filled - showing a prompt about that.
      * If there is no checked forms - redirecting back.
@@ -109,7 +117,7 @@ var survey = {
      * If all answers are stated - submitting them on server.
      * @param {Number} chosenStageDescriptionID A stage's ID to submit answers.
      * */
-    submitAnswersRequest : function(chosenStageDescriptionID) {
+    submitAnswersRequest : function(stageID, disciplineID, teacherID) {
         // Answers if all stated or false and toast in another case.
         var answers = survey.checkForms();
 
@@ -117,7 +125,9 @@ var survey = {
         if (answers) {
             var redirectUrl = '/survey/finish';
             $.redirectPost(redirectUrl, {
-                stage_description_id : chosenStageDescriptionID,
+                feedback_stage_id    : stageID,
+                discipline_id        : disciplineID,
+                teacher_id           : teacherID,
                 possible_answers     : answers
             });
         } else {

@@ -5,16 +5,24 @@ module.exports = function(sequelize, DataTypes) {
                 primaryKey: true,
                 notNull: true,
                 autoIncrement: true
+            },
+            discipline_id: {
+                type: DataTypes.INTEGER,
+                notNull: true
+            },
+            teacher_id: {
+                type: DataTypes.INTEGER,
+                notNull: true
             }
         },
         {
             classMethods: {
                 associate: function(models) {
-                    models.stage_description.hasMany(answer, {
+                    models.feedback_stage.hasMany(answer, {
                         onDelete: 'cascade',
                         onUpdate: 'cascade',
                         foreignKey: {
-                            name: 'stage_description_id',
+                            name: 'feedback_stage_id',
                             allowNull: false
                         }
                     });
@@ -27,8 +35,8 @@ module.exports = function(sequelize, DataTypes) {
                         }
                     });
 
-                    answer.belongsTo(models.stage_description, { foreignKey: 'stage_description_id' });
-                    answer.belongsTo(models.possible_answer,   { foreignKey: 'possible_answer_id' });
+                    answer.belongsTo(models.feedback_stage,  { foreignKey: 'feedback_stage_id' });
+                    answer.belongsTo(models.possible_answer, { foreignKey: 'possible_answer_id' });
                 }
             }
         });
