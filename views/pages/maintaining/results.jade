@@ -25,60 +25,56 @@ block content
             p На текущий момент нет ни одного проведённого опроса
         - }
         - else
-            // Export all links.
-            span Экспортировать все результаты в&nbsp
-            a(href='/maintaining/results/pdf' target='_blank') PDF
-            span &nbsp/&nbsp
-            a(href='/maintaining/results/csv' target='_blank') CSV
-            br
-            br
+            //// Export all links.
+            //span Экспортировать все результаты в&nbsp
+            //a(href='/maintaining/results/pdf' target='_blank') PDF
+            //span &nbsp/&nbsp
+            //a(href='/maintaining/results/csv' target='_blank') CSV
+            //br
+            //br
         -
 
         // Accordion with all results
         ul(class='collapsible popout' data-collapsible='accordion')
             - each feedbackStage in results
-                - each stageDescription in feedbackStage.stage_descriptions
+                each teacher in feedbackStage.uteachers
+
+
                     // Result item
                     li
 
                         // Header
-                        div(class='collapsible-header' id='#{stageDescription.id}')
+                        div(class='collapsible-header' id='#{feedbackStage.id}-#{teacher.id}')
                             // Icon on the left
                             i.material-icons trending_up
-                            // Form name
-                            | #{feedbackStage.feedback_form.name}
 
                             // Filling header data for accordion elements
                             script.
                                 /* Lambda to avoid names intersections. */
                                 (function () {
                                     // Getting current item object in DOM
-                                    var stageDescriptionId = '#{stageDescription.id}';
-                                    var currentItemRow = $('.maintaining-results-context .collapsible-header#' + stageDescriptionId);
+                                    var feedbackStageId = '#{feedbackStage.id}';
+                                        var teacherId = '#{teacher.id}';
+                                    var currentItemRow = $('.maintaining-results-context .collapsible-header#' + feedbackStageId + '-' + teacherId);
 
-                                    // Formatting and appending date
-                                    var dateFrom = '#{feedbackStage.date_from}';
-                                    var dateTo   = '#{feedbackStage.date_to}';
-                                    currentItemRow.append(' (' + utils.formatDateForStage(dateFrom));
-                                    currentItemRow.append(' -- ' + utils.formatDateForStage(dateTo) + ')');
 
-                                    // Appending discipline
-                                    var discipline = '#{JSON.stringify(stageDescription.discipline)}';
-                                    discipline = utils.parseObjectFromJadeStringified(discipline);
-                                    currentItemRow.append('' +
-                                     ' по ' + discipline.subject.name + '' +
-                                      ' ('  + discipline.teacher.name + ') ' +
-                                       'у ' + discipline.group.name);
+                                    var teacher = '#{JSON.stringify(teacher)}';
+                                    teacher = utils.parseObjectFromJadeStringified(teacher);
+
+                                    currentItemRow.append('' + teacher.last_name + ' ' + teacher.first_name + ' ' + teacher.second_name);
+
+
+                                // Formatting and appending date
+                                var dateFrom = '#{feedbackStage.date_from}';
+                                var dateTo = '#{feedbackStage.date_to}';
+                                currentItemRow.append(' (опрос ' + utils.formatDateForStage(dateFrom));
+                                currentItemRow.append(' -- ' + utils.formatDateForStage(dateTo) + ')');
+
                                 }())
 
-                            // Adding download results buttons
-                            span  (
-                            a(class='download-csv' id='#{stageDescription.id}' href='#!') csv
-                            span ,&nbsp
-                            a(class='download-pdf' id='#{stageDescription.id}' href='#!') pdf
-                            span )
+
 
 
                         // Inner block (hidden)
                         div.collapsible-body
-                            +create-graph-result(feedbackStage.feedback_form.questions, stageDescription.answers, stageDescription.voted_users.length)
+                            +create-graph-result(feedbackStage.feedback_form.questions, feedbackStage.answers, teacher.id, feedbackStage.voted_users.length)

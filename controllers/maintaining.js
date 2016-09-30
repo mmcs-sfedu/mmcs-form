@@ -199,7 +199,17 @@ function getSurveysResults(whereClause, res, callback) {
             {
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
                 model: models.answer,
-                required: true
+                required: true,
+                include: [
+                    {
+                        attributes: {exclude: ['createdAt', 'updatedAt']},
+                        model: models.discipline
+                    },
+                    {
+                        attributes: {exclude: ['createdAt', 'updatedAt']},
+                        model: models.teacher
+                    }
+                ]
             },
             // {
             //     attributes: { exclude: ['createdAt', 'updatedAt'] },
@@ -223,7 +233,17 @@ function getSurveysResults(whereClause, res, callback) {
             {
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
                 model: models.voted_user,
-                required: true
+                required: true,
+                include: [
+                    {
+                        attributes: {exclude: ['createdAt', 'updatedAt']},
+                        model: models.discipline
+                    },
+                    {
+                        attributes: {exclude: ['createdAt', 'updatedAt']},
+                        model: models.teacher
+                    }
+                ]
             },
             {
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
@@ -251,7 +271,18 @@ function getSurveysResults(whereClause, res, callback) {
             /* To convert this value to usual object and make it client-side-readable. */
             results = results.map(function(result){ return result.toJSON() });
 
-        // TODO кэшировать дисциплины и учителей, заполнять их здесь
+
+        for (var fsInd in results) {
+            var fs = results[fsInd];
+
+            fs['uteachers'] = {};
+
+            for (var ansInd in fs['answers']) {
+                var answer = fs['answers'][ansInd];
+                fs['uteachers'][answer['teacher']['id']] = answer['teacher'];
+                // fs['uteachers'][answer['teacher']['id']]['discipline'] = answer['discipline'];
+            }
+        }
 
             callback(results);
         }

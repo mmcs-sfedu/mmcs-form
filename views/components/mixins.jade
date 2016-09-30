@@ -55,7 +55,7 @@ mixin create-nav-column(name, description, url)
 
 
 // Creates survey item graph to represent it's results. All params are necessary.
-mixin create-graph-result(questionsAndAnswers, answers, usersCount)
+mixin create-graph-result(questionsAndAnswers, answers, teacherID, usersCount)
     // margins
     div.as-p-padding
         - for (var i = 0; i < questionsAndAnswers.length; i++) {
@@ -68,7 +68,7 @@ mixin create-graph-result(questionsAndAnswers, answers, usersCount)
         // counting total answers
         -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
         -       for (var k = 0; k < answers.length; k++) {
-        -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
+        -           if (answers[k].teacher_id == teacherID && answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
         -               totalVotesInQuestion++;
         -           }
         -       }
@@ -78,7 +78,7 @@ mixin create-graph-result(questionsAndAnswers, answers, usersCount)
         -   for (var j = 0; j < questionsAndAnswers[i].possible_answers.length; j++) {
         -       var count = 0;
         -       for (var k = 0; k < answers.length; k++) {
-        -           if (answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
+        -           if (answers[k].teacher_id == teacherID && answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
         -               count++;
         -           }
         -       }

@@ -34,9 +34,27 @@ module.exports = function(sequelize, DataTypes) {
                             allowNull: false
                         }
                     });
+                    models.discipline.hasMany(answer, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'discipline_id',
+                            allowNull: false
+                        }
+                    });
+                    models.teacher.hasMany(answer, {
+                        onDelete: 'cascade',
+                        onUpdate: 'cascade',
+                        foreignKey: {
+                            name: 'teacher_id',
+                            allowNull: false
+                        }
+                    });
 
                     answer.belongsTo(models.feedback_stage,  { foreignKey: 'feedback_stage_id' });
                     answer.belongsTo(models.possible_answer, { foreignKey: 'possible_answer_id' });
+                    answer.belongsTo(models.discipline,  { foreignKey: 'discipline_id' });
+                    answer.belongsTo(models.teacher, { foreignKey: 'teacher_id' });
                 }
             }
         });
