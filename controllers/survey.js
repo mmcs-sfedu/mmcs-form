@@ -108,7 +108,7 @@ function getStageDescriptions(req, callback) {
                             bannedTeachers.push(votedUser['teacher_id']);
 
                             if (bannedDisciplines[votedUser['discipline_id']] == null) {
-                                bannedDisciplines[votedUser['discipline_id']] = 0;
+                                bannedDisciplines[votedUser['discipline_id']] = 1;
                             } else
                                 bannedDisciplines[votedUser['discipline_id']] += 1;
                         }
@@ -260,8 +260,10 @@ function checkStageAvailabilityForUser(stageDescriptionId, disciplineID, teacher
                 ]
         }).then(function(stage) {
 
-            if (!stage || stage.length == 0)
+            if (!stage || stage.length == 0) {
                 return callback(false);
+            }
+
 
             // var normalStage = utilsController.toNormalArray(stage);
 
@@ -275,21 +277,25 @@ function checkStageAvailabilityForUser(stageDescriptionId, disciplineID, teacher
                 function (error, response, body) {
 
                     var parsed = JSON.parse(body);
-                    if (!parsed)
-                        return callback(false);
+                    if (!parsed) {
+                       return callback(false);
+                    }
 
                     if (!error && response.statusCode == 200) {
+
                         var resp = parsed['response'];
 
                             var bannedDisciplines = {};
                             var bannedTeachers = [];
+
+
 
                             // Проверка на лимит 2 дисциплин.
                             for (var vUserInd in stage['voted_users']) {
                                 var votedUser = stage['voted_users'][vUserInd];
                                 bannedTeachers.push(votedUser['teacher_id']);
                                 if (bannedDisciplines[votedUser['discipline_id']] == null) {
-                                    bannedDisciplines[votedUser['discipline_id']] = 0;
+                                    bannedDisciplines[votedUser['discipline_id']] = 1;
                                 } else
                                     bannedDisciplines[votedUser['discipline_id']] += 1;
                             }
@@ -299,20 +305,18 @@ function checkStageAvailabilityForUser(stageDescriptionId, disciplineID, teacher
                                 var discipline = resp[discInd];
 
                                 if (discipline['ID'] == disciplineID) {
+
                                     if (bannedDisciplines[discipline['ID']] == null || bannedDisciplines[discipline['ID']] < 2) {
-
-
 
                                         // Проверка, что уже голосовал за учителя.
                                         for (var teacherInd in bannedTeachers) {
                                             var teacher = bannedTeachers[teacherInd];
                                             for (var discTecInd in discipline['Teachers']) {
-                                                if (teacher == discipline['Teachers'][discTecInd]['ID']) {
+                                                if (teacher == teacherID && teacher == discipline['Teachers'][discTecInd]['ID']) {
                                                     return callback(false);
                                                 }
                                             }
                                         }
-
 
 
 
