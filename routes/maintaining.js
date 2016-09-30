@@ -92,10 +92,10 @@ router.get('/schedule', checklist, function(req, res, next) {
         callback(null, forms);
     })});
     // Then getting all disciplines from BRS.
-    functionsToExecute.push(function(callback) {maintainingController.getAllDisciplines(res, function(disciplines) {
-        preparedDisciplines = disciplines;
-        callback(null, disciplines);
-    })});
+    // functionsToExecute.push(function(callback) {maintainingController.getAllDisciplines(res, function(disciplines) {
+    //     preparedDisciplines = disciplines;
+    //     callback(null, disciplines);
+    // })});
 
     /* Running an array of functions. */
     async.parallel(functionsToExecute, function(err, result) {

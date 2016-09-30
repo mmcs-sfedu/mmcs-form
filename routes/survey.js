@@ -113,7 +113,11 @@ router.post('/finish', checklist, function(req, res, next) {
                 req.body['possible_answers'],     // user's answers
                 req.body['feedback_stage_id'], // answered stage
                 req.body['discipline_id'],
+                checkResult['discipline'],
                 req.body['teacher_id'],
+                checkResult['teacher_fn'],
+                checkResult['teacher_sn'],
+                checkResult['teacher_ln'],
                 res                               // res to draw response page
             );
         } else {

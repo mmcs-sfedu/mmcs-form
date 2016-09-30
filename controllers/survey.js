@@ -215,7 +215,7 @@ function getFormsQuestionsForStage(stageDescriptionId, discData, callback) {
 
         // Populating data about the discipline.
         formJsObject['subject'] = discData['discipline'];
-        formJsObject['teacher'] = discData['teacher'];
+        formJsObject['teacher'] = discData['teacher_ln'] + " " + discData['teacher_fn'] + " " + discData['teacher_sn'];
 
         /* Returning found form to student. */
         callback(formJsObject);
@@ -321,15 +321,19 @@ function checkStageAvailabilityForUser(stageDescriptionId, disciplineID, teacher
 
 
                                         var discName = discipline['DisciplineName'];
-                                        var teacherName = "";
+                                        var teacherLN = "";
+                                        var teacherFN = "";
+                                        var teacherSN = "";
                                         for (var teacherInd2 in discipline['Teachers']) {
                                             var teacher2 = discipline['Teachers'][teacherInd2];
                                             if (teacher2['ID'] == teacherID) {
-                                                teacherName = teacher2['LastName'] + " " + teacher2['FirstName'] + " " + teacher2['SecondName'];
+                                                teacherLN = teacher2['LastName'];
+                                                teacherFN = teacher2['FirstName'];
+                                                teacherSN = teacher2['SecondName'];
                                             }
                                         }
 
-                                        return callback({ discipline : discName, teacher: teacherName });
+                                        return callback({ discipline : discName, teacher_fn: teacherFN, teacher_sn: teacherSN, teacher_ln: teacherLN });
                                     } else {
                                         return callback(false);
                                     }
@@ -413,7 +417,7 @@ function checkStageAvailabilityForUser(stageDescriptionId, disciplineID, teacher
  * @param {Array} usersAnswers User's answers for that survey.
  * @param {Object} res To draw response page.
  */
-function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, teacherId, res) {
+function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, disciplineName, teacherId, teacherFN, teacherSN, teacherLN, res) {
     /* Using same format to get possible answers (user's answers) IDs. */
     usersAnswers = JSON.parse('[' + usersAnswers + ']');
 
@@ -430,28 +434,51 @@ function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, teacherId, re
         });
     }
 
-    /* Transaction to insert both voted user and his answers data. */
-    return models.sequelize.transaction(
-        { autocommit: false },   // without false param returns an error
-        function (t) {
-            return models.voted_user
-                .create({           // creating voted user record
-                    feedback_stage_id: stageId,
-                    account_id: authController.getStudentsAuthorization(req.session),
-                    discipline_id: disciplineId,
-                    teacher_id: teacherId,
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                }, { transaction: t })
-                .then(function () { // when voted user data inserted, adding his answers
-                    return models.answer.bulkCreate(answers, { transaction: t });
-                });
-        }).then(function (result) { // when transaction successfully completed - rendering ok page
+
+    function transact() {
+        /* Transaction to insert both voted user and his answers data. */
+        return models.sequelize.transaction(
+            { autocommit: false },   // without false param returns an error
+            function (t) {
+                return models.voted_user
+                    .create({           // creating voted user record
+                        feedback_stage_id: stageId,
+                        account_id: authController.getStudentsAuthorization(req.session),
+                        discipline_id: disciplineId,
+                        teacher_id: teacherId,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    }, { transaction: t })
+                    .then(function () { // when voted user data inserted, adding his answers
+                        return models.answer.bulkCreate(answers, { transaction: t });
+                    });
+            }).then(function (result) { // when transaction successfully completed - rendering ok page
             res.render('pages/survey/finish');
         }).catch(function (err) {   // when an error occurred with transaction - rendering error page
             res.render('error', {
                 message: "Произошла ошибка в транзакции записи результата голосования!",
                 error: {}
             });
+        });
+    }
+
+    function teachers() {
+        return utilsController.updateOrCreate(models.teacher, {id:teacherId},
+            {id:teacherId, discipline_id: disciplineId, first_name:teacherFN, second_name:teacherSN, last_name:teacherLN, createdAt: new Date(), updatedAt: new Date()},
+            function () {
+                return transact();
+            },
+            function () {
+                return transact();
+            });
+    }
+
+    return utilsController.updateOrCreate(models.discipline, {id:disciplineId},
+        {id:disciplineId, name:disciplineName, createdAt: new Date(), updatedAt: new Date()},
+        function () {
+            return teachers();
+        },
+        function () {
+            return teachers();
         });
 }

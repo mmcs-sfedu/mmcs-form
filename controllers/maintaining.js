@@ -194,43 +194,36 @@ function getSurveysResults(whereClause, res, callback) {
     models.feedback_stage.findAll({
         attributes: { exclude: ['createdAt', 'updatedAt'] }, // we don't like data with dates
         order: 'date_to DESC',
+        where: whereClause,
         include: [
             {
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
-                model: models.stage_description,
-                where: whereClause,
-                required: true,
-                include: [
-                    {
-                        attributes: { exclude: ['createdAt', 'updatedAt'] },
-                        model: models.answer,
-                        required: true
-                    },
-                    {
-                        attributes: { exclude: ['createdAt', 'updatedAt'] },
-                        model: models.discipline,
-                        required: true,
-                        include: [
-                            {
-                                attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                model: models.subject
-                            },
-                            {
-                                attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                model: models.teacher
-                            },
-                            {
-                                attributes: { exclude: ['createdAt', 'updatedAt'] },
-                                model: models.group
-                            }
-                        ]
-                    },
-                    {
-                        attributes: ['stage_description_id'],
-                        model: models.voted_user,
-                        required: true
-                    }
-                ]
+                model: models.answer,
+                required: true
+            },
+            // {
+            //     attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //     model: models.discipline,
+            //     required: true,
+            //     include: [
+            //         {
+            //             attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //             model: models.subject
+            //         },
+            //         {
+            //             attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //             model: models.teacher
+            //         },
+            //         {
+            //             attributes: { exclude: ['createdAt', 'updatedAt'] },
+            //             model: models.group
+            //         }
+            //     ]
+            // },
+            {
+                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                model: models.voted_user,
+                required: true
             },
             {
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
@@ -257,6 +250,8 @@ function getSurveysResults(whereClause, res, callback) {
 
             /* To convert this value to usual object and make it client-side-readable. */
             results = results.map(function(result){ return result.toJSON() });
+
+        // TODO кэшировать дисциплины и учителей, заполнять их здесь
 
             callback(results);
         }

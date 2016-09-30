@@ -1,7 +1,35 @@
 /* Public methods */
 module.exports =
 {
-    toNormalArray : toNormalArray
+    toNormalArray : toNormalArray,
+
+    updateOrCreate : function (model, where, newItem, onCreate, onUpdate, onError) {
+        // First try to find the record
+        model.findOne({where: where}).then(function (foundItem) {
+            if (!foundItem) {
+                // Item not found, create a new one
+                model.create(newItem)
+                    .then(function () {
+                        onCreate();
+                    })
+                    .error(function (err) {
+                        onError(err);
+                    });
+            } else {
+                // Found an item, update it
+                model.update(newItem, {where: where})
+                    .then(function () {
+                        onUpdate();
+                    })
+                    .catch(function (err) {
+                        onError(err);
+                    });
+                ;
+            }
+        }).catch(function (err) {
+            onError(err);
+        });
+    }
 };
 
 /**
