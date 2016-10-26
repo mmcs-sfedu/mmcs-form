@@ -190,6 +190,9 @@ var forms = {
             requestBody["name"] = formName;
         }
 
+        var description = $('#description').val();
+        requestBody["description"] = description;
+
         /* A div containing all questions. */
         var questionsBlock = forms.context.find('div.questions');
 

@@ -52,6 +52,11 @@ block content
                     input(id='name' type='text' class='validate' autocomplete='off')
                     label(for='name') Название формы
 
+                div(class='description-field')
+                    label(for='description') Описание
+                    textarea(id='description' rows='10')
+                    
+
                 // Here will be questions with answers for form
                 div(class='questions')
 
@@ -66,3 +71,4 @@ block content
             div.modal-footer
                 a(id='cancelForm' href='#!' class='modal-action modal-close waves-effect waves-teal btn-flat') Отмена
                 a(id='submitQuestions' class='waves-effect waves-teal btn-flat') Создать
+

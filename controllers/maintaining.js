@@ -519,6 +519,8 @@ function addForm(body, callback) {
         return;
     }
 
+    var description = body['description'];
+
     /* Checking request body questions array. */
     var questions = body['questions'];
     if (questions == null || Object.keys(questions).length == 0) {
@@ -533,9 +535,11 @@ function addForm(body, callback) {
     models.sequelize.transaction(
         { autocommit: false }, // transactions don't work without that param
         function(t) {
+            console.log(description);
             // Creating feedback form first.
             return models.feedback_form.create({
                 name: name,
+                description: description,
                 createdAt: new Date(),
                 updatedAt: new Date()
             }, { transaction: t }) // in the same transaction
