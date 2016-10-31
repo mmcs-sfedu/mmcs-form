@@ -13,6 +13,14 @@ module.exports = function(sequelize, DataTypes) {
             teacher_id: {
                 type: DataTypes.INTEGER,
                 notNull: true
+            },
+            student_group: {
+                type: DataTypes.INTEGER,
+                notNull: true
+            },
+            student_course: {
+                type: DataTypes.INTEGER,
+                notNull: true
             }
         },
         {

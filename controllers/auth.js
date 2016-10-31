@@ -15,7 +15,8 @@ module.exports =
 
     getStudentsName : getStudentsName,
 
-    // getStudentsGroupId : getStudentsGroupId,
+    getStudentsGroup : getStudentsGroup,
+    getStudentsCourse : getStudentsCourse,
 
     studentLogout : studentLogout,
 
@@ -48,7 +49,7 @@ module.exports =
  * */
 function studentAttemptLogin (req, login, password, callback) {
     /* Making async request with login and password to BRS. */
-    brsController.attemptForStudentsAuth(login, password, function(error, studentID, groupID, studentName) {
+    brsController.attemptForStudentsAuth(login, password, function(error, studentID, group, course, studentName) {
 
        /* If there is no errors. */
        if (error) {
@@ -57,13 +58,13 @@ function studentAttemptLogin (req, login, password, callback) {
        }
 
        /* And all data was provided. */
-       if (studentID == null || groupID == null || studentName == null) {
+       if (studentID == null || group == null || course == null || studentName == null) {
            callback('При получении данных от БРС произошла ошибка.');
            return;
        }
 
        /* Than authorizing student (saving student's data in session). */
-       saveStudentsDataInSession(req, studentID, groupID, studentName);
+       saveStudentsDataInSession(req, studentID, group, course, studentName);
        callback();
     });
 
@@ -78,10 +79,11 @@ function studentAttemptLogin (req, login, password, callback) {
  * @param {Integer} groupID Student's group.
  * @param {String} studentName Student's name.
  * */
-function saveStudentsDataInSession(req, studentID, groupID, studentName) {
+function saveStudentsDataInSession(req, studentID, group, course, studentName) {
     req.session.student = {
         id    : studentID,
-        group : groupID,
+        group : group,
+        course: course,
         name  : studentName
     }
 }
@@ -114,9 +116,15 @@ function getStudentsName (session) {
  * @param {Object} session To get student's data.
  * @returns {Object} Authorized student's group ID.
  * */
-function getStudentsGroupId(session) {
+function getStudentsGroup(session) {
     if (session != null && session.student != null && session.student.group != null)
         return session.student.group;
+    return null;
+}
+
+function getStudentsCourse(session) {
+    if (session != null && session.student != null && session.student.group != null)
+        return session.student.course;
     return null;
 }
 

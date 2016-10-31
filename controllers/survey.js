@@ -417,7 +417,7 @@ function checkStageAvailabilityForUser(stageDescriptionId, disciplineID, teacher
  * @param {Array} usersAnswers User's answers for that survey.
  * @param {Object} res To draw response page.
  */
-function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, disciplineName, teacherId, teacherFN, teacherSN, teacherLN, res) {
+function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, disciplineName, teacherId, course, group, teacherFN, teacherSN, teacherLN, res) {
     /* Using same format to get possible answers (user's answers) IDs. */
     usersAnswers = JSON.parse('[' + usersAnswers + ']');
 
@@ -430,7 +430,9 @@ function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, disciplineNam
             teacher_id: teacherId,
             discipline_id: disciplineId,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            student_course: course,
+            student_group: group
         });
     }
 
@@ -446,6 +448,7 @@ function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, disciplineNam
                         account_id: authController.getStudentsAuthorization(req.session),
                         discipline_id: disciplineId,
                         teacher_id: teacherId,
+
                         createdAt: new Date(),
                         updatedAt: new Date()
                     }, { transaction: t })

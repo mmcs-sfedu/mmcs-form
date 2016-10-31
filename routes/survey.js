@@ -108,6 +108,9 @@ router.post('/finish', checklist, function(req, res, next) {
         // Yes, he can vote for this stage.
         if (checkResult) {
             /* Saving student's answer */
+            var studGroup = authController.getStudentsGroup(req.session);
+            var studCourse = authController.getStudentsCourse(req.session);
+
             surveyController.saveUsersAnswer(
                 req,
                 req.body['possible_answers'],     // user's answers
@@ -115,6 +118,8 @@ router.post('/finish', checklist, function(req, res, next) {
                 req.body['discipline_id'],
                 checkResult['discipline'],
                 req.body['teacher_id'],
+                studCourse,
+                studGroup,
                 checkResult['teacher_fn'],
                 checkResult['teacher_sn'],
                 checkResult['teacher_ln'],

@@ -80,6 +80,9 @@ mixin create-graph-result(questionsAndAnswers, answers, teacherID, usersCount)
         -       for (var k = 0; k < answers.length; k++) {
         -           if (answers[k].teacher_id == teacherID && answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
         -               count++;
+        -               var student = "Студент из " + answers[k].student_group + " группы " + answers[k].student_course + "го курса";
+                        div(style="display: block; color: red;")
+                            span= student
         -           }
         -       }
         // getting part of votes for that answer from total votes count
@@ -92,6 +95,7 @@ mixin create-graph-result(questionsAndAnswers, answers, teacherID, usersCount)
                 // drawing ratio line
                 div(class='vote-line' style='width:#{proportion}%;')
                 br
+
         -   }
             i Всего проголосовавших:&nbsp
             i= totalVotesInQuestion

@@ -7,7 +7,7 @@ div(class='student-auth-context')
             // if student is authorized
             div(class='col l7 m7 s5 right-align')
                 p.white-text #{controller.authModule.getStudentsName(session)}
-            div(class='col l1 m1 s2')
+            div(class='col l1 m1 s2 btn-logout', style="float:right")
                 h6
                 // a link to logout for user
                 a(href='/student/logout')

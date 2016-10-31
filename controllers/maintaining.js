@@ -535,7 +535,6 @@ function addForm(body, callback) {
     models.sequelize.transaction(
         { autocommit: false }, // transactions don't work without that param
         function(t) {
-            console.log(description);
             // Creating feedback form first.
             return models.feedback_form.create({
                 name: name,

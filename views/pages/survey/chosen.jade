@@ -43,7 +43,7 @@ block content
 
                                     // Rendering answers for question
                                     each answer in question.possible_answers
-                                        p
+                                        p(style="display: inline-block")
                                             input(type='radio' name='#{question.id}' id='#{answer.id}')
                                             label(class='white-text' for='#{answer.id}')= answer.text
 
