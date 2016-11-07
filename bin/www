@@ -13,7 +13,7 @@ var models = require('../models'); // all db logic is in models
  * Get port from environment and store in Express.
  */
 
-var default_port = '3000';
+var default_port = '3001';
 
 var port = normalizePort(process.env.PORT || default_port);
 app.set('port', port);
