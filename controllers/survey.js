@@ -117,6 +117,9 @@ function getStageDescriptions(req, callback) {
                         stage['disciplines'] = [];
                         for (var discInd in resp) {
                             var discipline = resp[discInd];
+ 			    if(discipline.DisciplineName == 'Иностранный язык') {
+			       continue;
+		            }                            
 
                             if ((bannedDisciplines[discipline['ID']] == null || bannedDisciplines[discipline['ID']] < 2)) {
 
