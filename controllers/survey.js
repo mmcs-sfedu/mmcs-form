@@ -117,7 +117,7 @@ function getStageDescriptions(req, callback) {
                         stage['disciplines'] = [];
                         for (var discInd in resp) {
                             var discipline = resp[discInd];
- 			    if(discipline.DisciplineName == 'Иностранный язык') {
+ 			    if(discipline.DisciplineName == 'Иностранный язык' || discipline.DisciplineName == 'Курсовая работа') {
 			       continue;
 		            }                            
 
