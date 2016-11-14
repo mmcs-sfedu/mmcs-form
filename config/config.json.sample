@@ -1,0 +1,34 @@
+{ "_comment": "This file contains database configurations.",
+
+  "development": {
+    "username": "mmcs_form_dev",
+    "password": "anyDevPass",
+    "database": "mmcs_form_dev",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "logging": false,
+    "api": {
+        "url": "http://grade.sfedu.ru",
+        "token": "myFavouriteToken"
+    }
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "mmcs_form",
+    "password": "mySecurePassword",
+    "database": "mmcs_form",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "logging": false,
+    "api": {
+        "url": "http://grade.sfedu.ru",
+        "token": "mySecretToken"
+    }
+  }
+}

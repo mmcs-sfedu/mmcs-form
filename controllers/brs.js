@@ -1,4 +1,6 @@
 var request = require('request');
+var env       = process.env.NODE_ENV || 'development';
+var config    = require(__dirname + '/../config/config.json')[env];
 
 module.exports =
 {
@@ -6,8 +8,8 @@ module.exports =
     attemptForStudentsAuth : function(login, password, callback) {
 
         request.get(
-            'http://users.mmcs.sfedu.ru/~test_rating/api/v0/auth/userinfo?' +
-            'token=fc0e5f16a22c3196e052d7fdf20a710f19419607' + '&' +
+            config.api.url + '/api/v0/auth/userinfo?' +
+            'token=' + config.api.token + '&' +
             'login=' + login + '&' +
             'password=' + password,
             { form: {

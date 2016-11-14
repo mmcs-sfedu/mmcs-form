@@ -28,6 +28,7 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         {
+	    timestamps: false,
             classMethods: {
                 associate: function(models) {
                     models.feedback_stage.hasMany(answer, {

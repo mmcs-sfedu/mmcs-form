@@ -1,0 +1,8 @@
+{
+    "_comment": "Store here all admins auth data (login and inside his password (md5) and name).",
+
+    "admin" : {
+        "password" : "202cb962ac59075b964b07152d234b70",
+        "name"     : "Администратор"
+    }
+}

@@ -8,3 +8,7 @@ build
 # Excluding database configs from repository updates:
 config/config.json
 config/admins.json
+
+# Excluding builded files
+public/css/*.css
+

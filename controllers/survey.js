@@ -4,6 +4,9 @@ var utilsController   = require('../controllers/utils');
 
 var request = require('request');
 
+var env       = process.env.NODE_ENV || 'development';
+var config    = require(__dirname + '/../config/config.json')[env];
+
 /* To access DB. */
 var models = require('../models');
 
@@ -77,8 +80,8 @@ function getStageDescriptions(req, callback) {
 
 
         request.get(
-            'http://users.mmcs.sfedu.ru/~test_rating/api/v0/subject/listForStudentID?' +
-            'token=fc0e5f16a22c3196e052d7fdf20a710f19419607' + '&' +
+            config.api.url + '/api/v0/subject/listForStudentID?' +
+            'token=' + config.api.token + '&' +
             'studentID=' + authorizedUserId,
             { form: {} },
             function (error, response, body) {
@@ -273,8 +276,8 @@ function checkStageAvailabilityForUser(stageDescriptionId, disciplineID, teacher
 
 
             request.get(
-                'http://users.mmcs.sfedu.ru/~test_rating/api/v0/subject/listForStudentID?' +
-                'token=fc0e5f16a22c3196e052d7fdf20a710f19419607' + '&' +
+                config.api.url + '/api/v0/subject/listForStudentID?' +
+                'token=' + config.api.token + '&' +
                 'studentID=' + studentID,
                 {form: {}},
                 function (error, response, body) {
@@ -432,8 +435,6 @@ function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, disciplineNam
             feedback_stage_id: stageId,
             teacher_id: teacherId,
             discipline_id: disciplineId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
             student_course: course,
             student_group: group,
             student_degree: degree
@@ -452,7 +453,6 @@ function saveUsersAnswer(req, usersAnswers, stageId, disciplineId, disciplineNam
                         account_id: authController.getStudentsAuthorization(req.session),
                         discipline_id: disciplineId,
                         teacher_id: teacherId,
-
                         createdAt: new Date(),
                         updatedAt: new Date()
                     }, { transaction: t })
