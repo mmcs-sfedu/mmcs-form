@@ -49,7 +49,7 @@ module.exports =
  * */
 function studentAttemptLogin (req, login, password, callback) {
     /* Making async request with login and password to BRS. */
-    brsController.attemptForStudentsAuth(login, password, function(error, studentID, group, course, studentName) {
+    brsController.attemptForStudentsAuth(login, password, function(error, studentID, group, course, degree, studentName) {
 
        /* If there is no errors. */
        if (error) {
@@ -64,7 +64,7 @@ function studentAttemptLogin (req, login, password, callback) {
        }
 
        /* Than authorizing student (saving student's data in session). */
-       saveStudentsDataInSession(req, studentID, group, course, studentName);
+       saveStudentsDataInSession(req, studentID, group, course, degree, studentName);
        callback();
     });
 
@@ -79,11 +79,12 @@ function studentAttemptLogin (req, login, password, callback) {
  * @param {Integer} groupID Student's group.
  * @param {String} studentName Student's name.
  * */
-function saveStudentsDataInSession(req, studentID, group, course, studentName) {
+function saveStudentsDataInSession(req, studentID, group, course, degree, studentName) {
     req.session.student = {
         id    : studentID,
         group : group,
         course: course,
+        degree: degree,
         name  : studentName
     }
 }
@@ -125,6 +126,12 @@ function getStudentsGroup(session) {
 function getStudentsCourse(session) {
     if (session != null && session.student != null && session.student.group != null)
         return session.student.course;
+    return null;
+}
+
+function getStudentsDegree(session) {
+    if (session != null && session.student != null && session.student.degree != null)
+        return session.student.degree;
     return null;
 }
 

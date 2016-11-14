@@ -21,6 +21,10 @@ module.exports = function(sequelize, DataTypes) {
             student_course: {
                 type: DataTypes.INTEGER,
                 notNull: true
+            },
+            student_degree: {
+                type: DataTypes.STRING,
+                notNull: true
             }
         },
         {

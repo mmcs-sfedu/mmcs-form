@@ -110,6 +110,7 @@ router.post('/finish', checklist, function(req, res, next) {
             /* Saving student's answer */
             var studGroup = authController.getStudentsGroup(req.session);
             var studCourse = authController.getStudentsCourse(req.session);
+            var studDegree = authController.getStudentsDegree(req.session);
 
             surveyController.saveUsersAnswer(
                 req,
@@ -120,6 +121,7 @@ router.post('/finish', checklist, function(req, res, next) {
                 req.body['teacher_id'],
                 studCourse,
                 studGroup,
+                studDegree,
                 checkResult['teacher_fn'],
                 checkResult['teacher_sn'],
                 checkResult['teacher_ln'],
