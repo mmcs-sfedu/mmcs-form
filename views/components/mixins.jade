@@ -80,7 +80,7 @@ mixin create-graph-result(questionsAndAnswers, answers, teacherID, usersCount)
         -       for (var k = 0; k < answers.length; k++) {
         -           if (answers[k].teacher_id == teacherID && answers[k].possible_answer_id == questionsAndAnswers[i].possible_answers[j].id) {
         -               count++;
-        -               var student = "Студент из " + answers[k].student_group + " группы " + answers[k].student_course + "го курса";
+        -               var student = "Студент из " + answers[k].student_group + " группы " + answers[k].student_course + "го курса " + answers[k].student_degree;
                         div(style="display: block; color: red;")
                             span= student
         -           }

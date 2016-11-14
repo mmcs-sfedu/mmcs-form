@@ -17,6 +17,7 @@ module.exports =
 
     getStudentsGroup : getStudentsGroup,
     getStudentsCourse : getStudentsCourse,
+    getStudentsDegree : getStudentsDegree,
 
     studentLogout : studentLogout,
 
