@@ -207,7 +207,8 @@ function getFormsQuestionsForStage(stageDescriptionId, discData, callback) {
                     {
                         // And answers for question.
                         attributes: { exclude: ['createdAt', 'updatedAt'] },
-                        model: models.possible_answer
+                        model: models.possible_answer,
+			order: [ ['id', 'ASC'] ],	
                     }
                 ]
             }
